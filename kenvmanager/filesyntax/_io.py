@@ -23,9 +23,13 @@ def is_file_environment_profile(file_path: Path) -> bool:
     """
     if not file_path.suffix == ".yml":
         return False
-    content = yaml.safe_load(file_path.open("r"))
+
+    with file_path.open("r") as file:
+        content = yaml.safe_load(file)
+
     if not content:
         return False
+
     return content.get("__magic__", "").startswith(KENV_PROFILE_MAGIC)
 
 
@@ -52,7 +56,8 @@ def get_all_profile_file_paths(locations: Optional[list[Path]] = None) -> list[P
 
 
 def _get_profile_identifier(file_path: Path) -> str:
-    asdict: dict = yaml.safe_load(file_path.open("r"))
+    with file_path.open("r") as file:
+        asdict: dict = yaml.safe_load(file)
     return asdict["identifier"]
 
 
@@ -82,7 +87,8 @@ def read_profile_from_file(
     """
     Generate an instance from a serialized file on disk.
     """
-    asdict: dict = yaml.safe_load(file_path.open("r"))
+    with file_path.open("r") as file:
+        asdict: dict = yaml.safe_load(file)
     del asdict["__magic__"]
 
     base_name: Optional[str] = asdict.get("base", None)
@@ -125,5 +131,6 @@ def write_profile_to_file(
             )
         asdict["base"] = base_profile.identifier
 
-    yaml.dump(asdict, file_path.open("w"))
+    with file_path.open("w") as file:
+        yaml.dump(asdict, file)
     return file_path
