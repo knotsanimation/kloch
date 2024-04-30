@@ -1,5 +1,6 @@
 import abc
 import argparse
+import json
 import logging
 import os
 import sys
@@ -94,7 +95,7 @@ class RunParser(BaseParser):
         command = self.command or None
         print(f"starting package manager {manager.name()}")
         LOGGER.debug(f"executing manager={manager} with command={command}")
-        LOGGER.debug(f"os.environ={os.environ}")
+        LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
         sys.exit(manager.execute(command=command))
 
     @classmethod
@@ -129,7 +130,10 @@ class ListParser(BaseParser):
         )
 
         profile_locations = kenvmanager.get_profile_locations()
-        print(f"Searching {len(profile_locations)} locations: {profile_locations} ...")
+        profile_locations_txt = [str(path) for path in profile_locations]
+        print(
+            f"Searching {len(profile_locations)} locations: {profile_locations_txt} ..."
+        )
 
         profile_paths = kenvmanager.get_all_profile_file_paths(profile_locations)
         profiles: list[kenvmanager.EnvironmentProfileFileSyntax] = []
