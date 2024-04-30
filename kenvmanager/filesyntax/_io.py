@@ -125,5 +125,5 @@ def write_profile_to_file(
             )
         asdict["base"] = base_profile.identifier
 
-    yaml.serialize(asdict, file_path.open("w"))
+    yaml.dump(asdict, file_path.open("w"))
     return file_path
