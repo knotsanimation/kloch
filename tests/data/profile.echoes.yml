@@ -1,0 +1,11 @@
+__magic__: KenvEnvironmentProfile:1
+name: echoes
+identifier: knots:echoes
+version: 0.1.0
+#base: knots:echoes:beta
+content:
+  +=rezenv:
+    +=params:
+      verbosity: 0
+    +=requires:
+      - maya-2023
