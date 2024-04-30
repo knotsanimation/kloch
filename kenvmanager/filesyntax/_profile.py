@@ -81,7 +81,7 @@ class EnvironmentProfileFileSyntax:
             manager_class = get_package_manager_profile_class(manager_name)
             if not manager_class:
                 raise ValueError(
-                    f"No manager class registred with the name {manager_name}"
+                    f"No manager class registred with the name <{manager_name}>"
                 )
             manager = manager_class.from_dict(manager_config)
             managers.append(manager)

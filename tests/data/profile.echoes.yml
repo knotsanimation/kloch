@@ -6,6 +6,7 @@ version: 0.1.0
 content:
   +=rezenv:
     +=params:
-      verbosity: 0
+      - --verbose
+      - --verbose
     +=requires:
       - maya-2023

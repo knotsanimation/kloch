@@ -54,38 +54,3 @@ def get_package_manager_profile_class(
         if sub_class.name() == name:
             return sub_class
     return None
-
-
-def enforce_list_path_type(
-    src: Sequence[str],
-    path_exists: bool = True,
-    excludes=None,
-) -> list[str]:
-    excludes = excludes or []
-    converted = []
-    for path in src:
-        if path not in excludes:
-            path = Path(path)
-            if path_exists and not path.exists():
-                raise ValueError(f"path does not exist: {path}")
-        converted.append(str(path))
-    return converted
-
-
-def enforce_int_type(src: Union[str, int]):
-    # expected to raise if conversion not possible
-    return int(src)
-
-
-def enforce_callback_type(src: dict[str, str]) -> Callable:
-    module_name = src["module"]
-    function_name = src["function"]
-    user_module = importlib.import_module(module_name)
-    callback = getattr(user_module, function_name)
-    return callback
-
-
-def serialize_callback(callback: Callable):
-    module = inspect.getmodule(callback).__name__
-    function = callback.__name__
-    return {"module": module, "function": function}
