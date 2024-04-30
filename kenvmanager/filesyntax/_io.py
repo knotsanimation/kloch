@@ -24,6 +24,8 @@ def is_file_environment_profile(file_path: Path) -> bool:
     if not file_path.suffix == ".yml":
         return False
     content = yaml.safe_load(file_path.open("r"))
+    if not content:
+        return False
     return content.get("__magic__", "").startswith(KENV_PROFILE_MAGIC)
 
 
