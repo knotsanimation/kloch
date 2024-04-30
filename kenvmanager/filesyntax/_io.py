@@ -32,7 +32,7 @@ def get_profile_locations() -> list[Path]:
     if not locations:
         return []
 
-    locations = [Path(location) for location in locations.split(os.pathsep)]
+    locations = [Path(location).absolute() for location in locations.split(os.pathsep)]
     return locations
 
 
