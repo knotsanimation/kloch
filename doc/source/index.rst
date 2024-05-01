@@ -34,6 +34,7 @@ Contents
    :maxdepth: 2
 
    Home <self>
+   install
    cli
    file-format
    public-api
