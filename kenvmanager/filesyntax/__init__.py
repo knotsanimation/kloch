@@ -1,6 +1,7 @@
 from ._merging import refacto_dict
 from ._merging import deepmerge_dicts
 from ._merging import MergeRule
+from ._profile import PackageManagersProfile
 from ._profile import EnvironmentProfileFileSyntax
 from ._io import KENV_PROFILE_PATH_ENV_VAR
 from ._io import get_profile_locations

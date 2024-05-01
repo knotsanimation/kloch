@@ -1,5 +1,6 @@
 from .cli import getCli
 from . import filesyntax
+from .filesyntax import PackageManagersProfile
 from .filesyntax import EnvironmentProfileFileSyntax
 from .filesyntax import KENV_PROFILE_PATH_ENV_VAR
 from .filesyntax import read_profile_from_file

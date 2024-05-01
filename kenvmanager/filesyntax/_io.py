@@ -5,6 +5,7 @@ from typing import Optional
 
 import yaml
 
+from ._profile import PackageManagersProfile
 from ._profile import EnvironmentProfileFileSyntax
 
 
@@ -99,10 +100,13 @@ def read_profile_from_file(
         base_profile = read_profile_from_file(base_path)
         asdict["base"] = base_profile
 
-    profile = EnvironmentProfileFileSyntax.from_dict(asdict)
+    content = PackageManagersProfile(asdict["content"])
     if check_resolved:
-        # we check the resolved profile doesn't raise errors
-        profile.get_manager_profiles()
+        # discard output but ensure it doesn't raise error
+        content.get_package_managers()
+    asdict["content"] = content
+
+    profile = EnvironmentProfileFileSyntax.from_dict(asdict)
 
     return profile
 

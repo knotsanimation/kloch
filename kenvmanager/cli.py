@@ -84,7 +84,7 @@ class RunParser(BaseParser):
 
         print(f"Reading profile {profile_path} ...")
         profile = kenvmanager.read_profile_from_file(profile_path)
-        managers = profile.get_manager_profiles()
+        managers = profile.get_merged_profile().content.get_package_managers()
         if len(managers) > 1 or self.manager:
             if not self.manager:
                 raise ValueError(

@@ -9,12 +9,74 @@ import dataclasses
 from typing import Any
 from typing import Optional
 
+from ._merging import refacto_dict
 from ._merging import deepmerge_dicts
 from ._merging import MergeRule
-from kenvmanager.managers import get_package_manager_profile_class
-from kenvmanager.managers import PackageManagerProfileBase
 from kenvmanager.managers import get_package_manager_class
 from kenvmanager.managers import PackageManagerBase
+
+
+class PackageManagersProfile(dict[str, dict]):
+    """
+    A PackageManager serialized as a dict structure.
+
+    The dict structure include tokens that need to be resolved.
+    """
+
+    def __add__(self, other: "PackageManagersProfile") -> "PackageManagersProfile":
+        if not isinstance(other, PackageManagersProfile):
+            raise TypeError(
+                f"Cannot concatenate object of type {type(other)} with {type(self)}"
+            )
+
+        def key_resolve(key: str):
+            return key.removeprefix("+=")
+
+        def merge_rule(key: str):
+            return MergeRule.append if key.startswith("+=") else MergeRule.override
+
+        new_content = deepmerge_dicts(
+            over_content=other,
+            base_content=self,
+            key_resolve_callback=key_resolve,
+            merge_rule_callback=merge_rule,
+        )
+        return PackageManagersProfile(new_content)
+
+    def get_resolved(self) -> dict[str, dict]:
+        """
+        Get the dict structure with all tokens resolved.
+
+        Without tokens, the returned object is not a PackageManagersProfile instance anymore.
+        """
+
+        def pair_process(key: str, value: str):
+            new_key = key.removeprefix("+=")
+            return new_key, value
+
+        new_content = refacto_dict(
+            src_dict=self,
+            callback=pair_process,
+            recursive=True,
+        )
+        return new_content
+
+    def get_package_managers(self) -> list[PackageManagerBase]:
+        """
+        Unserialize the dict structure to PackageManager instances.
+        """
+        managers: list[PackageManagerBase] = []
+        content = self.get_resolved()
+        for manager_name, manager_config in content.items():
+            manager_class = get_package_manager_class(manager_name)
+            if not manager_class:
+                raise ValueError(
+                    f"No manager class registred with the name <{manager_name}>"
+                )
+            manager = manager_class.from_dict(manager_config)
+            managers.append(manager)
+
+        return managers
 
 
 @dataclasses.dataclass
@@ -22,17 +84,17 @@ class EnvironmentProfileFileSyntax:
     identifier: str
     version: str
     base: Optional["EnvironmentProfileFileSyntax"]
-    content: dict[str, dict]
+    content: PackageManagersProfile
 
     @classmethod
     def from_dict(cls, serialized: dict) -> "EnvironmentProfileFileSyntax":
         """
         Generate a profile instance from a serialized dict object.
         """
-        identifier = serialized["identifier"]
-        version = serialized["version"]
-        base = serialized.get("base", None)
-        content = serialized["content"]
+        identifier: str = serialized["identifier"]
+        version: str = serialized["version"]
+        base: Optional["EnvironmentProfileFileSyntax"] = serialized.get("base", None)
+        content: PackageManagersProfile = serialized["content"]
 
         return EnvironmentProfileFileSyntax(
             identifier=identifier,
@@ -55,37 +117,14 @@ class EnvironmentProfileFileSyntax:
         serialized["content"] = copy.deepcopy(self.content)
         return serialized
 
-    def get_resolved_content(self) -> dict[str, dict]:
-        """
-        Get the profile dict content with token resolved and merged with the specified base profile.
-        """
+    def get_merged_profile(self):
+        content = self.content
+        if self.base:
+            content = self.base.get_merged_profile().content + content
 
-        def key_resolve(key: str):
-            return key.removeprefix("+=")
-
-        def merge_rule(key: str):
-            return MergeRule.append if key.startswith("+=") else MergeRule.override
-
-        base_profile = self.base
-        base_content = base_profile.get_resolved_content() if base_profile else {}
-        new_content = deepmerge_dicts(
-            over_content=self.content,
-            base_content=base_content,
-            key_resolve_callback=key_resolve,
-            merge_rule_callback=merge_rule,
+        return EnvironmentProfileFileSyntax(
+            identifier=self.identifier,
+            version=self.version,
+            base=None,
+            content=content,
         )
-        return new_content
-
-    def get_manager_profiles(self) -> list[PackageManagerProfileBase]:
-        managers: list[PackageManagerProfileBase] = []
-        content = self.get_resolved_content()
-        for manager_name, manager_config in content.items():
-            manager_class = get_package_manager_profile_class(manager_name)
-            if not manager_class:
-                raise ValueError(
-                    f"No manager class registred with the name <{manager_name}>"
-                )
-            manager = manager_class.from_dict(manager_config)
-            managers.append(manager)
-
-        return managers
