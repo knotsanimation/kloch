@@ -54,11 +54,12 @@ class RunParser(BaseParser):
     """
 
     @property
-    def manager_name(self) -> str:
+    def manager(self) -> str:
         """
-        The name of a package manager to use in the provided profile.
+        The name of a package manager to use in the provided environment profile.
+        Only required if the profile define more than one package manager profile.
         """
-        return self._args.manager_name
+        return self._args.manager
 
     @property
     def profile_id(self) -> str:
@@ -83,16 +84,23 @@ class RunParser(BaseParser):
 
         print(f"Reading profile {profile_path} ...")
         profile = kenvmanager.read_profile_from_file(profile_path)
-        managers = [
-            manager
-            for manager in profile.get_manager_profiles()
-            if manager.name() == self.manager_name
-        ]
-        if not managers:
-            raise ValueError(
-                f"No package manager with name {self.manager_name} "
-                f"found in profile {self.profile_id}"
-            )
+        managers = profile.get_manager_profiles()
+        if len(managers) > 1 or self.manager:
+            if not self.manager:
+                raise ValueError(
+                    f"More than one package manager defined in profile "
+                    f"<{self.profile_id}>: you need to specify a manager name with --manager"
+                )
+
+            managers = [
+                manager for manager in managers if manager.name() == self.manager
+            ]
+            if not managers:
+                raise ValueError(
+                    f"No package manager with name <{self.manager}> "
+                    f"found in profile <{self.profile_id}>"
+                )
+
         manager = managers[0]
         command = self.command or None
 
@@ -110,14 +118,14 @@ class RunParser(BaseParser):
     def add_to_parser(cls, parser: argparse.ArgumentParser):
         super().add_to_parser(parser)
         parser.add_argument(
-            "manager_name",
-            type=str,
-            help=cls.manager_name.__doc__,
-        )
-        parser.add_argument(
             "profile_id",
             type=str,
             help=cls.profile_id.__doc__,
+        )
+        parser.add_argument(
+            "--manager",
+            type=str,
+            help=cls.manager.__doc__,
         )
         parser.add_argument(
             "--N0",
