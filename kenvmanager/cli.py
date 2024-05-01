@@ -65,6 +65,28 @@ class BaseParser:
         parser.set_defaults(func=cls)
 
 
+def _get_merged_profile(profile_identifiers: list[str]):
+    """
+    Merge each profile with its base then merge all of them from left to right.
+    """
+    profiles = []
+    for profile_id in profile_identifiers:
+        profile_path = kenvmanager.get_profile_file_path(profile_id)
+        if not profile_path:
+            raise ValueError(f"No profile with identifier <{profile_id}> found.")
+        LOGGER.debug(f"reading profile {profile_path}")
+        profile = kenvmanager.read_profile_from_file(profile_path)
+        profile = profile.get_merged_profile()
+        profiles.append(profile)
+
+    profile = profiles.pop(-1)
+    for base_profile in profiles:
+        profile.base = base_profile
+        profile = profile.get_merged_profile()
+
+    return profile
+
+
 class RunParser(BaseParser):
     """
     A "run" sub-command.
@@ -94,23 +116,10 @@ class RunParser(BaseParser):
         return self._args.command
 
     def execute(self):
-        profiles = []
-        for profile_id in self.profile_ids:
-            profile_path = kenvmanager.get_profile_file_path(profile_id)
-            if not profile_path:
-                raise ValueError(
-                    f"No profile found with associated identifier {profile_id}."
-                )
-            print(f"reading profile {profile_path} ...")
-            profile = kenvmanager.read_profile_from_file(profile_path)
-            profile = profile.get_merged_profile()
-            profiles.append(profile)
+        print(f"loading {len(self.profile_ids)} profiles ...")
+        profile = _get_merged_profile(self.profile_ids)
 
-        print(f"combining {len(profiles)} profiles")
-        managers = [profile.managers for profile in profiles]
-        managers = sum(managers[1:], managers[0])
-
-        managers = managers.unserialize()
+        managers = profile.managers.unserialize()
         if len(managers) > 1 or self.manager:
             if not self.manager:
                 raise ValueError(
@@ -212,23 +221,7 @@ class ResolveParser(BaseParser):
         return self._args.profile_ids
 
     def execute(self):
-        profiles = []
-        for profile_id in self.profile_ids:
-            profile_path = kenvmanager.get_profile_file_path(profile_id)
-            if not profile_path:
-                raise ValueError(
-                    f"No profile found with associated identifier {profile_id}."
-                )
-            LOGGER.debug(f"reading profile {profile_path}")
-            profile = kenvmanager.read_profile_from_file(profile_path)
-            profile = profile.get_merged_profile()
-            profiles.append(profile)
-
-        profile = profiles.pop(-1)
-        for base_profile in profiles:
-            profile.base = base_profile
-            profile = profile.get_merged_profile()
-
+        profile = _get_merged_profile(self.profile_ids)
         serialized = kenvmanager.serialize_profile(profile)
         print(serialized)
 
