@@ -26,11 +26,15 @@ class PackageManagerProfileBase:
         pass
 
     @abc.abstractmethod
-    def execute(self, command: Optional[list[str]] = None) -> int:
+    def execute(self, tmpdir: Path, command: Optional[list[str]] = None) -> int:
         """
         Start the given environment and execute this python session.
 
         Optionally execute the given command in the environment.
+
+        Args:
+            tmpdir: filesystem path to an existing temporary directory
+            command: optional list of command line arguments
 
         Returns:
             The exit code of the execution. 0 if successfull, else imply failure.

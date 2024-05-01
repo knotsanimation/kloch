@@ -4,6 +4,8 @@ import json
 import logging
 import os
 import sys
+import tempfile
+from pathlib import Path
 
 import kenvmanager
 
@@ -93,10 +95,16 @@ class RunParser(BaseParser):
             )
         manager = managers[0]
         command = self.command or None
+
         print(f"starting package manager {manager.name()}")
         LOGGER.debug(f"executing manager={manager} with command={command}")
         LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
-        sys.exit(manager.execute(command=command))
+
+        with tempfile.TemporaryDirectory(
+            prefix=f"{kenvmanager.__name__}-{manager.name()}",
+            ignore_cleanup_errors=True,
+        ) as tmpdir:
+            sys.exit(manager.execute(tmpdir=Path(tmpdir), command=command))
 
     @classmethod
     def add_to_parser(cls, parser: argparse.ArgumentParser):
