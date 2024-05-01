@@ -21,6 +21,8 @@ COMMAND = [
 COMMAND += sys.argv[1:]
 
 ENVIRON = dict(os.environ)
-ENVIRON["PYTHONPATH"] = f"{ENVIRON['PYTHONPATH']}{os.pathsep}{THISDIR.parent}"
+PYTHONPATH = f"{ENVIRON.get('PYTHONPATH', '')}{os.pathsep}{THISDIR.parent}"
+PYTHONPATH = PYTHONPATH.lstrip(os.pathsep)
+ENVIRON["PYTHONPATH"] = PYTHONPATH
 
 subprocess.check_call(COMMAND, cwd=THISDIR, env=ENVIRON)
