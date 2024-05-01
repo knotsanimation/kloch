@@ -1,0 +1,17 @@
+__magic__: KenvEnvironmentProfile:1
+identifier: knots:echoes
+version: 0.2.0
+managers:
+  +=rezenv:
+    +=config:
+      quiet: false
+      +=package_filter:
+        - excludes:
+            - glob(*.dev)
+        - excludes:
+            - after(1714574770)
+    +=params:
+      - --verbose
+    +=requires:
+      maya: 2023
+      houdini: 20.2

@@ -1,0 +1,15 @@
+__magic__: KenvEnvironmentProfile:1
+identifier: knots:echoes
+version: 0.2.0
+base: knots:echoes:beta
+managers:
+  +=rezenv:
+    +=config:
+      +=package_filter:
+        - excludes:
+            - after(1714574770)
+    +=params:
+      - --verbose
+    +=requires:
+      houdini: 20.2
+      -=devUtils: _
