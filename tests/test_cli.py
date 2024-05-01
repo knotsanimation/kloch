@@ -39,11 +39,14 @@ def test_getCli_list(monkeypatch, data_dir, capsys):
 def test_getCli_run(monkeypatch, data_dir):
     import subprocess
 
-    result = []
+    class Results:
+        command: list[str] = None
+        env: dict[str, str] = None
 
-    def patched_subprocess(*args, **kwargs):
-        result.append(args[0])
-        return subprocess.CompletedProcess([], 0)
+    def patched_subprocess(command, shell, env, *args, **kwargs):
+        Results.command = command
+        Results.env = env
+        return subprocess.CompletedProcess(command, 0)
 
     monkeypatch.setenv(kenvmanager.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
@@ -53,4 +56,7 @@ def test_getCli_run(monkeypatch, data_dir):
     with pytest.raises(SystemExit):
         cli.execute()
 
-    assert result[0][0].startswith("rez-env")
+    assert Results.command[0].startswith("rez-env")
+    assert "python-3.9" in Results.command
+    assert "--stats" in Results.command
+    assert Results.env.get("LXMCUSTOM") == "1"

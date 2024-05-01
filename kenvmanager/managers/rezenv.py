@@ -1,10 +1,12 @@
 import dataclasses
 import logging
 import os
+import re
 import subprocess
 from pathlib import Path
 from typing import Any
 from typing import Optional
+from typing import Union
 
 import yaml
 
@@ -23,6 +25,7 @@ class RezEnvManager(PackageManagerBase):
     requires: dict[str, str]
     params: list[str]
     config: dict
+    environ: dict[str, Union[str, list[str]]] = dataclasses.field(default_factory=dict)
 
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
         requires = [
@@ -33,6 +36,11 @@ class RezEnvManager(PackageManagerBase):
         full_command = ["rez-env"] + self.params + requires + command
 
         envvars = dict(os.environ)
+        for user_var, user_var_value in self.environ.items():
+            if isinstance(user_var_value, list):
+                user_var_value = [os.path.expandvars(arg) for arg in user_var_value]
+                user_var_value = os.pathsep.join(user_var_value)
+            envvars[user_var] = str(user_var_value)
 
         if self.config:
             config_path = tmpdir / "rezconfig.yml"
@@ -55,6 +63,7 @@ class RezEnvManager(PackageManagerBase):
             "params": self.params,
             "requires": self.requires,
             "config": self.config,
+            "environ": self.environ,
         }
 
     @classmethod
@@ -67,8 +76,10 @@ class RezEnvManager(PackageManagerBase):
         params = rezroot.get("params", [])
         package_requests = rezroot["requires"]
         config = rezroot.get("config", {})
+        environ = rezroot.get("environ", {})
         return RezEnvManager(
             requires=package_requests,
             params=params,
             config=config,
+            environ=environ,
         )

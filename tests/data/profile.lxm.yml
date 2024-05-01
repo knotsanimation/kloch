@@ -7,3 +7,5 @@ managers:
       - --stats
     +=requires:
       python: 3.9
+    environ:
+      LXMCUSTOM: 1
