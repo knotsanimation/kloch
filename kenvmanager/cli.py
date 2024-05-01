@@ -236,7 +236,7 @@ class ResolveParser(BaseParser):
         )
 
 
-def getCli(argv=None) -> BaseParser:
+def get_cli(argv=None) -> BaseParser:
     """
     Return the command line interface generated from user arguments provided.
 

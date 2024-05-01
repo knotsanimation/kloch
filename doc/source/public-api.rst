@@ -15,7 +15,7 @@ Summary
     kenvmanager.get_all_profile_file_paths
     kenvmanager.get_profile_locations
     kenvmanager.get_profile_file_path
-    kenvmanager.getCli
+    kenvmanager.get_cli
     kenvmanager.PackageManagersSerialized
     kenvmanager.read_profile_from_file
     kenvmanager.serialize_profile

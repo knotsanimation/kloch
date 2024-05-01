@@ -6,7 +6,7 @@ __all__ = [
     "get_all_profile_file_paths",
     "get_profile_locations",
     "get_profile_file_path",
-    "getCli",
+    "get_cli",
     "KENV_PROFILE_PATH_ENV_VAR",
     "PackageManagersSerialized",
     "read_profile_from_file",
@@ -14,7 +14,7 @@ __all__ = [
     "write_profile_to_file",
 ]
 
-from .cli import getCli
+from .cli import get_cli
 from . import filesyntax
 from .filesyntax import PackageManagersSerialized
 from .filesyntax import EnvironmentProfile

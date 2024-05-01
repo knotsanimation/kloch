@@ -7,7 +7,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def main():
-    cli = kenvmanager.getCli()
+    cli = kenvmanager.get_cli()
     log_level = logging.DEBUG if cli.debug else logging.INFO
     logging.basicConfig(
         level=log_level,

@@ -10,14 +10,14 @@ import kenvmanager.managers
 def test_getCli_subcommands():
     argv = [""]
     with pytest.raises(SystemExit):
-        kenvmanager.getCli(argv=argv)
+        kenvmanager.get_cli(argv=argv)
 
     argv = ["run", "_"]
-    cli = kenvmanager.getCli(argv=argv)
+    cli = kenvmanager.get_cli(argv=argv)
     assert isinstance(cli, kenvmanager.cli.RunParser)
 
     argv = ["list"]
-    cli = kenvmanager.getCli(argv=argv)
+    cli = kenvmanager.get_cli(argv=argv)
     assert isinstance(cli, kenvmanager.cli.ListParser)
 
 
@@ -25,7 +25,7 @@ def test_getCli_list(monkeypatch, data_dir, capsys):
     monkeypatch.setenv(kenvmanager.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
 
     argv = ["list"]
-    cli = kenvmanager.getCli(argv=argv)
+    cli = kenvmanager.get_cli(argv=argv)
     cli.execute()
 
     captured = capsys.readouterr()
@@ -52,7 +52,7 @@ def test_getCli_run(monkeypatch, data_dir):
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
     argv = ["run", "lxm"]
-    cli = kenvmanager.getCli(argv=argv)
+    cli = kenvmanager.get_cli(argv=argv)
     with pytest.raises(SystemExit):
         cli.execute()
 
