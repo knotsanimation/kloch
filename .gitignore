@@ -19,9 +19,6 @@ coverage.xml
 # PyCharm
 .idea/
 
-# Poetry
-poetry.lock
-
 # logging files
 *.log
 
