@@ -8,14 +8,14 @@ from typing import Optional
 
 import yaml
 
-from ._base import PackageManagerProfileBase
+from ._base import PackageManagerBase
 
 
 LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
-class RezEnvironmentProfile(PackageManagerProfileBase):
+class RezEnvManager(PackageManagerBase):
     """
     A datastructure that allow to create a rez environment.
     """
@@ -58,12 +58,12 @@ class RezEnvironmentProfile(PackageManagerProfileBase):
         return "rezenv"
 
     @classmethod
-    def from_dict(cls, src_dict: dict[str, Any]) -> "RezEnvironmentProfile":
+    def from_dict(cls, src_dict: dict[str, Any]) -> "RezEnvManager":
         rezroot = src_dict
         params = rezroot.get("params", [])
         package_requests = rezroot["requires"]
         config = rezroot.get("config", {})
-        return RezEnvironmentProfile(
+        return RezEnvManager(
             requires=package_requests,
             params=params,
             config=config,

@@ -13,6 +13,8 @@ from ._merging import deepmerge_dicts
 from ._merging import MergeRule
 from kenvmanager.managers import get_package_manager_profile_class
 from kenvmanager.managers import PackageManagerProfileBase
+from kenvmanager.managers import get_package_manager_class
+from kenvmanager.managers import PackageManagerBase
 
 
 @dataclasses.dataclass

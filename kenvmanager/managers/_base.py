@@ -15,7 +15,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
-class PackageManagerProfileBase:
+class PackageManagerBase:
     """
     A dataclass that describe how a package manager must start a software environment.
     """
@@ -23,6 +23,9 @@ class PackageManagerProfileBase:
     @classmethod
     @abc.abstractmethod
     def name(cls) -> str:
+        """
+        A unique name among all subclasses.
+        """
         pass
 
     @abc.abstractmethod
@@ -47,14 +50,15 @@ class PackageManagerProfileBase:
 
     @classmethod
     @abc.abstractmethod
-    def from_dict(cls, src_dict: dict[str, Any]) -> "PackageManagerProfileBase":
+    def from_dict(cls, src_dict: dict[str, Any]) -> "PackageManagerBase":
         pass
 
 
-def get_package_manager_profile_class(
-    name: str,
-) -> Optional[Type[PackageManagerProfileBase]]:
-    for sub_class in PackageManagerProfileBase.__subclasses__():
+def get_package_manager_class(name: str) -> Optional[Type[PackageManagerBase]]:
+    """
+    Get the PackageManagerBase class that correspond to the given unique name.
+    """
+    for sub_class in PackageManagerBase.__subclasses__():
         if sub_class.name() == name:
             return sub_class
     return None
