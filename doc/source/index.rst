@@ -1,23 +1,30 @@
 kenvmanager
 ===========
 
-``kenvmanager`` is a CLI writen in python, providing the environment managing
-task when used along a package manager.
+``kenvmanager`` is an environment manager which wrap requests sent to
+package managers.
 
-It was designed to be used with `rez <https://rez.readthedocs.io>`_.
+Those requests are stored as "environment profiles", serialized on disk
+as files in the yaml language.
 
-``kenvmanager`` define "environment profiles" which are yaml config files
-which store a serialized package manager request.
+In its current state, it only include support for `rez <https://rez.readthedocs.io>`_.
 
 .. literalinclude:: demo-a/profile.yml
    :language: yaml
    :caption: demo-profile.yml
 
-Which can the be used as :
+The above profile can be executed by using the CLI:
 
 .. code-block:: shell
 
    python -m kenvmanager run knots:echoes
+
+The profile system includes:
+
+- profile inheritance
+- token system to determine merging rules during inheritance
+- arbitrary profile locations definition through API and environment variable.
+- potential support for multiple package manager at once
 
 
 Contents
