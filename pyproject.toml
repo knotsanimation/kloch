@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "kenvmanager"
+version = "0.1.0"
+description = "Environment Manager CLI wrapping package managers calls as serialized config file"
+authors = ["Liam Collod <monsieurlixm@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+PyYAML = "^6.0.1"
+
+[tool.poetry.group.dev.dependencies]
+python = ">=3.9"
+black = { version = "^24.4.2", python = ">=3.9" }
+pytest = { version = "^8.2.0", python = ">=3.9" }
+Sphinx = { version = "^7.3.7" , python = ">=3.9" }
+furo = { version = "^2024.4.27", python = ">=3.9" }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
