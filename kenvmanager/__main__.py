@@ -15,8 +15,13 @@ def main():
         style="{",
         stream=sys.stdout,
     )
-    LOGGER.info(f"Starting {kenvmanager.__name__} v{kenvmanager.__version__}")
+    LOGGER.debug(f"starting {kenvmanager.__name__} v{kenvmanager.__version__}")
     LOGGER.debug(f"retrieved cli with args={cli._args}")
+
+    if cli.profile_paths:
+        LOGGER.debug(f"adding {len(cli.profile_paths)} profile locations")
+        [kenvmanager.add_profile_location(path) for path in cli.profile_paths]
+
     sys.exit(cli.execute())
 
 

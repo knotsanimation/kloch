@@ -32,6 +32,14 @@ class BaseParser:
         """
         return self._args.debug
 
+    @property
+    def profile_paths(self) -> list[Path]:
+        """
+        One or multiple filesystem path to existing directory containing profile file.
+        The paths are append to the global profile path variable.
+        """
+        return [Path(path) for path in self._args.profile_paths]
+
     @abc.abstractmethod
     def execute(self):
         """
@@ -44,7 +52,16 @@ class BaseParser:
         """
         Configure the given argparse ArgumentParser.
         """
-        parser.add_argument("--debug", action="store_true", help=cls.debug.__doc__)
+        parser.add_argument(
+            "--debug",
+            action="store_true",
+            help=cls.debug.__doc__,
+        )
+        parser.add_argument(
+            "--profile_paths",
+            nargs="*",
+            help=cls.profile_paths.__doc__,
+        )
         parser.set_defaults(func=cls)
 
 
