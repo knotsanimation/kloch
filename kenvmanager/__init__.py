@@ -10,6 +10,7 @@ __all__ = [
     "KENV_PROFILE_PATH_ENV_VAR",
     "PackageManagersSerialized",
     "read_profile_from_file",
+    "serialize_profile",
     "write_profile_to_file",
 ]
 
@@ -18,6 +19,7 @@ from . import filesyntax
 from .filesyntax import PackageManagersSerialized
 from .filesyntax import EnvironmentProfile
 from .filesyntax import KENV_PROFILE_PATH_ENV_VAR
+from .filesyntax import serialize_profile
 from .filesyntax import read_profile_from_file
 from .filesyntax import write_profile_to_file
 from .filesyntax import add_profile_location

@@ -18,6 +18,7 @@ Summary
     kenvmanager.getCli
     kenvmanager.PackageManagersSerialized
     kenvmanager.read_profile_from_file
+    kenvmanager.serialize_profile
     kenvmanager.write_profile_to_file
 
 Command Line Interface
@@ -32,7 +33,7 @@ Input/Output
 .. autodata:: kenvmanager.filesyntax._io.KENV_PROFILE_PATH_ENV_VAR
 
 .. automodule:: kenvmanager
-    :members: write_profile_to_file, read_profile_from_file, add_profile_location, get_profile_locations, get_all_profile_file_paths, get_profile_file_path
+    :members: serialize_profile, write_profile_to_file, read_profile_from_file, add_profile_location, get_profile_locations, get_all_profile_file_paths, get_profile_file_path
 
 Entities
 --------

@@ -157,6 +157,28 @@ def read_profile_from_file(
     return profile
 
 
+def serialize_profile(profile: EnvironmentProfile) -> str:
+    """
+    Convert the instance to a serialized dictionnary intended to be written on disk.
+    """
+    asdict = {"__magic__": f"{KENV_PROFILE_MAGIC}:{KENV_PROFILE_VERSION}"}
+    asdict.update(profile.to_dict())
+
+    base_profile: Optional[EnvironmentProfile] = asdict.get("base", None)
+    if base_profile:
+        base_path = get_profile_file_path(base_profile.identifier)
+        if not base_path:
+            raise ValueError(
+                f"Base profile {base_profile.identifier} is not registred on disk."
+            )
+        asdict["base"] = base_profile.identifier
+
+    # remove custom class wrapper
+    asdict["managers"] = dict(asdict["managers"])
+
+    return yaml.dump(asdict, sort_keys=False)
+
+
 def write_profile_to_file(
     profile: EnvironmentProfile,
     file_path: Path,
@@ -178,18 +200,7 @@ def write_profile_to_file(
         # expected to raise if more than one profile has the same name
         get_profile_file_path(profile.identifier)
 
-    asdict = profile.to_dict()
-    asdict["__magic__"] = f"{KENV_PROFILE_MAGIC}:{KENV_PROFILE_VERSION}"
+    serialized = serialize_profile(profile)
 
-    base_profile: Optional[EnvironmentProfile] = asdict.get("base", None)
-    if base_profile:
-        base_path = get_profile_file_path(base_profile.identifier)
-        if not base_path:
-            raise ValueError(
-                f"Base profile {base_profile.identifier} is not registred on disk."
-            )
-        asdict["base"] = base_profile.identifier
-
-    with file_path.open("w") as file:
-        yaml.dump(asdict, file)
+    file_path.write_text(serialized)
     return file_path
