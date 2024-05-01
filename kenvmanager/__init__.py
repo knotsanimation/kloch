@@ -1,5 +1,6 @@
 # XXX: any addition/change here need to be update in the doc too
 __all__ = [
+    "add_profile_location",
     "EnvironmentProfile",
     "filesyntax",
     "get_all_profile_file_paths",
@@ -19,6 +20,7 @@ from .filesyntax import EnvironmentProfile
 from .filesyntax import KENV_PROFILE_PATH_ENV_VAR
 from .filesyntax import read_profile_from_file
 from .filesyntax import write_profile_to_file
+from .filesyntax import add_profile_location
 from .filesyntax import get_profile_locations
 from .filesyntax import get_profile_file_path
 from .filesyntax import get_all_profile_file_paths
