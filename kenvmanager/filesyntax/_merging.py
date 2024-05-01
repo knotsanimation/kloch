@@ -18,6 +18,32 @@ class MergeRule(enum.IntEnum):
     append = enum.auto()
 
 
+def refacto_dict(
+    src_dict: dict,
+    callback: Callable[[Any, Any], tuple[Any, Any]],
+    recursive=True,
+) -> dict:
+    """
+    Iterate through all key/value pairs of the given dict and execute the given callback
+    at each step which return a new key/value pair for the output dict.
+
+    Args:
+        src_dict: dict obejct ot iterate
+        callback: Callable expecting 2args: key, value and should return a tuple of new_key, new_value
+        recursive: True to recursively process child dict
+
+    Returns:
+        a new dict instance
+    """
+    new_dict = {}
+    for key, value in src_dict.items():
+        if isinstance(value, dict) and recursive:
+            value = refacto_dict(value, callback=callback, recursive=True)
+        new_key, new_value = callback(key, value)
+        new_dict[new_key] = new_value
+    return new_dict
+
+
 def deepmerge_dicts(
     over_content: dict[str, Any],
     base_content: dict,
