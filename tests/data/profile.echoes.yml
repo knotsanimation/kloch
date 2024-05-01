@@ -11,4 +11,4 @@ managers:
     +=params:
       - --verbose
     +=requires:
-      - maya-2023
+      maya: 2023

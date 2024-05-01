@@ -20,13 +20,17 @@ class RezEnvManager(PackageManagerBase):
     A datastructure that allow to create a rez environment.
     """
 
-    requires: list[str]
+    requires: dict[str, str]
     params: list[str]
     config: dict
 
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
+        requires = [
+            f"{pkg_name}-{pkg_version}"
+            for pkg_name, pkg_version in self.requires.items()
+        ]
         command = ["--"] + command if command else []
-        full_command = ["rez-env"] + self.params + self.requires + command
+        full_command = ["rez-env"] + self.params + requires + command
 
         envvars = dict(os.environ)
 
