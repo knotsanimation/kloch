@@ -84,7 +84,7 @@ class RunParser(BaseParser):
 
         print(f"Reading profile {profile_path} ...")
         profile = kenvmanager.read_profile_from_file(profile_path)
-        managers = profile.get_merged_profile().content.get_package_managers()
+        managers = profile.get_merged_profile().managers.unserialize()
         if len(managers) > 1 or self.manager:
             if not self.manager:
                 raise ValueError(
@@ -152,7 +152,7 @@ class ListParser(BaseParser):
         )
 
         profile_paths = kenvmanager.get_all_profile_file_paths(profile_locations)
-        profiles: list[kenvmanager.EnvironmentProfileFileSyntax] = []
+        profiles: list[kenvmanager.EnvironmentProfile] = []
 
         for path in profile_paths:
             try:

@@ -1,13 +1,13 @@
-from kenvmanager import EnvironmentProfileFileSyntax
-from kenvmanager import PackageManagersProfile
+from kenvmanager import EnvironmentProfile
+from kenvmanager import PackageManagersSerialized
 
 
 def test_EnvironmentProfile_merging():
-    profile1 = EnvironmentProfileFileSyntax(
+    profile1 = EnvironmentProfile(
         identifier="knots",
         version="0.1.0",
         base=None,
-        content=PackageManagersProfile(
+        managers=PackageManagersSerialized(
             {
                 "rezenv": {
                     "requires": ["__maya-2023", "__houdini-20"],
@@ -20,11 +20,11 @@ def test_EnvironmentProfile_merging():
             }
         ),
     )
-    profile2 = EnvironmentProfileFileSyntax(
+    profile2 = EnvironmentProfile(
         identifier="knots:echoes",
         version="0.1.0",
         base=profile1,
-        content=PackageManagersProfile(
+        managers=PackageManagersSerialized(
             {
                 "+=rezenv": {
                     "+=config": {
@@ -44,7 +44,7 @@ def test_EnvironmentProfile_merging():
             }
         ),
     )
-    result = profile2.get_merged_profile().content
+    result = profile2.get_merged_profile().managers
     expected = {
         "+=rezenv": {
             "+=config": {
@@ -62,7 +62,7 @@ def test_EnvironmentProfile_merging():
         "testenv": {"command": "echo $cwd"},
     }
     assert result == expected
-    result = profile2.get_merged_profile().content.get_resolved()
+    result = profile2.get_merged_profile().managers.get_resolved()
     expected = {
         "rezenv": {
             "config": {

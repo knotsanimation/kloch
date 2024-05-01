@@ -3,7 +3,7 @@ name: echoes
 identifier: knots:echoes
 version: 0.1.0
 #base: knots:echoes:beta
-content:
+managers:
   +=rezenv:
     +=params:
       - --verbose

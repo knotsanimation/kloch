@@ -5,8 +5,8 @@ from typing import Optional
 
 import yaml
 
-from ._profile import PackageManagersProfile
-from ._profile import EnvironmentProfileFileSyntax
+from ._profile import PackageManagersSerialized
+from ._profile import EnvironmentProfile
 
 
 LOGGER = logging.getLogger(__name__)
@@ -84,7 +84,7 @@ def get_profile_file_path(profile_id: str) -> Optional[Path]:
 def read_profile_from_file(
     file_path: Path,
     check_resolved: bool = True,
-) -> EnvironmentProfileFileSyntax:
+) -> EnvironmentProfile:
     """
     Generate an instance from a serialized file on disk.
     """
@@ -100,19 +100,19 @@ def read_profile_from_file(
         base_profile = read_profile_from_file(base_path)
         asdict["base"] = base_profile
 
-    content = PackageManagersProfile(asdict["content"])
+    managers = PackageManagersSerialized(asdict["managers"])
     if check_resolved:
         # discard output but ensure it doesn't raise error
-        content.get_package_managers()
-    asdict["content"] = content
+        managers.unserialize()
+    asdict["managers"] = managers
 
-    profile = EnvironmentProfileFileSyntax.from_dict(asdict)
+    profile = EnvironmentProfile.from_dict(asdict)
 
     return profile
 
 
 def write_profile_to_file(
-    profile: EnvironmentProfileFileSyntax,
+    profile: EnvironmentProfile,
     file_path: Path,
     check_valid_name: bool = True,
 ) -> Path:
@@ -126,7 +126,7 @@ def write_profile_to_file(
     asdict = profile.to_dict()
     asdict["__magic__"] = f"{KENV_PROFILE_MAGIC}:{KENV_PROFILE_VERSION}"
 
-    base_profile: Optional[EnvironmentProfileFileSyntax] = asdict.get("base", None)
+    base_profile: Optional[EnvironmentProfile] = asdict.get("base", None)
     if base_profile:
         base_path = get_profile_file_path(base_profile.identifier)
         if not base_path:

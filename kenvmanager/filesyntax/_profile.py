@@ -16,15 +16,18 @@ from kenvmanager.managers import get_package_manager_class
 from kenvmanager.managers import PackageManagerBase
 
 
-class PackageManagersProfile(dict[str, dict]):
+class PackageManagersSerialized(dict[str, dict]):
     """
     A PackageManager serialized as a dict structure.
 
     The dict structure include tokens that need to be resolved.
     """
 
-    def __add__(self, other: "PackageManagersProfile") -> "PackageManagersProfile":
-        if not isinstance(other, PackageManagersProfile):
+    def __add__(
+        self,
+        other: "PackageManagersSerialized",
+    ) -> "PackageManagersSerialized":
+        if not isinstance(other, PackageManagersSerialized):
             raise TypeError(
                 f"Cannot concatenate object of type {type(other)} with {type(self)}"
             )
@@ -41,7 +44,7 @@ class PackageManagersProfile(dict[str, dict]):
             key_resolve_callback=key_resolve,
             merge_rule_callback=merge_rule,
         )
-        return PackageManagersProfile(new_content)
+        return PackageManagersSerialized(new_content)
 
     def get_resolved(self) -> dict[str, dict]:
         """
@@ -50,18 +53,18 @@ class PackageManagersProfile(dict[str, dict]):
         Without tokens, the returned object is not a PackageManagersProfile instance anymore.
         """
 
-        def pair_process(key: str, value: str):
+        def process_pair(key: str, value: str):
             new_key = key.removeprefix("+=")
             return new_key, value
 
         new_content = refacto_dict(
             src_dict=self,
-            callback=pair_process,
+            callback=process_pair,
             recursive=True,
         )
         return new_content
 
-    def get_package_managers(self) -> list[PackageManagerBase]:
+    def unserialize(self) -> list[PackageManagerBase]:
         """
         Unserialize the dict structure to PackageManager instances.
         """
@@ -80,27 +83,27 @@ class PackageManagersProfile(dict[str, dict]):
 
 
 @dataclasses.dataclass
-class EnvironmentProfileFileSyntax:
+class EnvironmentProfile:
     identifier: str
     version: str
-    base: Optional["EnvironmentProfileFileSyntax"]
-    content: PackageManagersProfile
+    base: Optional["EnvironmentProfile"]
+    managers: PackageManagersSerialized
 
     @classmethod
-    def from_dict(cls, serialized: dict) -> "EnvironmentProfileFileSyntax":
+    def from_dict(cls, serialized: dict) -> "EnvironmentProfile":
         """
         Generate a profile instance from a serialized dict object.
         """
         identifier: str = serialized["identifier"]
         version: str = serialized["version"]
-        base: Optional["EnvironmentProfileFileSyntax"] = serialized.get("base", None)
-        content: PackageManagersProfile = serialized["content"]
+        base: Optional["EnvironmentProfile"] = serialized.get("base", None)
+        managers: PackageManagersSerialized = serialized["managers"]
 
-        return EnvironmentProfileFileSyntax(
+        return EnvironmentProfile(
             identifier=identifier,
             version=version,
             base=base,
-            content=content,
+            managers=managers,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -114,17 +117,17 @@ class EnvironmentProfileFileSyntax:
         if self.base:
             serialized["base"] = self.base
 
-        serialized["content"] = copy.deepcopy(self.content)
+        serialized["managers"] = copy.deepcopy(self.managers)
         return serialized
 
     def get_merged_profile(self):
-        content = self.content
+        managers = self.managers
         if self.base:
-            content = self.base.get_merged_profile().content + content
+            managers = self.base.get_merged_profile().managers + managers
 
-        return EnvironmentProfileFileSyntax(
+        return EnvironmentProfile(
             identifier=self.identifier,
             version=self.version,
             base=None,
-            content=content,
+            managers=managers,
         )
