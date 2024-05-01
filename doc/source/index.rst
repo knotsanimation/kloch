@@ -9,7 +9,7 @@ It was designed to be used with `rez <https://rez.readthedocs.io>`_.
 ``kenvmanager`` define "environment profiles" which are yaml config files
 which store a serialized package manager request.
 
-.. literalinclude:: demo-profile.yml
+.. literalinclude:: demo-a/profile.yml
    :language: yaml
    :caption: demo-profile.yml
 
