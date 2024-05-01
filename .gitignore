@@ -24,3 +24,6 @@ poetry.lock
 
 # logging files
 *.log
+
+# documentation
+doc/build/

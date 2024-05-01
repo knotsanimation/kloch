@@ -12,7 +12,10 @@ from ._profile import EnvironmentProfile
 LOGGER = logging.getLogger(__name__)
 
 
-KENV_PROFILE_PATH_ENV_VAR = "KENV_PROFILE_PATHS"
+KENV_PROFILE_PATH_ENV_VAR: str = "KENV_PROFILE_PATHS"
+"""
+Name of the user-editable environment variable to add profile locations.
+"""
 
 KENV_PROFILE_MAGIC = "KenvEnvironmentProfile"
 KENV_PROFILE_VERSION = 1
