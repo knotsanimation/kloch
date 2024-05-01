@@ -119,7 +119,6 @@ class RunParser(BaseParser):
 
         with tempfile.TemporaryDirectory(
             prefix=f"{kenvmanager.__name__}-{manager.name()}",
-            ignore_cleanup_errors=True,
         ) as tmpdir:
             sys.exit(manager.execute(tmpdir=Path(tmpdir), command=command))
 
