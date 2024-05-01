@@ -1,0 +1,22 @@
+name: doc
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  doc-build:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'poetry'
+      - run: poetry install
+      - run: poetry run ./doc/build-doc.py
