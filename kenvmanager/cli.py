@@ -62,11 +62,12 @@ class RunParser(BaseParser):
         return self._args.manager
 
     @property
-    def profile_id(self) -> str:
+    def profile_ids(self) -> list[str]:
         """
-        Identifier of an existing environment profile.
+        One or more identifier of existing environment profile(s).
+        The profiles are concatenated together from left to right.
         """
-        return self._args.profile_id
+        return self._args.profile_ids
 
     @property
     def command(self) -> list[str]:
@@ -76,20 +77,28 @@ class RunParser(BaseParser):
         return self._args.command
 
     def execute(self):
-        profile_path = kenvmanager.get_profile_file_path(self.profile_id)
-        if not profile_path:
-            raise ValueError(
-                f"No profile found with associated identifier {self.profile_id}."
-            )
+        profiles = []
+        for profile_id in self.profile_ids:
+            profile_path = kenvmanager.get_profile_file_path(profile_id)
+            if not profile_path:
+                raise ValueError(
+                    f"No profile found with associated identifier {profile_id}."
+                )
+            print(f"reading profile {profile_path} ...")
+            profile = kenvmanager.read_profile_from_file(profile_path)
+            profile = profile.get_merged_profile()
+            profiles.append(profile)
 
-        print(f"Reading profile {profile_path} ...")
-        profile = kenvmanager.read_profile_from_file(profile_path)
-        managers = profile.get_merged_profile().managers.unserialize()
+        print(f"combining {len(profiles)} profiles")
+        managers = [profile.managers for profile in profiles]
+        managers = sum(managers[1:], managers[0])
+
+        managers = managers.unserialize()
         if len(managers) > 1 or self.manager:
             if not self.manager:
                 raise ValueError(
                     f"More than one package manager defined in profile "
-                    f"<{self.profile_id}>: you need to specify a manager name with --manager"
+                    f"<{self.profile_ids}>: you need to specify a manager name with --manager"
                 )
 
             managers = [
@@ -98,7 +107,7 @@ class RunParser(BaseParser):
             if not managers:
                 raise ValueError(
                     f"No package manager with name <{self.manager}> "
-                    f"found in profile <{self.profile_id}>"
+                    f"found in profile <{self.profile_ids}>"
                 )
 
         manager = managers[0]
@@ -118,9 +127,10 @@ class RunParser(BaseParser):
     def add_to_parser(cls, parser: argparse.ArgumentParser):
         super().add_to_parser(parser)
         parser.add_argument(
-            "profile_id",
+            "profile_ids",
             type=str,
-            help=cls.profile_id.__doc__,
+            nargs="+",
+            help=cls.profile_ids.__doc__,
         )
         parser.add_argument(
             "--manager",
