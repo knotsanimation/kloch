@@ -198,6 +198,51 @@ class ListParser(BaseParser):
         super().add_to_parser(parser)
 
 
+class ResolveParser(BaseParser):
+    """
+    A "resolve" sub-command.
+    """
+
+    @property
+    def profile_ids(self) -> list[str]:
+        """
+        One or more identifier of existing environment profile(s).
+        The profiles are concatenated together from left to right.
+        """
+        return self._args.profile_ids
+
+    def execute(self):
+        profiles = []
+        for profile_id in self.profile_ids:
+            profile_path = kenvmanager.get_profile_file_path(profile_id)
+            if not profile_path:
+                raise ValueError(
+                    f"No profile found with associated identifier {profile_id}."
+                )
+            LOGGER.debug(f"reading profile {profile_path}")
+            profile = kenvmanager.read_profile_from_file(profile_path)
+            profile = profile.get_merged_profile()
+            profiles.append(profile)
+
+        profile = profiles.pop(-1)
+        for base_profile in profiles:
+            profile.base = base_profile
+            profile = profile.get_merged_profile()
+
+        serialized = kenvmanager.serialize_profile(profile)
+        print(serialized)
+
+    @classmethod
+    def add_to_parser(cls, parser: argparse.ArgumentParser):
+        super().add_to_parser(parser)
+        parser.add_argument(
+            "profile_ids",
+            type=str,
+            nargs="+",
+            help=cls.profile_ids.__doc__,
+        )
+
+
 def getCli(argv=None) -> BaseParser:
     """
     Return the command line interface generated from user arguments provided.
@@ -226,6 +271,16 @@ def getCli(argv=None) -> BaseParser:
         help="List all available profiles.",
     )
     ListParser.add_to_parser(subparser)
+
+    subparser = subparsers.add_parser(
+        "resolve",
+        help=(
+            "Echo the profile resolved from the given request."
+            "Care is made to only echo a valid yaml file to stdout, and nothing else."
+            "(unless you use the debug flag)"
+        ),
+    )
+    ResolveParser.add_to_parser(subparser)
 
     argv = argv or sys.argv[1:]
     args = parser.parse_args(argv)
