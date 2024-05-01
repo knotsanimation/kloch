@@ -1,8 +1,8 @@
 """
-We define a simple config system that can handle the merging of 2 configs.
+We define a simple config system that describe how to build a software environment using
+different package managers.
 
-The config allow to describe how to build a software environment using a
-package manager.
+The config system can handle the merging of 2 configs structure.
 """
 import copy
 import dataclasses
@@ -20,7 +20,8 @@ class PackageManagersSerialized(dict[str, dict]):
     """
     A PackageManager serialized as a dict structure.
 
-    The dict structure include tokens that need to be resolved.
+    The dict structure include tokens that need to be resolved. Those tokens are used
+    to dertemine how to merge 2 instances together.
     """
 
     def __add__(
@@ -84,6 +85,13 @@ class PackageManagersSerialized(dict[str, dict]):
 
 @dataclasses.dataclass
 class EnvironmentProfile:
+    """
+    An environment is a collection of parameters to launch a package manager.
+
+    Environment can inherit each other by specifying a `base` attribute. The inheritance
+    only merge the package managers parameters of the 2.
+    """
+
     identifier: str
     version: str
     base: Optional["EnvironmentProfile"]
@@ -93,6 +101,9 @@ class EnvironmentProfile:
     def from_dict(cls, serialized: dict) -> "EnvironmentProfile":
         """
         Generate a profile instance from a serialized dict object.
+
+        No type checking is performed and the user is reponsible for the correct
+        type being stored in the dict.
         """
         identifier: str = serialized["identifier"]
         version: str = serialized["version"]
@@ -121,6 +132,12 @@ class EnvironmentProfile:
         return serialized
 
     def get_merged_profile(self):
+        """
+        Resolve the inheritance the profile might have over another profile.
+
+        Returns:
+            a new instance.
+        """
         managers = self.managers
         if self.base:
             managers = self.base.get_merged_profile().managers + managers

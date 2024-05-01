@@ -21,6 +21,9 @@ KENV_PROFILE_VERSION = 1
 def is_file_environment_profile(file_path: Path) -> bool:
     """
     Return True if the given file is an Environment Profile.
+
+    Args:
+        file_path: filesystem path to an existing file
     """
     if not file_path.suffix == ".yml":
         return False
@@ -35,6 +38,12 @@ def is_file_environment_profile(file_path: Path) -> bool:
 
 
 def get_profile_locations() -> list[Path]:
+    """
+    Get the user-defined directories where profile are stored.
+
+    Returns:
+         list of filesystem path to directory that might exist
+    """
     locations = os.getenv(KENV_PROFILE_PATH_ENV_VAR)
     if not locations:
         return []
@@ -46,6 +55,9 @@ def get_profile_locations() -> list[Path]:
 def get_all_profile_file_paths(locations: Optional[list[Path]] = None) -> list[Path]:
     """
     Get all the environment-profile file paths as registred by the user.
+
+    Args:
+        locations: list of filesystem path to directory that might exist
     """
     locations = locations or get_profile_locations()
     return [
@@ -65,6 +77,9 @@ def _get_profile_identifier(file_path: Path) -> str:
 def get_profile_file_path(profile_id: str) -> Optional[Path]:
     """
     Get the filesystem location to the profile with the given name.
+
+    Returns:
+        filesystem path to an existing file or None if not found.
     """
     profile_paths = get_all_profile_file_paths()
     profiles: list[Path] = [
@@ -87,6 +102,10 @@ def read_profile_from_file(
 ) -> EnvironmentProfile:
     """
     Generate an instance from a serialized file on disk.
+
+    Args:
+        file_path: filesystem path to an existing file
+        check_resolved: if True, run additional sanity check on the profile file
     """
     with file_path.open("r") as file:
         asdict: dict = yaml.safe_load(file)
@@ -114,10 +133,19 @@ def read_profile_from_file(
 def write_profile_to_file(
     profile: EnvironmentProfile,
     file_path: Path,
+    # TODO rename param to check_valid_id
     check_valid_name: bool = True,
 ) -> Path:
     """
     Convert the instance to a serialized file on disk.
+
+    Args:
+        profile: profile instance to write to disk
+        file_path:
+            filesystem path to a file that might exist.
+            parent location is expected to exist.
+        check_valid_name:
+            if True, ensure the identifier of the profile is unique
     """
     if check_valid_name:
         # expected to raise if more than one profile has the same name

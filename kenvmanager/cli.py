@@ -183,6 +183,12 @@ class ListParser(BaseParser):
 
 
 def getCli(argv=None) -> BaseParser:
+    """
+    Return the command line interface generated from user arguments provided.
+
+    Args:
+        argv: source command line argument to use instea dof the usual sys.argv
+    """
     parser = argparse.ArgumentParser(
         "kenv",
         description=(
