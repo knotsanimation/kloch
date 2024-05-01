@@ -27,5 +27,6 @@ Contents
    :maxdepth: 2
 
    Home <self>
+   cli
    file-format
    public-api
