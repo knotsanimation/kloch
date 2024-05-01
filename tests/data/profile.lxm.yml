@@ -1,0 +1,9 @@
+__magic__: KenvEnvironmentProfile:1
+identifier: lxm
+version: 0.1.0
+managers:
+  +=rezenv:
+    +=params:
+      - --stats
+    +=requires:
+      - python-3.9
