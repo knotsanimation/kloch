@@ -13,3 +13,5 @@ managers:
     +=requires:
       houdini: 20.2
       -=devUtils: _
+    +=environ:
+      PROD_STATUS: prod

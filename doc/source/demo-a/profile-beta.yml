@@ -12,3 +12,6 @@ managers:
       houdini: 20.1
       maya: 2023
       devUtils: 1+
+    environ:
+      PROD_STATUS: beta
+      PROD_NAME: echoes

@@ -100,31 +100,33 @@ There is currently 1 package manager registred:
 Examples
 --------
 
+Assuming the file structure:
+
 .. container:: columns
 
    .. container:: column-left
 
-      .. literalinclude:: demo-profile-beta.yml
+      .. literalinclude:: demo-a/profile-beta.yml
          :language: yaml
-         :caption: a "beta" profile with no inheritance
+         :caption: ./profiles/beta.yml
 
    .. container:: column-right
 
-      .. literalinclude:: demo-profile.yml
+      .. literalinclude:: demo-a/profile.yml
          :language: yaml
-         :caption: a profile that inherit from the above "beta" profile
+         :caption: ./profiles/prod.yml
 
 
-With the request:
+We execute the following command:
 
 .. code-block:: shell
 
-   kenvmanager run knots:echoes
+   kenvmanager resolve knots:echoes --profile_paths ./profiles/
 
-Will generate internally the following profile (can be checked using ``kenvmanager resolve ...``):
-
-.. literalinclude:: demo-profile-merged.yml
-   :language: yaml
+.. exec_code::
+   :hide_code:
+   :filename: demo-a/merge.py
+   :language_output: yaml
 
 
 
