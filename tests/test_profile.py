@@ -10,7 +10,11 @@ def test_EnvironmentProfile_merging():
         managers=PackageManagersSerialized(
             {
                 "rezenv": {
-                    "requires": ["__maya-2023", "__houdini-20"],
+                    "+=config": {"exclude": "whatever"},
+                    "requires": {
+                        "echoes": "2",
+                        "maya": "2023",
+                    },
                     "+=tests": {
                         "+=foo": [1, 2, 3],
                         "deeper!": {"as deep": [1, 2]},
@@ -27,14 +31,12 @@ def test_EnvironmentProfile_merging():
         managers=PackageManagersSerialized(
             {
                 "+=rezenv": {
-                    "+=config": {
-                        "+=package_filter": [
-                            {"excludes": ["after(1429830188)"], "includes": ["foo"]}
-                        ]
+                    "config": {"include": "yes"},
+                    "+=requires": {
+                        "-=maya": "_",
+                        "-=notAdded": "_",
+                        "added": "1.2",
                     },
-                    "requires": [
-                        "OK-echoes-1+",
-                    ],
                     "+=tests": {
                         "+=foo": [4, 5, 6],
                         "+=new-echoes-key": {"working": True},
@@ -47,12 +49,11 @@ def test_EnvironmentProfile_merging():
     result = profile2.get_merged_profile().managers
     expected = {
         "+=rezenv": {
-            "+=config": {
-                "+=package_filter": [
-                    {"excludes": ["after(1429830188)"], "includes": ["foo"]}
-                ]
+            "config": {"include": "yes"},
+            "+=requires": {
+                "echoes": "2",
+                "added": "1.2",
             },
-            "requires": ["OK-echoes-1+"],
             "+=tests": {
                 "+=foo": [1, 2, 3, 4, 5, 6],
                 "+=new-echoes-key": {"working": True},
@@ -62,15 +63,15 @@ def test_EnvironmentProfile_merging():
         "testenv": {"command": "echo $cwd"},
     }
     assert result == expected
+
     result = profile2.get_merged_profile().managers.get_resolved()
     expected = {
         "rezenv": {
-            "config": {
-                "package_filter": [
-                    {"excludes": ["after(1429830188)"], "includes": ["foo"]}
-                ]
+            "config": {"include": "yes"},
+            "requires": {
+                "echoes": "2",
+                "added": "1.2",
             },
-            "requires": ["OK-echoes-1+"],
             "tests": {
                 "foo": [1, 2, 3, 4, 5, 6],
                 "new-echoes-key": {"working": True},

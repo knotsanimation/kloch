@@ -33,19 +33,24 @@ class PackageManagersSerialized(dict[str, dict]):
                 f"Cannot concatenate object of type {type(other)} with {type(self)}"
             )
 
-        def key_resolve(key: str):
-            return key.removeprefix("+=")
-
         def merge_rule(key: str):
-            return MergeRule.append if key.startswith("+=") else MergeRule.override
+            if key.startswith("+="):
+                return MergeRule.append
+            if key.startswith("-="):
+                return MergeRule.remove
+            return MergeRule.override
 
         new_content = deepmerge_dicts(
             over_content=other,
             base_content=self,
-            key_resolve_callback=key_resolve,
+            key_resolve_callback=self._resolve_key_tokens,
             merge_rule_callback=merge_rule,
         )
         return PackageManagersSerialized(new_content)
+
+    @staticmethod
+    def _resolve_key_tokens(key: str) -> str:
+        return key.removeprefix("+=").removeprefix("-=")
 
     def get_resolved(self) -> dict[str, dict]:
         """
@@ -55,7 +60,7 @@ class PackageManagersSerialized(dict[str, dict]):
         """
 
         def process_pair(key: str, value: str):
-            new_key = key.removeprefix("+=")
+            new_key = self._resolve_key_tokens(key)
             return new_key, value
 
         new_content = refacto_dict(

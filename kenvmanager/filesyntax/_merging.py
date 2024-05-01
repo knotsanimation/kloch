@@ -16,6 +16,7 @@ class MergeRule(enum.IntEnum):
 
     override = enum.auto()
     append = enum.auto()
+    remove = enum.auto()
 
 
 def refacto_dict(
@@ -62,16 +63,30 @@ def deepmerge_dicts(
 
     for over_key, over_value in over_content.items():
         merge_rule = merge_rule_callback(over_key)
-        new_base_content = {
-            key_resolve_callback(bk): bv for bk, bv in base_content.items()
-        }
-        base_key = key_resolve_callback(over_key)
-        base_value = new_base_content.get(base_key, None)
-        if base_key in new_content:
-            del new_content[base_key]
 
-        if isinstance(over_value, dict):
-            base_value = base_value or {} if merge_rule == merge_rule.append else {}
+        # put base and over at same level by resolving both
+        base_keys_resolved = {
+            key_resolve_callback(bk): bk for bk, _ in base_content.items()
+        }
+        over_key_resolved = key_resolve_callback(over_key)
+
+        base_key: Optional[str] = base_keys_resolved.get(over_key_resolved, None)
+        base_value: Optional[Any] = base_content[base_key] if base_key else None
+
+        if merge_rule == merge_rule.remove:
+            if base_key:
+                del new_content[base_key]
+            continue
+
+        if merge_rule == merge_rule.override:
+            if base_key:
+                del new_content[base_key]
+            new_content[over_key] = over_value
+            continue
+
+        # reaching here implies `merge_rule.append`
+
+        if isinstance(over_value, dict) and base_value:
             new_value = deepmerge_dicts(
                 over_value,
                 base_content=base_value,
@@ -79,16 +94,16 @@ def deepmerge_dicts(
                 key_resolve_callback=key_resolve_callback,
             )
 
-        elif (
-            merge_rule == merge_rule.append
-            and isinstance(over_value, list)
-            and base_value
-        ):
+        elif isinstance(over_value, list) and base_value:
             new_value = [] + base_value + over_value
 
         else:
             new_value = copy.deepcopy(over_value)
 
+        if base_key:
+            # we have merged `base` value with `over` so we can remove it safely
+            del new_content[base_key]
         new_content[over_key] = new_value
+        continue
 
     return new_content
