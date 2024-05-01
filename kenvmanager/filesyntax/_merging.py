@@ -57,13 +57,18 @@ def deepmerge_dicts(
     the default rule is to override.
     """
     new_content = copy.deepcopy(base_content)
+    merge_rule_callback = merge_rule_callback or (lambda k: MergeRule.override)
+    key_resolve_callback = key_resolve_callback or (lambda k: k)
 
     for over_key, over_value in over_content.items():
-        merge_rule = (
-            merge_rule_callback(over_key) if merge_rule_callback else MergeRule.override
-        )
-        over_key = key_resolve_callback(over_key) if key_resolve_callback else over_key
-        base_value = base_content.get(over_key, None)
+        merge_rule = merge_rule_callback(over_key)
+        new_base_content = {
+            key_resolve_callback(bk): bv for bk, bv in base_content.items()
+        }
+        base_key = key_resolve_callback(over_key)
+        base_value = new_base_content.get(base_key, None)
+        if base_key in new_content:
+            del new_content[base_key]
 
         if isinstance(over_value, dict):
             base_value = base_value or {} if merge_rule == merge_rule.append else {}
