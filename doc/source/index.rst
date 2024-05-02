@@ -35,6 +35,7 @@ Contents
 
    Home <self>
    install
+   usage
    cli
    file-format
    public-api

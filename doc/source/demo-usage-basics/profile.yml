@@ -1,0 +1,9 @@
+__magic__: KenvEnvironmentProfile:1
+identifier: myMovie
+version: 0.1.0
+managers:
+  rezenv:
+    requires:
+      houdini: 20.2
+      maya: 2023
+      nuke: 15
