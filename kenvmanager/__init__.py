@@ -27,4 +27,5 @@ from .filesyntax import get_profile_locations
 from .filesyntax import get_profile_file_path
 from .filesyntax import get_all_profile_file_paths
 
-__version__ = "0.1.0"
+# keep in sync with pyproject.toml
+__version__ = "0.2.0"
