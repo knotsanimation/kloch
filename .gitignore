@@ -24,3 +24,7 @@ coverage.xml
 
 # documentation
 doc/build/
+
+# pyinstaller
+scripts/.pyinstaller/
+scripts/build/
