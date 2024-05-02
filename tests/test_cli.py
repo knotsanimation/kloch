@@ -36,6 +36,20 @@ def test_getCli_list(monkeypatch, data_dir, capsys):
     assert int(profile_capture.group(1)) >= 1
 
 
+def test_getCli_list_filter(monkeypatch, data_dir, capsys):
+    monkeypatch.setenv(kenvmanager.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+
+    name_filter = ".*es:beta"
+    argv = ["list", name_filter]
+    cli = kenvmanager.get_cli(argv=argv)
+    cli.execute()
+
+    captured = capsys.readouterr()
+    assert "Searching 1 locations" in captured.out
+    assert f"Filter <{name_filter}> specified" in captured.out
+    assert "Found 1 valid profiles" in captured.out
+
+
 def test_getCli_run(monkeypatch, data_dir):
     import subprocess
 

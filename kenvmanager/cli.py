@@ -3,9 +3,11 @@ import argparse
 import json
 import logging
 import os
+import re
 import sys
 import tempfile
 from pathlib import Path
+from typing import Optional
 
 import kenvmanager
 
@@ -177,6 +179,16 @@ class ListParser(BaseParser):
     A "list" sub-command.
     """
 
+    @property
+    def id_filter(self) -> Optional[str]:
+        """
+        A regex expression to remove profiles whose identifier doesn't match.
+
+        Example: "knots" will match all profile starting by "knots";
+        ".*beta.*" will match all profile containing "beta"
+        """
+        return self._args.id_filter
+
     def execute(self):
         print(
             f"Parsing environment variable {kenvmanager.KENV_PROFILE_PATH_ENV_VAR} ..."
@@ -200,6 +212,18 @@ class ListParser(BaseParser):
             profiles.append(profile)
 
         profile_ids = [profile.identifier for profile in profiles]
+
+        if self.id_filter:
+            pattern = re.compile(self.id_filter)
+            original_profile_count = len(profile_ids)
+            profile_ids = [
+                profile_id for profile_id in profile_ids if pattern.match(profile_id)
+            ]
+            print(
+                f"Filter <{self.id_filter}> specified, reduced listed profiles from "
+                f"{original_profile_count} to {len(profile_ids)} profiles."
+            )
+
         profile_ids_txt = ":\n- " + "\n- ".join(profile_ids) if profile_ids else "."
         message = f"Found {len(profile_ids)} valid profiles{profile_ids_txt}"
         print(message)
@@ -207,6 +231,13 @@ class ListParser(BaseParser):
     @classmethod
     def add_to_parser(cls, parser: argparse.ArgumentParser):
         super().add_to_parser(parser)
+        parser.add_argument(
+            "id_filter",
+            type=str,
+            nargs="?",
+            default=None,
+            help=cls.id_filter.__doc__,
+        )
 
 
 class ResolveParser(BaseParser):
