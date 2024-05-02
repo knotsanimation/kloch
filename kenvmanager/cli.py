@@ -60,6 +60,7 @@ class BaseParser:
         parser.add_argument(
             "--profile_paths",
             nargs="*",
+            default=[],
             help=cls.profile_paths.__doc__,
         )
         parser.set_defaults(func=cls)
@@ -166,6 +167,7 @@ class RunParser(BaseParser):
             "--N0",
             dest="command",
             nargs="*",
+            default=[],
             help=argparse.SUPPRESS,
         )
 
