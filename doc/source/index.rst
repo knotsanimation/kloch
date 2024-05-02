@@ -1,6 +1,11 @@
 kenvmanager
 ===========
 
+.. warning::
+
+   Despite being public, this repository is still in development stage and
+   have not been tested extensively yet.
+
 ``kenvmanager`` or ``kenv``, is an environment manager which wrap
 :abbr:`requests (usually a collection of software to load with some specific conditions)`
 sent to package managers.

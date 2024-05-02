@@ -1,5 +1,9 @@
 # kenvmanager
 
+> [!WARNING]
+> Despite being public, this repository is still in development stage and
+> have not been tested extensively yet.
+
 ``kenvmanager`` is an environment manager which wrap requests sent to
 package managers.
 
