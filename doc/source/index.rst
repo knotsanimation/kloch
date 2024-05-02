@@ -1,7 +1,7 @@
 kenvmanager
 ===========
 
-``kenvmanager`` is an environment manager which wrap
+``kenvmanager`` or ``kenv``, is an environment manager which wrap
 :abbr:`requests (usually a collection of software to load with some specific conditions)`
 sent to package managers.
 
