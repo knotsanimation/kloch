@@ -4,6 +4,7 @@ different package managers.
 
 The config system can handle the merging of 2 configs structure.
 """
+
 import copy
 import dataclasses
 from typing import Any
