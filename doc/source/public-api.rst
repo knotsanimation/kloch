@@ -1,43 +1,56 @@
 Public API
 ==========
 
-Summary
--------
+.. exec_code::
+   :hide_code:
+   :filename: exec-public-api.py
+   :language_output: python
 
-.. autosummary::
 
-    kenvmanager
-    kenvmanager.cli
-    kenvmanager.filesyntax
-    kenvmanager.managers
-    kenvmanager.add_profile_location
-    kenvmanager.EnvironmentProfile
-    kenvmanager.get_all_profile_file_paths
-    kenvmanager.get_profile_locations
-    kenvmanager.get_profile_file_path
-    kenvmanager.get_cli
-    kenvmanager.PackageManagersSerialized
-    kenvmanager.read_profile_from_file
-    kenvmanager.serialize_profile
-    kenvmanager.write_profile_to_file
 
 Command Line Interface
 ----------------------
 
-.. automodule:: kenvmanager.cli
-    :members:
+.. code-block:: python
+
+   import kenvmanager
+   import kenvmanager.cli
+
+.. autofunction:: kenvmanager.get_cli
+
+.. autoclass:: kenvmanager.cli.BaseParser
+   :members:
 
 Input/Output
 ------------
+
+.. code-block:: python
+
+   import kenvmanager
+   import kenvmanager.filesyntax
 
 .. autodata:: kenvmanager.filesyntax._io.KENV_PROFILE_PATH_ENV_VAR
 
 .. automodule:: kenvmanager
     :members: serialize_profile, write_profile_to_file, read_profile_from_file, add_profile_location, get_profile_locations, get_all_profile_file_paths, get_profile_file_path
 
-Entities
---------
+Profile Entities
+----------------
+
+.. code-block:: python
+
+   import kenvmanager
+   import kenvmanager.filesyntax
 
 .. automodule:: kenvmanager
     :members: EnvironmentProfile, PackageManagersSerialized
 
+Package Managers
+----------------
+
+.. code-block:: python
+
+   import kenvmanager.managers
+
+.. automodule:: kenvmanager.managers
+   :members: PackageManagerBase, get_package_manager_class, RezEnvManager
