@@ -11,7 +11,7 @@ as files in the `yaml <https://en.wikipedia.org/wiki/YAML>`_ language.
 
 In its current state, it only include support for `rez <https://rez.readthedocs.io>`_.
 
-.. literalinclude:: demo-a/profile.yml
+.. literalinclude:: demo-fileformat/profile.yml
    :language: yaml
    :caption: demo-profile.yml
 
