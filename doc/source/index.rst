@@ -48,3 +48,4 @@ Contents
    file-format
    public-api
    developer
+   changelog
