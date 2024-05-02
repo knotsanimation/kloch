@@ -288,22 +288,22 @@ def get_cli(argv=None) -> BaseParser:
 
     subparser = subparsers.add_parser(
         "run",
-        help="Start an interactive environment session.",
+        description="Launch an environment as described in the given profile.",
     )
     RunParser.add_to_parser(subparser)
 
     subparser = subparsers.add_parser(
         "list",
-        help="List all available profiles.",
+        description="List all available profiles.",
     )
     ListParser.add_to_parser(subparser)
 
     subparser = subparsers.add_parser(
         "resolve",
-        help=(
-            "Echo the profile resolved from the given request."
-            "Care is made to only echo a valid yaml file to stdout, and nothing else."
-            "(unless you use the debug flag)"
+        description=(
+            "Output the given profile(s) resolved and merged to a single profile."
+            "The output is machine parsable as a valid yaml file "
+            "(unless you use the --debug flag)."
         ),
     )
     ResolveParser.add_to_parser(subparser)
