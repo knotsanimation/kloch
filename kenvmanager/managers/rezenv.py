@@ -1,7 +1,6 @@
 import dataclasses
 import logging
 import os
-import re
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -19,7 +18,7 @@ LOGGER = logging.getLogger(__name__)
 @dataclasses.dataclass
 class RezEnvManager(PackageManagerBase):
     """
-    A datastructure that allow to create a rez environment.
+    A dataclass specifying how to create a rez environment.
     """
 
     requires: dict[str, str]
@@ -28,6 +27,11 @@ class RezEnvManager(PackageManagerBase):
     environ: dict[str, Union[str, list[str]]] = dataclasses.field(default_factory=dict)
 
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
+        """
+        Start a rez environment by calling rez-env in a subprocess.
+
+        If asked, a rez config is created on the fly before starting rez-env.
+        """
         requires = [
             f"{pkg_name}-{pkg_version}"
             for pkg_name, pkg_version in self.requires.items()

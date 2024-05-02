@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 @dataclasses.dataclass
 class PackageManagerBase:
     """
-    A dataclass that describe how a package manager must start a software environment.
+    An "abstract" dataclass that describe how a package manager must start a software environment.
     """
 
     @classmethod
@@ -46,11 +46,17 @@ class PackageManagerBase:
 
     @abc.abstractmethod
     def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the instance to a python dict object.
+        """
         pass
 
     @classmethod
     @abc.abstractmethod
     def from_dict(cls, src_dict: dict[str, Any]) -> "PackageManagerBase":
+        """
+        Generate an instance from a python dict object with a specific structure.
+        """
         pass
 
 
