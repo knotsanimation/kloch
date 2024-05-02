@@ -8,3 +8,11 @@ div.columns > div.column-right  {
   margin-left: 45%;
   /* float: right; */
 }
+
+/* improve tables look */
+table.docutils {
+  width: 100%;
+}
+table.docutils td, table.docutils th {
+  text-align: left;
+}
