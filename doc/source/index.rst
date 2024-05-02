@@ -39,3 +39,4 @@ Contents
    cli
    file-format
    public-api
+   developer
