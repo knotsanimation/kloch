@@ -2,7 +2,7 @@ from pathlib import Path
 
 import kenvmanager
 
-THISDIR = Path(".", "source", "demo-a").absolute()
+THISDIR = Path(".", "source", "demo-fileformat").absolute()
 
 profile_path = THISDIR / "profile.yml"
 kenvmanager.add_profile_location(THISDIR)

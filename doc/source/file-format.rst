@@ -194,13 +194,13 @@ Assuming the file structure:
 
    .. container:: column-left
 
-      .. literalinclude:: demo-a/profile-beta.yml
+      .. literalinclude:: demo-fileformat/profile-beta.yml
          :language: yaml
          :caption: ./profiles/beta.yml
 
    .. container:: column-right
 
-      .. literalinclude:: demo-a/profile.yml
+      .. literalinclude:: demo-fileformat/profile.yml
          :language: yaml
          :caption: ./profiles/prod.yml
 
@@ -213,7 +213,7 @@ We execute the following command:
 
 .. exec_code::
    :hide_code:
-   :filename: demo-a/merge.py
+   :filename: demo-fileformat/exec-merge.py
    :language_output: yaml
 
 ----
