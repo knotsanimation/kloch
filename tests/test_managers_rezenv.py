@@ -1,7 +1,17 @@
 import os
 import subprocess
 
+import pytest
+
 import kenvmanager.managers
+
+
+def test_RezEnvManager_required_fields():
+    asdict = {"params": ["--verbose"]}
+
+    with pytest.raises(ValueError) as error:
+        manager = kenvmanager.managers.RezEnvManager.from_dict(asdict)
+        assert "required field" in error
 
 
 def test_RezEnvManager_environ(monkeypatch, tmp_path):

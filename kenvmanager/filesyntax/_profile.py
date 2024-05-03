@@ -17,55 +17,92 @@ from kenvmanager.managers import get_package_manager_class
 from kenvmanager.managers import PackageManagerBase
 
 
+def _resolve_key_tokens(key: str) -> str:
+    return key.removeprefix("+=").removeprefix("-=")
+
+
+def _merge_tokenized_dict(base_dict: dict, over_dict: dict):
+    def merge_rule(key: str):
+        if key.startswith("+="):
+            return MergeRule.append
+        if key.startswith("-="):
+            return MergeRule.remove
+        return MergeRule.override
+
+    new_content = deepmerge_dicts(
+        over_content=over_dict,
+        base_content=base_dict,
+        key_resolve_callback=_resolve_key_tokens,
+        merge_rule_callback=merge_rule,
+    )
+    return new_content
+
+
 class PackageManagersSerialized(dict[str, dict]):
     """
-    A PackageManager serialized as a dict structure.
+    A list of PackageManager serialized as a dict structure.
+
+    The dict is expected to have the following root structure::
+
+        {manager_name1: {...}, manager_name2: {...}, ...}
 
     The dict structure include tokens that need to be resolved. Those tokens are used
-    to dertemine how to merge 2 instances together.
+    to determine how to merge 2 instances together.
     """
 
     def __add__(
         self,
         other: "PackageManagersSerialized",
     ) -> "PackageManagersSerialized":
+        """
+        Returns:
+            new instance with deepcopied structure.
+        """
         if not isinstance(other, PackageManagersSerialized):
             raise TypeError(
                 f"Cannot concatenate object of type {type(other)} with {type(self)}"
             )
 
-        def merge_rule(key: str):
-            if key.startswith("+="):
-                return MergeRule.append
-            if key.startswith("-="):
-                return MergeRule.remove
-            return MergeRule.override
-
-        new_content = deepmerge_dicts(
-            over_content=other,
-            base_content=self,
-            key_resolve_callback=self._resolve_key_tokens,
-            merge_rule_callback=merge_rule,
-        )
+        new_content = _merge_tokenized_dict(over_dict=other, base_dict=self)
         return PackageManagersSerialized(new_content)
 
-    @staticmethod
-    def _resolve_key_tokens(key: str) -> str:
-        return key.removeprefix("+=").removeprefix("-=")
+    def get_with_base_merged(self) -> "PackageManagersSerialized":
+        """
+        Get a copy of this instance with the .base manager merged with the other managers.
+
+        Returns:
+            new instance with deepcopied structure.
+        """
+        self_copy = copy.deepcopy(self)
+        # extract the potential base that all managers should inherit
+        if not PackageManagerBase.name() in self_copy:
+            return self_copy
+
+        base_manager_config = self_copy.pop(PackageManagerBase.name())
+        base_managers = PackageManagersSerialized(
+            {
+                manager_name: copy.deepcopy(base_manager_config)
+                for manager_name in self_copy
+            }
+        )
+        return base_managers + self_copy
 
     def get_resolved(self) -> dict[str, dict]:
         """
         Get the dict structure with all tokens resolved.
 
         Without tokens, the returned object is not a PackageManagersProfile instance anymore.
+
+        Returns:
+            deepcopied dict structure.
         """
 
         def process_pair(key: str, value: str):
-            new_key = self._resolve_key_tokens(key)
+            new_key = _resolve_key_tokens(key)
             return new_key, value
 
         new_content = refacto_dict(
-            src_dict=self,
+            src_dict=copy.deepcopy(self),
             callback=process_pair,
             recursive=True,
         )
@@ -73,11 +110,16 @@ class PackageManagersSerialized(dict[str, dict]):
 
     def unserialize(self) -> list[PackageManagerBase]:
         """
-        Unserialize the dict structure to PackageManager instances.
+        Unserialize the given dict structure to PackageManager instances.
+
+        The list can't contain duplicated package managers subclasses.
         """
         managers: list[PackageManagerBase] = []
-        content = self.get_resolved()
-        for manager_name, manager_config in content.items():
+
+        serialized = self.get_with_base_merged()
+        serialized = serialized.get_resolved()
+
+        for manager_name, manager_config in serialized.items():
             manager_class = get_package_manager_class(manager_name)
             if not manager_class:
                 raise ValueError(
