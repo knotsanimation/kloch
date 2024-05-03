@@ -61,7 +61,7 @@ class RezEnvManager(PackageManagerBase):
             config_path = tmpdir / "rezconfig.yml"
 
             LOGGER.debug(f"writing config_path={config_path}")
-            with config_path.open("w") as config_file:
+            with config_path.open("w", encoding="utf-8") as config_file:
                 yaml.dump(self.config, config_file)
 
             env_config_path = envvars.get("REZ_CONFIG_FILE", "").split(os.pathsep)
