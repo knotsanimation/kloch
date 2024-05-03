@@ -85,9 +85,9 @@ def document_manager(manager: Type[kenvmanager.managers.PackageManagerBase]) -> 
 
     header_table = [
         ("-", "-", "-"),
-        (" ≻ parent ", f" :managers:{manager.name()} ", ""),
+        (" ➡parent ", f" :managers:{manager.name()} ", ""),
         ("-", "-", "-"),
-        (" ∨ key ", "", ""),
+        (" ⬇key ", "", ""),
         ("=", "=", "="),
     ]
     table = header_table + fields_table
