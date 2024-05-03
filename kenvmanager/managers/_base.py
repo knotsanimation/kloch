@@ -104,12 +104,20 @@ class PackageManagerBase:
         """
         Get the ``environ`` field resolved to be ready to use.
         """
+        # TODO see if its worth to make it part of PackageManagersSerialized token resolving
 
         def process_pair(key: str, value: str):
             if isinstance(value, list):
-                value = [os.path.expandvars(arg) for arg in value]
                 value = os.pathsep.join(value)
-            return key, str(value)
+
+            value = str(value)
+            # temporary remove escape character
+            value = value.replace("$$", "##tmp##")
+            # environment variable expansion
+            value = os.path.expandvars(value)
+            # restore escaped character
+            value = value.replace("##tmp##", "$")
+            return key, value
 
         return refacto_dict(self.environ, callback=process_pair)
 
