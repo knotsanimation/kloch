@@ -31,9 +31,10 @@ class PackageManagerBase:
         dict[str, Union[str, list[str]]],
         "mapping of environment variable to set before starting the environment.",
         "",
-        "The value can either be a regular string or a list of string. ",
-        "The list of string has each item expanded with ``os.expandvars`` [1]_ and then joined",
-        "using the system path separator [2]_.",
+        "The value can either be a regular string or a list of string.",
+        "The list of string has each item joined using the system path separator [2]_.",
+        "All values have environment variables expanded with ``os.expandvars`` [1]_. "
+        "You can escape the expansion by doubling the ``$`` like ``$$``",
     ] = dataclasses.field(default_factory=dict)
     """
     Mapping of environment variables to set when starting the environment.
