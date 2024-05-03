@@ -26,6 +26,7 @@ def execute_python_code(code: Union[str, Path]) -> str:
         capture_output=True,
         text=True,
         check=False,
+        encoding="utf-8",
     )
     if result.returncode != 0:
         raise RuntimeError(
@@ -77,7 +78,7 @@ class ExecDirective(Directive):
             if filepath:
                 if not filepath.is_absolute():
                     filepath = Path(source_file_path).parent / filepath
-                code_content = filepath.read_text()
+                code_content = filepath.read_text(encoding="utf-8")
             else:
                 code_content = "\n".join(self.content)
 
