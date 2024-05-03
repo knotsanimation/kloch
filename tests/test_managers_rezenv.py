@@ -24,6 +24,7 @@ def test_RezEnvManager_environ(monkeypatch, tmp_path):
             "NOTRESOLVED": "foo;$$PATH;D:\\some\\path",
             "NUMBER": 1,
             "ANOTHERONE": "$__TEST__",
+            "SUCCESSIVE": "$NUMBER",
         },
     )
 
@@ -48,3 +49,4 @@ def test_RezEnvManager_environ(monkeypatch, tmp_path):
     assert Results.env["NOTRESOLVED"] == "foo;$PATH;D:\\some\\path"
     assert Results.env["NUMBER"] == "1"
     assert Results.env["ANOTHERONE"] == "SUCCESS"
+    assert Results.env["SUCCESSIVE"] == "1"

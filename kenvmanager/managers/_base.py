@@ -1,4 +1,5 @@
 import abc
+import contextlib
 import dataclasses
 import logging
 import os
@@ -13,6 +14,20 @@ from typing import Union
 from kenvmanager.filesyntax import refacto_dict
 
 LOGGER = logging.getLogger(__name__)
+
+
+@contextlib.contextmanager
+def _patch_environ(**environ):
+    """
+    Temporarily change ``os.environ`` and restore it once finished.
+    """
+    old_environ = dict(os.environ)
+    os.environ.update(environ)
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(old_environ)
 
 
 @dataclasses.dataclass
@@ -118,9 +133,14 @@ class PackageManagerBase:
             value = os.path.expandvars(value)
             # restore escaped character
             value = value.replace("##tmp##", "$")
+
+            # reverted by context manager, we need it so a variable defined after
+            # another one can reuse that first one.
+            os.environ[key] = value
             return key, value
 
-        return refacto_dict(self.environ, callback=process_pair)
+        with _patch_environ():
+            return refacto_dict(self.environ, callback=process_pair)
 
     def to_dict(self) -> dict[str, Any]:
         """
