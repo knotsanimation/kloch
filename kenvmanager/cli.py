@@ -13,6 +13,8 @@ import kenvmanager
 
 LOGGER = logging.getLogger(__name__)
 
+_ARGS_USER_COMMAND_DEST = "command"
+
 
 class BaseParser:
     """
@@ -167,7 +169,7 @@ class RunParser(BaseParser):
         )
         parser.add_argument(
             "--N0",
-            dest="command",
+            dest=_ARGS_USER_COMMAND_DEST,
             nargs="*",
             default=[],
             help=argparse.SUPPRESS,
@@ -308,6 +310,15 @@ def get_cli(argv=None) -> BaseParser:
     )
     ResolveParser.add_to_parser(subparser)
 
-    argv = argv or sys.argv[1:]
+    argv: list[str] = argv or sys.argv[1:]
+
+    # retrieve the "--" system that allow to specify an arbitrary command to execute
+    user_command = None
+    if "--" in argv:
+        split_index = argv.index("--")
+        user_command = argv[split_index + 1 :]
+        argv = argv[:split_index]
+
     args = parser.parse_args(argv)
+    setattr(args, _ARGS_USER_COMMAND_DEST, user_command)
     return args.func(args)
