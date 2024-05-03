@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import tempfile
+import textwrap
 from pathlib import Path
 from typing import Optional
 
@@ -168,11 +169,14 @@ class RunParser(BaseParser):
             help=cls.manager.__doc__,
         )
         parser.add_argument(
-            "--N0",
+            "--",
             dest=_ARGS_USER_COMMAND_DEST,
             nargs="*",
             default=[],
-            help=argparse.SUPPRESS,
+            help=(
+                "Specify multiple argument to execute in the environment as a single command.\n"
+                "MUST be the last argument as anything after is consumed."
+            ),
         )
 
 
@@ -271,6 +275,21 @@ class ResolveParser(BaseParser):
         )
 
 
+class RawFormatter(argparse.HelpFormatter):
+    """
+    https://stackoverflow.com/a/64102901/13806195
+    """
+
+    def _fill_text(self, text, width, indent):
+        # Strip the indent from the original python definition that plagues most of us.
+        text = textwrap.dedent(text)
+        text = textwrap.indent(text, indent)  # Apply any requested indent.
+        text = text.splitlines()  # Make a list of lines
+        text = [textwrap.fill(line, width) for line in text]  # Wrap each line
+        text = "\n".join(text)  # Join the lines again
+        return text
+
+
 def get_cli(argv=None) -> BaseParser:
     """
     Return the command line interface generated from user arguments provided.
@@ -290,7 +309,12 @@ def get_cli(argv=None) -> BaseParser:
 
     subparser = subparsers.add_parser(
         "run",
-        description="Launch an environment as described in the given profile.",
+        description=(
+            "Launch an environment as described in the given profile.\n\n"
+            'Optionally specify a command to execute after the "--" argument:\n'
+            '   > %(prog)s some-profile -- echo "hello world"'
+        ),
+        formatter_class=RawFormatter,
     )
     RunParser.add_to_parser(subparser)
 

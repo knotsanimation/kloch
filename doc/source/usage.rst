@@ -80,6 +80,13 @@ Which in our case should start a rez interactive shell.
 
    The command line interface tool is documented in :doc:`cli`.
 
+You can also execute a command as multiple argument
+specified after a ``--``:
+
+.. code-block:: shell
+
+   python -m kenvmanager run myMovie -- echo "hello world"
+
 
 Standard workflow
 -----------------
