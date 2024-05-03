@@ -98,11 +98,18 @@ class PackageManagerBase:
         return cls(**src_dict)
 
 
+def get_available_managers_classes() -> list[Type[PackageManagerBase]]:
+    """
+    Get all the PackageManager classes that are registred.
+    """
+    return [PackageManagerBase] + PackageManagerBase.__subclasses__()
+
+
 def get_package_manager_class(name: str) -> Optional[Type[PackageManagerBase]]:
     """
     Get the PackageManagerBase class that correspond to the given unique name.
     """
-    for sub_class in [PackageManagerBase] + PackageManagerBase.__subclasses__():
+    for sub_class in get_available_managers_classes():
         if sub_class.name() == name:
             return sub_class
     return None
