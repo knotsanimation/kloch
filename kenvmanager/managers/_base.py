@@ -3,6 +3,7 @@ import dataclasses
 import logging
 import os
 from pathlib import Path
+from typing import Annotated
 from typing import Any
 from typing import ClassVar
 from typing import Optional
@@ -23,7 +24,17 @@ class PackageManagerBase:
     # XXX: all fields defined MUST specify a default value (else inheritance issues)
     #   instead add them to the `required_fields` class variable.
 
-    environ: dict[str, Union[str, list[str]]] = dataclasses.field(default_factory=dict)
+    # XXX: all fields are automatically extracted in the static doc, you must
+    #   typing.Annotated to add string metadata that is used as description (list of lines).
+
+    environ: Annotated[
+        dict[str, Union[str, list[str]]],
+        "mapping of environment variable to set before starting the environment.",
+        "",
+        "The value can either be a regular string or a list of string. ",
+        "The list of string has each item expanded with ``os.expandvars`` [1]_ and then joined",
+        "using the system path separator [2]_.",
+    ] = dataclasses.field(default_factory=dict)
     """
     Mapping of environment variables to set when starting the environment.
     """
@@ -47,6 +58,31 @@ class PackageManagerBase:
         A unique name among all subclasses.
         """
         return ".base"
+
+    @classmethod
+    @abc.abstractmethod
+    def summary(cls) -> str:
+        """
+        One-line documentation for users explaining what is this manager.
+
+        Standard rst formatting can be used.
+        """
+        return "An abstract manager that whose purpose is to be merged with other managers."
+
+    @classmethod
+    @abc.abstractmethod
+    def doc(cls) -> list[str]:
+        """
+        Extended documentation for users explaining what is this manager.
+
+        Standard rst formatting can be used.
+
+        Returns:
+            a list of text lines
+        """
+        return [
+            "This manager cannot be used directly and is simply merged with other managers defined in the config."
+        ]
 
     @abc.abstractmethod
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None) -> int:
