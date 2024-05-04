@@ -151,7 +151,7 @@ List of available launchers:
    print(txt)
 
 .. exec-inject::
-   :filename: exec-managers-doc.py
+   :filename: exec-launchers-doc.py
 
 
 Examples

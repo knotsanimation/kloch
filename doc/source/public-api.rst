@@ -45,8 +45,8 @@ Profile Entities
 .. automodule:: kenvmanager
     :members: EnvironmentProfile, PackageManagersSerialized
 
-Package Managers
-----------------
+Launchers
+---------
 
 .. code-block:: python
 
