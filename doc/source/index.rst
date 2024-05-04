@@ -1,4 +1,4 @@
-kenvmanager
+kloch
 ===========
 
 .. warning::
@@ -6,7 +6,7 @@ kenvmanager
    Despite being public, this repository is still in development stage and
    have not been tested extensively yet.
 
-``kenvmanager`` or ``kenv``, is an environment manager which wrap
+``kloch`` `/klˈoʃ/` [1]_ [2]_, is an environment manager which wrap
 :abbr:`requests (usually a collection of software to load with some specific conditions)`
 sent to package managers, which we abstract as "launchers".
 
@@ -28,7 +28,7 @@ The above profile can be executed by using the
 
 .. code-block:: shell
 
-   python -m kenvmanager run knots:echoes
+   python -m kloch run knots:echoes
 
 The profile system includes:
 
@@ -52,3 +52,10 @@ Contents
    public-api
    developer
    changelog
+
+----
+
+**References**
+
+.. [1] https://www.internationalphoneticalphabet.org/ipa-sounds/ipa-chart-with-sounds/#ipachartstart
+.. [2] https://unalengua.com/ipa-translate?hl=en&ttsLocale=fr-FR&voiceId=Celine&sl=fr&text=clauche&ttsMode=word&speed=2

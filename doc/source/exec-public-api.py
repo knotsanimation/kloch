@@ -1,7 +1,7 @@
 import inspect
 import types
 
-import kenvmanager
+import kloch
 
 
 output = {
@@ -11,12 +11,12 @@ output = {
     "other": [],
 }
 
-print("import kenvmanager")
-for obj_name in sorted(kenvmanager.__all__):
-    if not hasattr(kenvmanager, obj_name):
+print("import kloch")
+for obj_name in sorted(kloch.__all__):
+    if not hasattr(kloch, obj_name):
         output["other"].append((obj_name, ""))
 
-    obj = getattr(kenvmanager, obj_name)
+    obj = getattr(kloch, obj_name)
     doc = ""
     if hasattr(obj, "__doc__"):
         doc = obj.__doc__.lstrip(" ").lstrip("\n")
@@ -37,7 +37,7 @@ for obj_name in sorted(kenvmanager.__all__):
 for category, content_list in output.items():
     print(f'\n""" {category} """')
     for content in content_list:
-        print(f"kenvmanager.{content[0]}")
+        print(f"kloch.{content[0]}")
         doc = content[1]
         if doc:
             print(f"# {doc}")

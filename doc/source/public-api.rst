@@ -13,12 +13,12 @@ Command Line Interface
 
 .. code-block:: python
 
-   import kenvmanager
-   import kenvmanager.cli
+   import kloch
+   import kloch.cli
 
-.. autofunction:: kenvmanager.get_cli
+.. autofunction:: kloch.get_cli
 
-.. autoclass:: kenvmanager.cli.BaseParser
+.. autoclass:: kloch.cli.BaseParser
    :members:
 
 Input/Output
@@ -26,12 +26,12 @@ Input/Output
 
 .. code-block:: python
 
-   import kenvmanager
-   import kenvmanager.filesyntax
+   import kloch
+   import kloch.filesyntax
 
-.. autodata:: kenvmanager.filesyntax._io.KENV_PROFILE_PATH_ENV_VAR
+.. autodata:: kloch.filesyntax._io.KENV_PROFILE_PATH_ENV_VAR
 
-.. automodule:: kenvmanager
+.. automodule:: kloch
     :members: serialize_profile, write_profile_to_file, read_profile_from_file, add_profile_location, get_profile_locations, get_all_profile_file_paths, get_profile_file_path
 
 Profile Entities
@@ -39,10 +39,10 @@ Profile Entities
 
 .. code-block:: python
 
-   import kenvmanager
-   import kenvmanager.filesyntax
+   import kloch
+   import kloch.filesyntax
 
-.. automodule:: kenvmanager
+.. automodule:: kloch
     :members: EnvironmentProfile, LaunchersSerialized
 
 Launchers
@@ -50,7 +50,7 @@ Launchers
 
 .. code-block:: python
 
-   import kenvmanager.launchers
+   import kloch.launchers
 
-.. automodule:: kenvmanager.launchers
+.. automodule:: kloch.launchers
    :members: BaseLauncher, get_launcher_class, RezEnvLauncher

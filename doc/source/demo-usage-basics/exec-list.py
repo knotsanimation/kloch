@@ -1,10 +1,10 @@
 from pathlib import Path
 
-import kenvmanager
+import kloch
 
 THISDIR = Path(".", "source", "demo-usage").absolute()
 
 
-kenvmanager.add_profile_location(THISDIR)
-cli = kenvmanager.get_cli(["list"])
+kloch.add_profile_location(THISDIR)
+cli = kloch.get_cli(["list"])
 cli.execute()

@@ -1,8 +1,8 @@
 import pytest
 
-import kenvmanager.launchers
-from kenvmanager import EnvironmentProfile
-from kenvmanager import LaunchersSerialized
+import kloch.launchers
+from kloch import EnvironmentProfile
+from kloch import LaunchersSerialized
 
 
 def test_EnvironmentProfile_merging():
@@ -109,7 +109,7 @@ def test_LaunchersSerialized_with_base():
     launchers = launcher_serial.unserialize()
     assert len(launchers) == 1
     launcher = launchers[0]
-    assert isinstance(launcher, kenvmanager.launchers.RezEnvLauncher)
+    assert isinstance(launcher, kloch.launchers.RezEnvLauncher)
     assert launcher.environ == {"PATH": ["$PATH", "/foo/bar"], "PROD": "unittest"}
     assert launcher.get_resolved_environ()["PATH"].endswith("/foo/bar")
     assert not launcher.get_resolved_environ()["PATH"].startswith("$PATH")
