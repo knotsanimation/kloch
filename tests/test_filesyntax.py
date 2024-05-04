@@ -1,3 +1,5 @@
+import pytest
+
 import kenvmanager.filesyntax
 
 
@@ -21,3 +23,11 @@ def test_read_profile_from_file(monkeypatch, data_dir):
     m_profile = profile_echoes.get_merged_profile()
     assert m_profile.identifier == "knots:echoes"
     assert m_profile.base is None
+
+
+def test_read_profile_from_file_old(monkeypatch, data_dir):
+    monkeypatch.setenv(kenvmanager.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+
+    profile_path = kenvmanager.filesyntax.get_profile_file_path("version1")
+    with pytest.raises(SyntaxError):
+        kenvmanager.filesyntax.read_profile_from_file(profile_path)

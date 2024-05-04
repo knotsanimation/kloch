@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### changed
 
 - ! changed  the concept of `managers` to `launchers`, everywhere.
+- ! bump the profile version to 2
 
 ## [0.3.0] - 2024-05-04
 

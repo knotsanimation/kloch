@@ -20,7 +20,7 @@ Name of the user-editable environment variable to add profile locations.
 _PROFILE_LOCATIONS_INTERNAL: list[Path] = []
 
 KENV_PROFILE_MAGIC = "KenvEnvironmentProfile"
-KENV_PROFILE_VERSION = 1
+KENV_PROFILE_VERSION = 2
 
 
 def is_file_environment_profile(file_path: Path) -> bool:
@@ -136,6 +136,13 @@ def read_profile_from_file(
     """
     with file_path.open("r", encoding="utf-8") as file:
         asdict: dict = yaml.safe_load(file)
+
+    profile_version = int(asdict["__magic__"].split(":")[-1])
+    if not profile_version == KENV_PROFILE_VERSION:
+        raise SyntaxError(
+            f"Cannot read profile with version <{profile_version}> while current "
+            f"API version is <{KENV_PROFILE_VERSION}>."
+        )
     del asdict["__magic__"]
 
     base_name: Optional[str] = asdict.get("base", None)

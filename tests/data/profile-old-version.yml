@@ -1,8 +1,7 @@
-__magic__: KenvEnvironmentProfile:2
-identifier: knots:echoes
+__magic__: KenvEnvironmentProfile:1
+identifier: version1
 version: 0.2.0
-base: knots:echoes:beta
-launchers:
+managers:
   +=rezenv:
     +=config:
       +=package_filter:
