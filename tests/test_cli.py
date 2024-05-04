@@ -2,30 +2,30 @@ import re
 
 import pytest
 
-import kenvmanager
-import kenvmanager.cli
-import kenvmanager.launchers
+import kloch
+import kloch.cli
+import kloch.launchers
 
 
 def test_getCli_subcommands():
     argv = [""]
     with pytest.raises(SystemExit):
-        kenvmanager.get_cli(argv=argv)
+        kloch.get_cli(argv=argv)
 
     argv = ["run", "_"]
-    cli = kenvmanager.get_cli(argv=argv)
-    assert isinstance(cli, kenvmanager.cli.RunParser)
+    cli = kloch.get_cli(argv=argv)
+    assert isinstance(cli, kloch.cli.RunParser)
 
     argv = ["list"]
-    cli = kenvmanager.get_cli(argv=argv)
-    assert isinstance(cli, kenvmanager.cli.ListParser)
+    cli = kloch.get_cli(argv=argv)
+    assert isinstance(cli, kloch.cli.ListParser)
 
 
 def test_getCli_list(monkeypatch, data_dir, capsys):
-    monkeypatch.setenv(kenvmanager.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+    monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
 
     argv = ["list"]
-    cli = kenvmanager.get_cli(argv=argv)
+    cli = kloch.get_cli(argv=argv)
     cli.execute()
 
     captured = capsys.readouterr()
@@ -37,11 +37,11 @@ def test_getCli_list(monkeypatch, data_dir, capsys):
 
 
 def test_getCli_list_filter(monkeypatch, data_dir, capsys):
-    monkeypatch.setenv(kenvmanager.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+    monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
 
     name_filter = ".*es:beta"
     argv = ["list", name_filter]
-    cli = kenvmanager.get_cli(argv=argv)
+    cli = kloch.get_cli(argv=argv)
     cli.execute()
 
     captured = capsys.readouterr()
@@ -62,11 +62,11 @@ def test_getCli_run(monkeypatch, data_dir):
         Results.env = env
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setenv(kenvmanager.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+    monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
     argv = ["run", "lxm"]
-    cli = kenvmanager.get_cli(argv=argv)
+    cli = kloch.get_cli(argv=argv)
     with pytest.raises(SystemExit):
         cli.execute()
 
@@ -88,12 +88,12 @@ def test_getCli_command(monkeypatch, data_dir):
         Results.env = env
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setenv(kenvmanager.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+    monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
     extra_command = ["echo", "a", "bunch", "of", "ÅÍÎÏ˝ÓÔÒÚÆ☃", "--debug"]
     argv = ["run", "system-test", "--"] + extra_command
-    cli = kenvmanager.get_cli(argv=argv)
+    cli = kloch.get_cli(argv=argv)
     with pytest.raises(SystemExit):
         cli.execute()
 

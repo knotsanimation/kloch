@@ -13,8 +13,8 @@ from typing import Optional
 from ._merging import refacto_dict
 from ._merging import deepmerge_dicts
 from ._merging import MergeRule
-from kenvmanager.launchers import get_launcher_class
-from kenvmanager.launchers import BaseLauncher
+from kloch.launchers import get_launcher_class
+from kloch.launchers import BaseLauncher
 
 
 def _resolve_key_tokens(key: str) -> str:

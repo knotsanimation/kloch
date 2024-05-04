@@ -4,19 +4,18 @@ import time
 from pathlib import Path
 from typing import Optional
 
-import kenvmanager
+import kloch
 
 THIS_DIR = Path(__file__).parent.resolve()
 REPO_ROOT = THIS_DIR.parent.resolve()
 
 
 def main(repo_root: Path):
-
-    app_name = f"{kenvmanager.__name__}-v{kenvmanager.__version__}"
+    app_name = f"{kloch.__name__}-v{kloch.__version__}"
     as_one_file = False
 
     # // read
-    start_script_path = repo_root / "kenvmanager" / "__main__.py"
+    start_script_path = repo_root / "kloch" / "__main__.py"
     """
     Filesystem path to an existing python script used to start the application.
     """

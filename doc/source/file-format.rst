@@ -14,7 +14,7 @@ those rules are discarded:
 - The file CAN have an abitrary name.
 - The file extension MUST be ``.yml``.
 - The file MUST NOT be empty.
-- The file MUST have a ``__magic__`` root key with a value starting by ``KenvEnvironmentProfile``.
+- The file MUST have a ``__magic__`` root key with a value starting by ``kloch_profile``.
 
 The content of the file is then defined as:
 
@@ -144,9 +144,9 @@ List of available launchers:
 
 .. exec-inject::
 
-   import kenvmanager.launchers
+   import kloch.launchers
 
-   launchers = kenvmanager.launchers.get_available_launchers_classes()
+   launchers = kloch.launchers.get_available_launchers_classes()
    txt = "\n- ".join([""] + [f"``{launcher.name()}`` : {launcher.summary()}" for launcher in launchers])
    print(txt)
 
@@ -178,7 +178,7 @@ We execute the following command:
 
 .. code-block:: shell
 
-   kenvmanager resolve knots:echoes --profile_paths ./profiles/
+   kloch resolve knots:echoes --profile_paths ./profiles/
 
 .. exec_code::
    :hide_code:

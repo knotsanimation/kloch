@@ -12,7 +12,7 @@ However you must still specify to the package manager which software you want
 to process so you can start using them. This list of software is called an
 "environment".
 
-``kenvmanager`` allow to store on disk (serialize) this request of software so
+``kloch`` allow to store on disk (serialize) this request of software so
 you can create reproducible environment for any user.
 
 We abstract the package manager concept even more by using "launchers", which
@@ -23,7 +23,7 @@ Basics
 
    `The following instructions assume you have completed` :doc:`install`.
 
-In its current state, ``kenvmanager`` is designed to work with `rez <https://rez.readthedocs.io>`_.
+In its current state, ``kloch`` is designed to work with `rez <https://rez.readthedocs.io>`_.
 
 You can store the `rez-env` request of packages in a config file
 that we will refer as `environment profile` or just `profile`.
@@ -35,7 +35,7 @@ wish all artists use those same version without having to remember them.
 With rez, you have already installed a package for all the desired software version,
 like `maya-2023`, `houdini-20`, ...
 
-With ``kenvmanager`` you will be able to create a profile that will "save" this
+With ``kloch`` you will be able to create a profile that will "save" this
 request of packages:
 
 .. literalinclude:: demo-usage-basics/profile.yml
@@ -51,9 +51,9 @@ use environment variable:
    :hide_code:
    :language_output: shell
 
-   import kenvmanager
+   import kloch
    print("# (shell syntax, to adapt for you context)")
-   print(f"export {kenvmanager.KENV_PROFILE_PATH_ENV_VAR}=/d/pipeline/profiles/")
+   print(f"export {kloch.KENV_PROFILE_PATH_ENV_VAR}=/d/pipeline/profiles/")
 
 .. tip::
 
@@ -61,11 +61,11 @@ use environment variable:
 
 
 Then you can validate your manipulation by using the ``list`` command. This
-imply we will be using ``kenvmanager`` as a `Command Line Interface` tool [2]_:
+imply we will be using ``kloch`` as a `Command Line Interface` tool [2]_:
 
 .. code-block:: shell
 
-   python -m kenvmanager list
+   python -m kloch list
 
 .. exec_code::
    :hide_code:
@@ -75,7 +75,7 @@ Time to use your profile:
 
 .. code-block:: shell
 
-   python -m kenvmanager run myMovie
+   python -m kloch run myMovie
 
 Which in our case should start a rez interactive shell.
 
@@ -88,7 +88,7 @@ specified after a ``--``:
 
 .. code-block:: shell
 
-   python -m kenvmanager run myMovie -- echo "hello world"
+   python -m kloch run myMovie -- echo "hello world"
 
 
 Standard workflow
@@ -107,7 +107,7 @@ It usually lead to a tree-like pipeline hierarchy:
 To reduce maintenance we would like not to rewrite all our requests
 in each profile but instead inherit from each hierarchy level requests.
 
-This is possible with ``kenvmanager`` where a profile can inherit from another
+This is possible with ``kloch`` where a profile can inherit from another
 profile.
 
 .. container:: columns
@@ -138,7 +138,7 @@ to rez will be :
 
 .. code-block:: shell
 
-   python -m kenvmanager resolve myMovie
+   python -m kloch resolve myMovie
 
 .. exec_code::
    :hide_code:

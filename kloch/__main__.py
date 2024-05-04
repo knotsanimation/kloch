@@ -1,13 +1,13 @@
 import logging
 import sys
 
-import kenvmanager
+import kloch
 
 LOGGER = logging.getLogger(__name__)
 
 
 def main():
-    cli = kenvmanager.get_cli()
+    cli = kloch.get_cli()
     log_level = logging.DEBUG if cli.debug else logging.INFO
     logging.basicConfig(
         level=log_level,
@@ -15,12 +15,12 @@ def main():
         style="{",
         stream=sys.stdout,
     )
-    LOGGER.debug(f"starting {kenvmanager.__name__} v{kenvmanager.__version__}")
+    LOGGER.debug(f"starting {kloch.__name__} v{kloch.__version__}")
     LOGGER.debug(f"retrieved cli with args={cli._args}")
 
     if cli.profile_paths:
         LOGGER.debug(f"adding {len(cli.profile_paths)} profile locations")
-        [kenvmanager.add_profile_location(path) for path in cli.profile_paths]
+        [kloch.add_profile_location(path) for path in cli.profile_paths]
 
     sys.exit(cli.execute())
 

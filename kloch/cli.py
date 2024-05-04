@@ -10,7 +10,7 @@ import textwrap
 from pathlib import Path
 from typing import Optional
 
-import kenvmanager
+import kloch
 
 LOGGER = logging.getLogger(__name__)
 
@@ -77,11 +77,11 @@ def _get_merged_profile(profile_identifiers: list[str]):
     """
     profiles = []
     for profile_id in profile_identifiers:
-        profile_path = kenvmanager.get_profile_file_path(profile_id)
+        profile_path = kloch.get_profile_file_path(profile_id)
         if not profile_path:
             raise ValueError(f"No profile with identifier <{profile_id}> found.")
         LOGGER.debug(f"reading profile {profile_path}")
-        profile = kenvmanager.read_profile_from_file(profile_path)
+        profile = kloch.read_profile_from_file(profile_path)
         profile = profile.get_merged_profile()
         profiles.append(profile)
 
@@ -151,7 +151,7 @@ class RunParser(BaseParser):
         LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
 
         with tempfile.TemporaryDirectory(
-            prefix=f"{kenvmanager.__name__}-{launcher.name()}",
+            prefix=f"{kloch.__name__}-{launcher.name()}",
         ) as tmpdir:
             sys.exit(launcher.execute(tmpdir=Path(tmpdir), command=command))
 
@@ -197,22 +197,20 @@ class ListParser(BaseParser):
         return self._args.id_filter
 
     def execute(self):
-        print(
-            f"Parsing environment variable {kenvmanager.KENV_PROFILE_PATH_ENV_VAR} ..."
-        )
+        print(f"Parsing environment variable {kloch.KENV_PROFILE_PATH_ENV_VAR} ...")
 
-        profile_locations = kenvmanager.get_profile_locations()
+        profile_locations = kloch.get_profile_locations()
         profile_locations_txt = [str(path) for path in profile_locations]
         print(
             f"Searching {len(profile_locations)} locations: {profile_locations_txt} ..."
         )
 
-        profile_paths = kenvmanager.get_all_profile_file_paths(profile_locations)
-        profiles: list[kenvmanager.EnvironmentProfile] = []
+        profile_paths = kloch.get_all_profile_file_paths(profile_locations)
+        profiles: list[kloch.EnvironmentProfile] = []
 
         for path in profile_paths:
             try:
-                profile = kenvmanager.read_profile_from_file(path)
+                profile = kloch.read_profile_from_file(path)
             except Exception as error:
                 print(f"WARNING: {path}: {error}", file=sys.stderr)
                 continue
@@ -262,7 +260,7 @@ class ResolveParser(BaseParser):
 
     def execute(self):
         profile = _get_merged_profile(self.profile_ids)
-        serialized = kenvmanager.serialize_profile(profile)
+        serialized = kloch.serialize_profile(profile)
         print(serialized)
 
     @classmethod
@@ -299,7 +297,7 @@ def get_cli(argv=None) -> BaseParser:
         argv: source command line argument to use instea dof the usual sys.argv
     """
     parser = argparse.ArgumentParser(
-        "kenv",
+        kloch.__name__,
         description=(
             "Create an environment to launch software using pre-defined configurations."
         ),

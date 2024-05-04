@@ -17,7 +17,7 @@ COMMAND = [
     str(BUILDIR),
     "--watch",
     str(
-        THISDIR.parent / "kenvmanager",
+        THISDIR.parent / "kloch",
     ),
 ]
 COMMAND += sys.argv[1:]

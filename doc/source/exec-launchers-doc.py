@@ -7,7 +7,7 @@ All the information is extracted from the code of the dataclass.
 import dataclasses
 from typing import Type
 
-import kenvmanager.launchers
+import kloch.launchers
 
 
 RowType = tuple[str, str, str]
@@ -70,7 +70,7 @@ def replace_character(src_str: str, character: str, substitution: str) -> str:
     return src_str[:index] + substitution + src_str[index + 1 :]
 
 
-def document_launcher(launcher: Type[kenvmanager.launchers.BaseLauncher]) -> str:
+def document_launcher(launcher: Type[kloch.launchers.BaseLauncher]) -> str:
     lines = []
     lines += [launcher.name(), "_" * len(launcher.name())]
     lines += [""] + launcher.doc() + [""]
@@ -108,7 +108,7 @@ def document_launcher(launcher: Type[kenvmanager.launchers.BaseLauncher]) -> str
 
 
 def main():
-    for launcher in kenvmanager.launchers.get_available_launchers_classes():
+    for launcher in kloch.launchers.get_available_launchers_classes():
         print(document_launcher(launcher))
 
 
