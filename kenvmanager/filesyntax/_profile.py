@@ -1,6 +1,6 @@
 """
 We define a simple config system that describe how to build a software environment using
-different package managers.
+different package launchers.
 
 The config system can handle the merging of 2 configs structure.
 """
@@ -68,13 +68,13 @@ class PackageManagersSerialized(dict[str, dict]):
 
     def get_with_base_merged(self) -> "PackageManagersSerialized":
         """
-        Get a copy of this instance with the .base manager merged with the other managers.
+        Get a copy of this instance with the ``.base`` launcher merged with the other launchers.
 
         Returns:
             new instance with deepcopied structure.
         """
         self_copy = copy.deepcopy(self)
-        # extract the potential base that all managers should inherit
+        # extract the potential base that all launchers should inherit
         if not BaseLauncher.name() in self_copy:
             return self_copy
 
@@ -112,38 +112,38 @@ class PackageManagersSerialized(dict[str, dict]):
         """
         Unserialize the given dict structure to PackageManager instances.
 
-        The list can't contain duplicated package managers subclasses.
+        The list can't contain duplicated package launchers subclasses.
         """
-        managers: list[BaseLauncher] = []
+        launchers: list[BaseLauncher] = []
 
         serialized = self.get_with_base_merged()
         serialized = serialized.get_resolved()
 
-        for manager_name, manager_config in serialized.items():
-            manager_class = get_launcher_class(manager_name)
-            if not manager_class:
+        for launcher_name, launcher_config in serialized.items():
+            launcher_class = get_launcher_class(launcher_name)
+            if not launcher_class:
                 raise ValueError(
-                    f"No manager class registred with the name <{manager_name}>"
+                    f"No launcher class registred with name <{launcher_name}>"
                 )
-            manager = manager_class.from_dict(manager_config)
-            managers.append(manager)
+            launcher = launcher_class.from_dict(launcher_config)
+            launchers.append(launcher)
 
-        return managers
+        return launchers
 
 
 @dataclasses.dataclass
 class EnvironmentProfile:
     """
-    An environment is a collection of parameters to launch a package manager.
+    An environment is a collection of parameters required to start a pre-defined launcher.
 
     Environment can inherit each other by specifying a `base` attribute. The inheritance
-    only merge the package managers parameters of the 2.
+    only merge the ``launchers`` attribute of the 2.
     """
 
     identifier: str
     version: str
     base: Optional["EnvironmentProfile"]
-    managers: PackageManagersSerialized
+    launchers: PackageManagersSerialized
 
     @classmethod
     def from_dict(cls, serialized: dict) -> "EnvironmentProfile":
@@ -156,13 +156,13 @@ class EnvironmentProfile:
         identifier: str = serialized["identifier"]
         version: str = serialized["version"]
         base: Optional["EnvironmentProfile"] = serialized.get("base", None)
-        managers: PackageManagersSerialized = serialized["managers"]
+        launchers: PackageManagersSerialized = serialized["launchers"]
 
         return EnvironmentProfile(
             identifier=identifier,
             version=version,
             base=base,
-            managers=managers,
+            launchers=launchers,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -176,7 +176,7 @@ class EnvironmentProfile:
         if self.base:
             serialized["base"] = self.base
 
-        serialized["managers"] = copy.deepcopy(self.managers)
+        serialized["launchers"] = copy.deepcopy(self.launchers)
         return serialized
 
     def get_merged_profile(self):
@@ -186,13 +186,13 @@ class EnvironmentProfile:
         Returns:
             a new instance.
         """
-        managers = self.managers
+        launchers = self.launchers
         if self.base:
-            managers = self.base.get_merged_profile().managers + managers
+            launchers = self.base.get_merged_profile().launchers + launchers
 
         return EnvironmentProfile(
             identifier=self.identifier,
             version=self.version,
             base=None,
-            managers=managers,
+            launchers=launchers,
         )

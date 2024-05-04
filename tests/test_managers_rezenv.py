@@ -10,12 +10,12 @@ def test_RezEnvManager_required_fields():
     asdict = {"params": ["--verbose"]}
 
     with pytest.raises(ValueError) as error:
-        manager = kenvmanager.launchers.RezEnvLauncher.from_dict(asdict)
+        launcher = kenvmanager.launchers.RezEnvLauncher.from_dict(asdict)
         assert "required field" in error
 
 
 def test_RezEnvManager_environ(monkeypatch, tmp_path):
-    manager = kenvmanager.launchers.RezEnvLauncher(
+    launcher = kenvmanager.launchers.RezEnvLauncher(
         requires={"maya": "2023", "houdini": "20.2"},
         params=["--verbose"],
         config={},
@@ -40,7 +40,7 @@ def test_RezEnvManager_environ(monkeypatch, tmp_path):
     monkeypatch.setenv("__TEST__", "SUCCESS")
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
-    manager.execute(tmpdir=tmp_path)
+    launcher.execute(tmpdir=tmp_path)
 
     assert Results.env["PATH"] != "$PATH;D:\\some\\path"
     assert len(Results.env["PATH"]) > len("D:\\some\\path") + 2

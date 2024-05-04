@@ -146,11 +146,11 @@ def read_profile_from_file(
         base_profile = read_profile_from_file(base_path)
         asdict["base"] = base_profile
 
-    managers = PackageManagersSerialized(asdict["managers"])
+    launchers = PackageManagersSerialized(asdict["launchers"])
     if check_resolved:
         # discard output but ensure it doesn't raise error
-        managers.unserialize()
-    asdict["managers"] = managers
+        launchers.unserialize()
+    asdict["launchers"] = launchers
 
     profile = EnvironmentProfile.from_dict(asdict)
 
@@ -174,7 +174,7 @@ def serialize_profile(profile: EnvironmentProfile) -> str:
         asdict["base"] = base_profile.identifier
 
     # remove custom class wrapper
-    asdict["managers"] = dict(asdict["managers"])
+    asdict["launchers"] = dict(asdict["launchers"])
 
     return yaml.dump(asdict, sort_keys=False)
 

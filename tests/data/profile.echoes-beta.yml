@@ -1,7 +1,7 @@
 __magic__: KenvEnvironmentProfile:1
 identifier: knots:echoes:beta
 version: 0.1.0
-managers:
+launchers:
   +=rezenv:
     +=requires:
       maya: 2023

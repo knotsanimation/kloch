@@ -1,7 +1,7 @@
 __magic__: KenvEnvironmentProfile:1
 identifier: myStudio
 version: 0.1.0
-managers:
+launchers:
   rezenv:
     config:
       default_shell: powershell

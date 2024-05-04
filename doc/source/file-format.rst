@@ -41,11 +41,11 @@ The content of the file is then defined as:
 |                +-----------------+----------------------------------------------------------------------------+
 |                | **description** | optional ``identifier`` of the profile that must be inherited              |
 +----------------+-----------------+----------------------------------------------------------------------------+
-| ``managers``   | **required**    | yes                                                                        |
+| ``launchers``  | **required**    | yes                                                                        |
 +----------------+-----------------+----------------------------------------------------------------------------+
 |                | **type**        | `dict`                                                                     |
 |                +-----------------+----------------------------------------------------------------------------+
-|                | **description** | configuration of each package managers                                     |
+|                | **description** | configuration of each launcher                                             |
 +----------------+-----------------+----------------------------------------------------------------------------+
 
 Inheritance
@@ -56,13 +56,13 @@ of each other" using the ``base`` key, or from the CLI.
 
 .. important::
 
-   Only the content of the ``managers`` root key is merged with the other profile.
+   Only the content of the ``launchers`` root key is merged with the other profile.
 
 Assuming ``profile-B`` is declaring a ``base: profile-A`` then the merge will
 happen as follow:
 
-- keep all root keys of ``profile-B`` that are not the ``managers`` key.
-- merge the ``managers`` as ``profile-A + profile-B``
+- keep all root keys of ``profile-B`` that are not the ``launchers`` key.
+- merge the ``launchers`` as ``profile-A + profile-B``
 
 By default a merge actually correspond to only keeping ``profile-B`` value (override).
 Check the below `tokens` section to see how you can use other merge rules.
@@ -70,7 +70,7 @@ Check the below `tokens` section to see how you can use other merge rules.
 Tokens
 ------
 
-All keys in the ``managers`` root key can make use of tokens.
+All keys in the ``launchers`` root key can make use of tokens.
 
 A token is a specific
 chain of characters that is removed (resolved) in the final config, but allow to
@@ -125,11 +125,11 @@ The following merge tokens are available:
             - /foobar
 
 
-Package Managers
-----------------
+Launchers
+---------
 
 +---------------------+------------------------------------------------------------------------------------------------+
-| ➡parent             | :managers                                                                                      |
+| ➡parent             | :launchers                                                                                     |
 +---------------------+------------------------------------------------------------------------------------------------+
 | ⬇key                |                                                                                                |
 +=====================+=================+==============================================================================+
@@ -137,7 +137,7 @@ Package Managers
 +---------------------+-----------------+------------------------------------------------------------------------------+
 |                     | **type**        | `dict`                                                                       |
 |                     +-----------------+------------------------------------------------------------------------------+
-|                     | **description** | a registred package manager name with its configuration                      |
+|                     | **description** | a registred launcher name with its configuration                             |
 +---------------------+-----------------+------------------------------------------------------------------------------+
 
 List of available launchers:

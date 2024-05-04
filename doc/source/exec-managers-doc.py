@@ -84,7 +84,7 @@ def document_manager(manager: Type[kenvmanager.launchers.BaseLauncher]) -> str:
 
     header_table = [
         ("-", "-", "-"),
-        (" ➡parent ", f" :managers:{manager.name()} ", ""),
+        (" ➡parent ", f" :launchers:{manager.name()} ", ""),
         ("-", "-", "-"),
         (" ⬇key ", "", ""),
         ("=", "=", "="),

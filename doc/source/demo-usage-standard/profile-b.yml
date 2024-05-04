@@ -2,7 +2,7 @@ __magic__: KenvEnvironmentProfile:1
 identifier: myMovie
 base: myStudio
 version: 0.1.0
-managers:
+launchers:
   +=rezenv:
     +=requires:
       maya: 2023

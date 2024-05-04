@@ -1,7 +1,7 @@
 __magic__: KenvEnvironmentProfile:1
 identifier: lxm
 version: 0.1.0
-managers:
+launchers:
   +=rezenv:
     +=params:
       - --stats

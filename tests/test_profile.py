@@ -10,7 +10,7 @@ def test_EnvironmentProfile_merging():
         identifier="knots",
         version="0.1.0",
         base=None,
-        managers=PackageManagersSerialized(
+        launchers=PackageManagersSerialized(
             {
                 "rezenv": {
                     "+=config": {"exclude": "whatever"},
@@ -31,7 +31,7 @@ def test_EnvironmentProfile_merging():
         identifier="knots:echoes",
         version="0.1.0",
         base=profile1,
-        managers=PackageManagersSerialized(
+        launchers=PackageManagersSerialized(
             {
                 "+=rezenv": {
                     "config": {"include": "yes"},
@@ -49,7 +49,7 @@ def test_EnvironmentProfile_merging():
             }
         ),
     )
-    result = profile2.get_merged_profile().managers
+    result = profile2.get_merged_profile().launchers
     expected = {
         "+=rezenv": {
             "config": {"include": "yes"},
@@ -67,7 +67,7 @@ def test_EnvironmentProfile_merging():
     }
     assert result == expected
 
-    result = profile2.get_merged_profile().managers.get_resolved()
+    result = profile2.get_merged_profile().launchers.get_resolved()
     expected = {
         "rezenv": {
             "config": {"include": "yes"},
@@ -89,7 +89,7 @@ def test_EnvironmentProfile_merging():
 def test_PackageManagersSerialized_with_base():
     # test rezenv inherit .base properly when rezenv doesn't define the key
 
-    manager_serial = PackageManagersSerialized(
+    launcher_serial = PackageManagersSerialized(
         {
             "+=rezenv": {
                 "+=config": {"exclude": "whatever"},
@@ -106,17 +106,17 @@ def test_PackageManagersSerialized_with_base():
             },
         },
     )
-    managers = manager_serial.unserialize()
-    assert len(managers) == 1
-    manager = managers[0]
-    assert isinstance(manager, kenvmanager.launchers.RezEnvLauncher)
-    assert manager.environ == {"PATH": ["$PATH", "/foo/bar"], "PROD": "unittest"}
-    assert manager.get_resolved_environ()["PATH"].endswith("/foo/bar")
-    assert not manager.get_resolved_environ()["PATH"].startswith("$PATH")
+    launchers = launcher_serial.unserialize()
+    assert len(launchers) == 1
+    launcher = launchers[0]
+    assert isinstance(launcher, kenvmanager.launchers.RezEnvLauncher)
+    assert launcher.environ == {"PATH": ["$PATH", "/foo/bar"], "PROD": "unittest"}
+    assert launcher.get_resolved_environ()["PATH"].endswith("/foo/bar")
+    assert not launcher.get_resolved_environ()["PATH"].startswith("$PATH")
 
     # test rezenv inherit .base properly when rezenv already define the key
 
-    manager_serial = PackageManagersSerialized(
+    launcher_serial = PackageManagersSerialized(
         {
             "+=rezenv": {
                 "requires": {"echoes": "2", "maya": "2023"},
@@ -135,9 +135,9 @@ def test_PackageManagersSerialized_with_base():
             },
         },
     )
-    managers = manager_serial.unserialize()
-    manager = managers[0]
-    assert manager.environ == {
+    launchers = launcher_serial.unserialize()
+    launcher = launchers[0]
+    assert launcher.environ == {
         "PATH": ["$PATH", "/foo/bar", "/rez"],
         "REZVERBOSE": 2,
         "PROD": "unittest",
@@ -146,7 +146,7 @@ def test_PackageManagersSerialized_with_base():
 
     # test non-supported key in .base
 
-    manager_serial = PackageManagersSerialized(
+    launcher_serial = PackageManagersSerialized(
         {
             "+=rezenv": {"requires": {"echoes": "2"}},
             ".base": {
@@ -156,5 +156,5 @@ def test_PackageManagersSerialized_with_base():
         },
     )
     with pytest.raises(TypeError) as error:
-        managers = manager_serial.unserialize()
+        launchers = launcher_serial.unserialize()
         assert "error_key" in str(error)

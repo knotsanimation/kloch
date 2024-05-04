@@ -1,7 +1,7 @@
 __magic__: KenvEnvironmentProfile:1
 identifier: myMovie
 version: 0.1.0
-managers:
+launchers:
   rezenv:
     requires:
       houdini: 20.2

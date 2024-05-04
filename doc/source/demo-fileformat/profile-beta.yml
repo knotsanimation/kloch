@@ -1,7 +1,7 @@
 __magic__: KenvEnvironmentProfile:1
 identifier: knots:echoes:beta
 version: 0.3.2
-managers:
+launchers:
   +=rezenv:
     +=config:
       quiet: false
