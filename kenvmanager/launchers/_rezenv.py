@@ -9,16 +9,16 @@ from typing import Optional
 
 import yaml
 
-from ._base import PackageManagerBase
+from ._base import BaseLauncher
 
 
 LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
-class RezEnvManager(PackageManagerBase):
+class RezEnvLauncher(BaseLauncher):
     """
-    A dataclass specifying how to create a rez environment.
+    Describe how to start a rez shell interactive session.
     """
 
     requires: Annotated[

@@ -8,7 +8,7 @@ __all__ = [
     "get_profile_file_path",
     "get_cli",
     "KENV_PROFILE_PATH_ENV_VAR",
-    "PackageManagersSerialized",
+    "LaunchersSerialized",
     "read_profile_from_file",
     "serialize_profile",
     "write_profile_to_file",
@@ -16,7 +16,7 @@ __all__ = [
 
 from .cli import get_cli
 from . import filesyntax
-from .filesyntax import PackageManagersSerialized
+from .filesyntax import LaunchersSerialized
 from .filesyntax import EnvironmentProfile
 from .filesyntax import KENV_PROFILE_PATH_ENV_VAR
 from .filesyntax import serialize_profile
@@ -28,4 +28,4 @@ from .filesyntax import get_profile_file_path
 from .filesyntax import get_all_profile_file_paths
 
 # keep in sync with pyproject.toml
-__version__ = "0.3.0"
+__version__ = "0.4.0"

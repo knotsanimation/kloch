@@ -8,7 +8,10 @@ kenvmanager
 
 ``kenvmanager`` or ``kenv``, is an environment manager which wrap
 :abbr:`requests (usually a collection of software to load with some specific conditions)`
-sent to package managers.
+sent to package managers, which we abstract as "launchers".
+
+A launcher is a predefined piece of code which on execution will produce
+an environment session as requested, and optionally execute a command.
 
 Those requests are stored as "environment profiles",
 :abbr:`serialized (translating a data structure or object state into a format that can be stored on disk)` on disk
@@ -32,7 +35,7 @@ The profile system includes:
 - profile inheritance (a profile specify it merge on top of another profile)
 - token system to determine merging rules during inheritance
 - arbitrary profile locations definition through API and environment variable.
-- potential (not-tested) support for multiple package manager at once
+- abstract launcher system to accomodate any package manager or software launching.
 
 
 Contents

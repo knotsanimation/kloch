@@ -5,7 +5,7 @@ from typing import Optional
 
 import yaml
 
-from ._profile import PackageManagersSerialized
+from ._profile import LaunchersSerialized
 from ._profile import EnvironmentProfile
 
 
@@ -20,7 +20,7 @@ Name of the user-editable environment variable to add profile locations.
 _PROFILE_LOCATIONS_INTERNAL: list[Path] = []
 
 KENV_PROFILE_MAGIC = "KenvEnvironmentProfile"
-KENV_PROFILE_VERSION = 1
+KENV_PROFILE_VERSION = 2
 
 
 def is_file_environment_profile(file_path: Path) -> bool:
@@ -136,6 +136,13 @@ def read_profile_from_file(
     """
     with file_path.open("r", encoding="utf-8") as file:
         asdict: dict = yaml.safe_load(file)
+
+    profile_version = int(asdict["__magic__"].split(":")[-1])
+    if not profile_version == KENV_PROFILE_VERSION:
+        raise SyntaxError(
+            f"Cannot read profile with version <{profile_version}> while current "
+            f"API version is <{KENV_PROFILE_VERSION}>."
+        )
     del asdict["__magic__"]
 
     base_name: Optional[str] = asdict.get("base", None)
@@ -146,11 +153,11 @@ def read_profile_from_file(
         base_profile = read_profile_from_file(base_path)
         asdict["base"] = base_profile
 
-    managers = PackageManagersSerialized(asdict["managers"])
+    launchers = LaunchersSerialized(asdict["launchers"])
     if check_resolved:
         # discard output but ensure it doesn't raise error
-        managers.unserialize()
-    asdict["managers"] = managers
+        launchers.unserialize()
+    asdict["launchers"] = launchers
 
     profile = EnvironmentProfile.from_dict(asdict)
 
@@ -174,7 +181,7 @@ def serialize_profile(profile: EnvironmentProfile) -> str:
         asdict["base"] = base_profile.identifier
 
     # remove custom class wrapper
-    asdict["managers"] = dict(asdict["managers"])
+    asdict["launchers"] = dict(asdict["launchers"])
 
     return yaml.dump(asdict, sort_keys=False)
 

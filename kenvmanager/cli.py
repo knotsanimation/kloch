@@ -99,12 +99,13 @@ class RunParser(BaseParser):
     """
 
     @property
-    def manager(self) -> str:
+    def launcher(self) -> str:
         """
-        The name of a package manager to use in the provided environment profile.
-        Only required if the profile define more than one package manager profile.
+        The name of a launcher to use in the provided environment profile.
+
+        Only required if the profile define more than one launcher profile.
         """
-        return self._args.manager
+        return self._args.launcher
 
     @property
     def profile_ids(self) -> list[str]:
@@ -125,34 +126,34 @@ class RunParser(BaseParser):
         print(f"loading {len(self.profile_ids)} profiles ...")
         profile = _get_merged_profile(self.profile_ids)
 
-        managers = profile.managers.unserialize()
-        if len(managers) > 1 or self.manager:
-            if not self.manager:
+        launchers = profile.launchers.unserialize()
+        if len(launchers) > 1 or self.launcher:
+            if not self.launcher:
                 raise ValueError(
-                    f"More than one package manager defined in profile "
-                    f"<{self.profile_ids}>: you need to specify a manager name with --manager"
+                    f"More than one launcher defined in profile "
+                    f"<{self.profile_ids}>: you need to specify a launcher name with --launcher"
                 )
 
-            managers = [
-                manager for manager in managers if manager.name() == self.manager
+            launchers = [
+                launcher for launcher in launchers if launcher.name() == self.launcher
             ]
-            if not managers:
+            if not launchers:
                 raise ValueError(
-                    f"No package manager with name <{self.manager}> "
+                    f"No launcher with name <{self.launcher}> "
                     f"found in profile <{self.profile_ids}>"
                 )
 
-        manager = managers[0]
+        launcher = launchers[0]
         command = self.command or None
 
-        print(f"starting package manager {manager.name()}")
-        LOGGER.debug(f"executing manager={manager} with command={command}")
+        print(f"starting launcher {launcher.name()}")
+        LOGGER.debug(f"executing launcher={launcher} with command={command}")
         LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
 
         with tempfile.TemporaryDirectory(
-            prefix=f"{kenvmanager.__name__}-{manager.name()}",
+            prefix=f"{kenvmanager.__name__}-{launcher.name()}",
         ) as tmpdir:
-            sys.exit(manager.execute(tmpdir=Path(tmpdir), command=command))
+            sys.exit(launcher.execute(tmpdir=Path(tmpdir), command=command))
 
     @classmethod
     def add_to_parser(cls, parser: argparse.ArgumentParser):
@@ -164,9 +165,9 @@ class RunParser(BaseParser):
             help=cls.profile_ids.__doc__,
         )
         parser.add_argument(
-            "--manager",
+            "--launcher",
             type=str,
-            help=cls.manager.__doc__,
+            help=cls.launcher.__doc__,
         )
         parser.add_argument(
             "--",
@@ -300,8 +301,7 @@ def get_cli(argv=None) -> BaseParser:
     parser = argparse.ArgumentParser(
         "kenv",
         description=(
-            "A custom environment manager for rez.\n"
-            "Allow to create an environment to launch software using pre-defined configurations."
+            "Create an environment to launch software using pre-defined configurations."
         ),
     )
     BaseParser.add_to_parser(parser)

@@ -43,14 +43,14 @@ Profile Entities
    import kenvmanager.filesyntax
 
 .. automodule:: kenvmanager
-    :members: EnvironmentProfile, PackageManagersSerialized
+    :members: EnvironmentProfile, LaunchersSerialized
 
-Package Managers
-----------------
+Launchers
+---------
 
 .. code-block:: python
 
-   import kenvmanager.managers
+   import kenvmanager.launchers
 
-.. automodule:: kenvmanager.managers
-   :members: PackageManagerBase, get_package_manager_class, RezEnvManager
+.. automodule:: kenvmanager.launchers
+   :members: BaseLauncher, get_launcher_class, RezEnvLauncher

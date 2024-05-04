@@ -15,6 +15,9 @@ to process so you can start using them. This list of software is called an
 ``kenvmanager`` allow to store on disk (serialize) this request of software so
 you can create reproducible environment for any user.
 
+We abstract the package manager concept even more by using "launchers", which
+is an arbitrary set of instruction to start an environment and execute software.
+
 Basics
 ------
 

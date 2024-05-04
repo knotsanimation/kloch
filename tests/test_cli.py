@@ -4,7 +4,7 @@ import pytest
 
 import kenvmanager
 import kenvmanager.cli
-import kenvmanager.managers
+import kenvmanager.launchers
 
 
 def test_getCli_subcommands():

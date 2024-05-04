@@ -55,9 +55,9 @@ def _resolve_path(src_str: str) -> str:
 
 
 @dataclasses.dataclass
-class PackageManagerBase:
+class BaseLauncher:
     """
-    An "abstract" dataclass that describe how a package manager must start a software environment.
+    An "abstract" dataclass that describe how to start a software environment session.
     """
 
     # XXX: all fields defined MUST specify a default value (else inheritance issues)
@@ -105,17 +105,17 @@ class PackageManagerBase:
     @abc.abstractmethod
     def summary(cls) -> str:
         """
-        One-line documentation for users explaining what is this manager.
+        Short one-line summary of what is this instance. Used for user documentation.
 
         Standard rst formatting can be used.
         """
-        return "An abstract manager that whose purpose is to be merged with other managers."
+        return "An abstract launcher that whose purpose is to be merged with other launchers."
 
     @classmethod
     @abc.abstractmethod
     def doc(cls) -> list[str]:
         """
-        Extended documentation for users explaining what is this manager.
+        Extended documentation describing this launcher purpose. For user documentation.
 
         Standard rst formatting can be used.
 
@@ -123,7 +123,7 @@ class PackageManagerBase:
             a list of text lines
         """
         return [
-            "This manager cannot be used directly and is simply merged with other managers defined in the config."
+            "This launcher is never launched and is simply merged with other launchers defined in the profile."
         ]
 
     @abc.abstractmethod
@@ -146,7 +146,7 @@ class PackageManagerBase:
         """
         Get the ``environ`` field resolved to be ready to use.
         """
-        # TODO see if its worth to make it part of PackageManagersSerialized token resolving
+        # TODO see if its worth to make it part of LaunchersSerialized token resolving
 
         def process_pair(key: str, value: str):
             if isinstance(value, list):
@@ -177,25 +177,25 @@ class PackageManagerBase:
         return as_dict
 
     @classmethod
-    def from_dict(cls, src_dict: dict[str, Any]) -> "PackageManagerBase":
+    def from_dict(cls, src_dict: dict[str, Any]) -> "BaseLauncher":
         """
         Generate an instance from a python dict object with a specific structure.
         """
         return cls(**src_dict)
 
 
-def get_available_managers_classes() -> list[Type[PackageManagerBase]]:
+def get_available_launchers_classes() -> list[Type[BaseLauncher]]:
     """
-    Get all the PackageManager classes that are registred.
+    Get all list of available launcher classes that are registred.
     """
-    return [PackageManagerBase] + PackageManagerBase.__subclasses__()
+    return [BaseLauncher] + BaseLauncher.__subclasses__()
 
 
-def get_package_manager_class(name: str) -> Optional[Type[PackageManagerBase]]:
+def get_launcher_class(name: str) -> Optional[Type[BaseLauncher]]:
     """
-    Get the PackageManagerBase class that correspond to the given unique name.
+    Get the launcher class which match the given unique name.
     """
-    for sub_class in get_available_managers_classes():
+    for sub_class in get_available_launchers_classes():
         if sub_class.name() == name:
             return sub_class
     return None
