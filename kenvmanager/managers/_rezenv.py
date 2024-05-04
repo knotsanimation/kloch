@@ -3,9 +3,9 @@ import logging
 import os
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Annotated
+from typing import ClassVar
 from typing import Optional
-from typing import Union
 
 import yaml
 
@@ -21,10 +21,24 @@ class RezEnvManager(PackageManagerBase):
     A dataclass specifying how to create a rez environment.
     """
 
-    requires: dict[str, str]
-    params: list[str]
-    config: dict
-    environ: dict[str, Union[str, list[str]]] = dataclasses.field(default_factory=dict)
+    requires: Annotated[
+        dict[str, str],
+        "mapping of rez `package name`: `package version`",
+    ] = dataclasses.field(default_factory=dict)
+
+    params: Annotated[
+        list[str],
+        "list of command line arguments passed to rez-env.",
+        "",
+        "Check the `rez documentation <https://rez.readthedocs.io/en/stable/commands/rez-env.html>`_.",
+    ] = dataclasses.field(default_factory=list)
+
+    config: Annotated[
+        dict[...],
+        "content of a valid yaml rez config that is created on the fly before the rez-env.",
+    ] = dataclasses.field(default_factory=dict)
+
+    required_fields: ClassVar[list[str]] = ["requires"]
 
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
         """
@@ -40,17 +54,14 @@ class RezEnvManager(PackageManagerBase):
         full_command = ["rez-env"] + self.params + requires + command
 
         envvars = dict(os.environ)
-        for user_var, user_var_value in self.environ.items():
-            if isinstance(user_var_value, list):
-                user_var_value = [os.path.expandvars(arg) for arg in user_var_value]
-                user_var_value = os.pathsep.join(user_var_value)
-            envvars[user_var] = str(user_var_value)
+        environ = self.get_resolved_environ()
+        envvars.update(environ)
 
         if self.config:
             config_path = tmpdir / "rezconfig.yml"
 
             LOGGER.debug(f"writing config_path={config_path}")
-            with config_path.open("w") as config_file:
+            with config_path.open("w", encoding="utf-8") as config_file:
                 yaml.dump(self.config, config_file)
 
             env_config_path = envvars.get("REZ_CONFIG_FILE", "").split(os.pathsep)
@@ -62,28 +73,14 @@ class RezEnvManager(PackageManagerBase):
 
         return result.returncode
 
-    def to_dict(self) -> dict:
-        return {
-            "params": self.params,
-            "requires": self.requires,
-            "config": self.config,
-            "environ": self.environ,
-        }
-
     @classmethod
     def name(cls):
         return "rezenv"
 
     @classmethod
-    def from_dict(cls, src_dict: dict[str, Any]) -> "RezEnvManager":
-        rezroot = src_dict
-        params = rezroot.get("params", [])
-        package_requests = rezroot["requires"]
-        config = rezroot.get("config", {})
-        environ = rezroot.get("environ", {})
-        return RezEnvManager(
-            requires=package_requests,
-            params=params,
-            config=config,
-            environ=environ,
-        )
+    def summary(cls) -> str:
+        return "Start an interactive rez shell using the ``rez-env`` command."
+
+    @classmethod
+    def doc(cls) -> list[str]:
+        return ["The implementation will call ``rez-env`` in a python subprocess [3]_."]

@@ -1,0 +1,8 @@
+__magic__: KenvEnvironmentProfile:1
+identifier: system-test
+version: 0.1.0
+managers:
+  +=system:
+    environ:
+      LXMCUSTOM: "表ポあA鷗ŒéＢ逍Üßªąñ丂㐀𠀀"
+      HEH: "(╯°□°）╯︵ ┻━┻)"

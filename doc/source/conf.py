@@ -2,8 +2,10 @@
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
+import sys
 
 import kenvmanager
+from pathlib import Path
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -17,12 +19,15 @@ release = version
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+sys.path.append(str(Path("extensions").resolve()))
+
 extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_exec_code",
+    "execinject",
 ]
 
 templates_path = ["_templates"]

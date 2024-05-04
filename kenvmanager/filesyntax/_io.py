@@ -33,7 +33,7 @@ def is_file_environment_profile(file_path: Path) -> bool:
     if not file_path.suffix == ".yml":
         return False
 
-    with file_path.open("r") as file:
+    with file_path.open("r", encoding="utf-8") as file:
         content = yaml.safe_load(file)
 
     if not content:
@@ -96,7 +96,7 @@ def get_all_profile_file_paths(locations: Optional[list[Path]] = None) -> list[P
 
 
 def _get_profile_identifier(file_path: Path) -> str:
-    with file_path.open("r") as file:
+    with file_path.open("r", encoding="utf-8") as file:
         asdict: dict = yaml.safe_load(file)
     return asdict["identifier"]
 
@@ -134,7 +134,7 @@ def read_profile_from_file(
         file_path: filesystem path to an existing file
         check_resolved: if True, run additional sanity check on the profile file
     """
-    with file_path.open("r") as file:
+    with file_path.open("r", encoding="utf-8") as file:
         asdict: dict = yaml.safe_load(file)
     del asdict["__magic__"]
 
