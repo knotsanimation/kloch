@@ -177,6 +177,7 @@ class RunParser(BaseParser):
             help=(
                 "Specify multiple argument to execute in the environment as a single command.\n"
                 "MUST be the last argument as anything after is consumed."
+                "If the profile already specify a command, the arguments are appended to the existing command."
             ),
         )
 

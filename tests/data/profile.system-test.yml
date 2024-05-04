@@ -6,3 +6,6 @@ launchers:
     environ:
       LXMCUSTOM: "表ポあA鷗ŒéＢ逍Üßªąñ丂㐀𠀀"
       HEH: "(╯°□°）╯︵ ┻━┻)"
+    command:
+      - paint.exe
+      - new

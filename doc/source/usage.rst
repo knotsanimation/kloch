@@ -90,6 +90,11 @@ specified after a ``--``:
 
    python -m kloch run myMovie -- echo "hello world"
 
+.. note::
+
+   Because profiles can also specify a command, the CLI command is always
+   **appened** to whatever is already defined.
+
 
 Standard workflow
 -----------------
