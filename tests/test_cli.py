@@ -97,5 +97,5 @@ def test_getCli_command(monkeypatch, data_dir):
     with pytest.raises(SystemExit):
         cli.execute()
 
-    assert Results.command == extra_command
+    assert Results.command == ["paint.exe", "new"] + extra_command
     assert Results.env["HEH"] == "(╯°□°）╯︵ ┻━┻)"

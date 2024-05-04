@@ -21,12 +21,14 @@ class SystemLauncher(BaseLauncher):
         """
         Just call subprocess.run.
         """
+        command = self.command + (command or [])
+
         envvars = dict(os.environ)
         environ = self.get_resolved_environ()
         envvars.update(environ)
 
         LOGGER.debug(f"executing system command={command}")
-        result = subprocess.run(command or [], shell=True, env=envvars)
+        result = subprocess.run(command, shell=True, env=envvars)
 
         return result.returncode
 

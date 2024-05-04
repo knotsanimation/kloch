@@ -79,6 +79,18 @@ class BaseLauncher:
     ] = dataclasses.field(default_factory=dict)
     """
     Mapping of environment variables to set when starting the environment.
+    
+    The developer is reponsible of honoring the field usage in its launcher implementation.
+    """
+
+    command: Annotated[
+        list[str],
+        "Arbitrary list of command line arguments to call at the end of the launcher execution.",
+    ] = dataclasses.field(default_factory=list)
+    """
+    Arbitrary list of command line arguments to call at the end of the launcher execution.
+    
+    The developer is reponsible of honoring the field usage in its launcher implementation.
     """
 
     required_fields: ClassVar[list[str]] = []

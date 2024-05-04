@@ -50,6 +50,8 @@ class RezEnvLauncher(BaseLauncher):
             f"{pkg_name}-{pkg_version}"
             for pkg_name, pkg_version in self.requires.items()
         ]
+
+        command = self.command + (command or [])
         command = ["--"] + command if command else []
         full_command = ["rez-env"] + self.params + requires + command
 
