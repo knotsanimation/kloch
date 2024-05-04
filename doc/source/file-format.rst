@@ -192,3 +192,4 @@ We execute the following command:
 .. [1] https://docs.python.org/3/library/os.path.html#os.path.expandvars
 .. [2] ``:`` on UNIX, ``;`` on Windows
 .. [3] There was multiple way of doing it. See `rez ASWF slack discussion <https://academysoftwarefdn.slack.com/archives/C0321B828FM/p1714383583013449>`_
+.. [4] with https://docs.python.org/3.9/library/pathlib.html#pathlib.Path.resolve

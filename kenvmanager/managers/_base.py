@@ -30,6 +30,30 @@ def _patch_environ(**environ):
         os.environ.update(old_environ)
 
 
+def _resolve_env_var(src_str: str) -> str:
+    """
+    Resolve environment variable pattern in the given string.
+
+    Using ``os.path.expandvars``.
+    """
+    # temporary remove escape character
+    new_str = src_str.replace("$$", "##tmp##")
+    # environment variable expansion
+    new_str = os.path.expandvars(new_str)
+    # restore escaped character
+    new_str = new_str.replace("##tmp##", "$")
+    return new_str
+
+
+def _resolve_path(src_str: str) -> str:
+    """
+    Ensure the path is system compliant if it looks like one.
+    """
+    if not Path(src_str).exists():
+        return src_str
+    return str(Path(src_str).resolve())
+
+
 @dataclasses.dataclass
 class PackageManagerBase:
     """
@@ -50,6 +74,8 @@ class PackageManagerBase:
         "The list of string has each item joined using the system path separator [2]_.",
         "All values have environment variables expanded with ``os.expandvars`` [1]_. "
         "You can escape the expansion by doubling the ``$`` like ``$$``",
+        "",
+        "If the variable value is an existing path at resolve time, then it is normalized for the system (correct slashes) [4]_.",
     ] = dataclasses.field(default_factory=dict)
     """
     Mapping of environment variables to set when starting the environment.
@@ -124,15 +150,10 @@ class PackageManagerBase:
 
         def process_pair(key: str, value: str):
             if isinstance(value, list):
+                value = [_resolve_path(_resolve_env_var(str(path))) for path in value]
                 value = os.pathsep.join(value)
-
-            value = str(value)
-            # temporary remove escape character
-            value = value.replace("$$", "##tmp##")
-            # environment variable expansion
-            value = os.path.expandvars(value)
-            # restore escaped character
-            value = value.replace("##tmp##", "$")
+            else:
+                value = _resolve_path(_resolve_env_var(str(value)))
 
             # reverted by context manager, we need it so a variable defined after
             # another one can reuse that first one.
