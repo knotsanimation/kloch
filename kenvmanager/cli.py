@@ -99,12 +99,13 @@ class RunParser(BaseParser):
     """
 
     @property
-    def manager(self) -> str:
+    def launcher(self) -> str:
         """
-        The name of a package manager to use in the provided environment profile.
-        Only required if the profile define more than one package manager profile.
+        The name of a launcher to use in the provided environment profile.
+
+        Only required if the profile define more than one launcher profile.
         """
-        return self._args.manager
+        return self._args.launcher
 
     @property
     def profile_ids(self) -> list[str]:
@@ -126,19 +127,19 @@ class RunParser(BaseParser):
         profile = _get_merged_profile(self.profile_ids)
 
         launchers = profile.launchers.unserialize()
-        if len(launchers) > 1 or self.manager:
-            if not self.manager:
+        if len(launchers) > 1 or self.launcher:
+            if not self.launcher:
                 raise ValueError(
                     f"More than one launcher defined in profile "
-                    f"<{self.profile_ids}>: you need to specify a manager name with --manager"
+                    f"<{self.profile_ids}>: you need to specify a launcher name with --launcher"
                 )
 
             launchers = [
-                launcher for launcher in launchers if launcher.name() == self.manager
+                launcher for launcher in launchers if launcher.name() == self.launcher
             ]
             if not launchers:
                 raise ValueError(
-                    f"No launcher with name <{self.manager}> "
+                    f"No launcher with name <{self.launcher}> "
                     f"found in profile <{self.profile_ids}>"
                 )
 
@@ -164,9 +165,9 @@ class RunParser(BaseParser):
             help=cls.profile_ids.__doc__,
         )
         parser.add_argument(
-            "--manager",
+            "--launcher",
             type=str,
-            help=cls.manager.__doc__,
+            help=cls.launcher.__doc__,
         )
         parser.add_argument(
             "--",
@@ -300,8 +301,7 @@ def get_cli(argv=None) -> BaseParser:
     parser = argparse.ArgumentParser(
         "kenv",
         description=(
-            "A custom environment manager for rez.\n"
-            "Allow to create an environment to launch software using pre-defined configurations."
+            "Create an environment to launch software using pre-defined configurations."
         ),
     )
     BaseParser.add_to_parser(parser)
