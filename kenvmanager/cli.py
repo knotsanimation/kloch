@@ -129,16 +129,16 @@ class RunParser(BaseParser):
         if len(launchers) > 1 or self.manager:
             if not self.manager:
                 raise ValueError(
-                    f"More than one package manager defined in profile "
+                    f"More than one launcher defined in profile "
                     f"<{self.profile_ids}>: you need to specify a manager name with --manager"
                 )
 
             launchers = [
-                manager for manager in launchers if manager.name() == self.manager
+                launcher for launcher in launchers if launcher.name() == self.manager
             ]
             if not launchers:
                 raise ValueError(
-                    f"No package manager with name <{self.manager}> "
+                    f"No launcher with name <{self.manager}> "
                     f"found in profile <{self.profile_ids}>"
                 )
 

@@ -2,7 +2,7 @@ import pytest
 
 import kenvmanager.launchers
 from kenvmanager import EnvironmentProfile
-from kenvmanager import PackageManagersSerialized
+from kenvmanager import LaunchersSerialized
 
 
 def test_EnvironmentProfile_merging():
@@ -10,7 +10,7 @@ def test_EnvironmentProfile_merging():
         identifier="knots",
         version="0.1.0",
         base=None,
-        launchers=PackageManagersSerialized(
+        launchers=LaunchersSerialized(
             {
                 "rezenv": {
                     "+=config": {"exclude": "whatever"},
@@ -31,7 +31,7 @@ def test_EnvironmentProfile_merging():
         identifier="knots:echoes",
         version="0.1.0",
         base=profile1,
-        launchers=PackageManagersSerialized(
+        launchers=LaunchersSerialized(
             {
                 "+=rezenv": {
                     "config": {"include": "yes"},
@@ -86,10 +86,10 @@ def test_EnvironmentProfile_merging():
     assert result == expected
 
 
-def test_PackageManagersSerialized_with_base():
+def test_LaunchersSerialized_with_base():
     # test rezenv inherit .base properly when rezenv doesn't define the key
 
-    launcher_serial = PackageManagersSerialized(
+    launcher_serial = LaunchersSerialized(
         {
             "+=rezenv": {
                 "+=config": {"exclude": "whatever"},
@@ -116,7 +116,7 @@ def test_PackageManagersSerialized_with_base():
 
     # test rezenv inherit .base properly when rezenv already define the key
 
-    launcher_serial = PackageManagersSerialized(
+    launcher_serial = LaunchersSerialized(
         {
             "+=rezenv": {
                 "requires": {"echoes": "2", "maya": "2023"},
@@ -146,7 +146,7 @@ def test_PackageManagersSerialized_with_base():
 
     # test non-supported key in .base
 
-    launcher_serial = PackageManagersSerialized(
+    launcher_serial = LaunchersSerialized(
         {
             "+=rezenv": {"requires": {"echoes": "2"}},
             ".base": {

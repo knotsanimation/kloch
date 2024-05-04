@@ -1,6 +1,6 @@
 """
 We define a simple config system that describe how to build a software environment using
-different package launchers.
+different "software launchers".
 
 The config system can handle the merging of 2 configs structure.
 """
@@ -38,9 +38,9 @@ def _merge_tokenized_dict(base_dict: dict, over_dict: dict):
     return new_content
 
 
-class PackageManagersSerialized(dict[str, dict]):
+class LaunchersSerialized(dict[str, dict]):
     """
-    A list of PackageManager serialized as a dict structure.
+    A list of launchers instance serialized as a dict structure.
 
     The dict is expected to have the following root structure::
 
@@ -52,21 +52,21 @@ class PackageManagersSerialized(dict[str, dict]):
 
     def __add__(
         self,
-        other: "PackageManagersSerialized",
-    ) -> "PackageManagersSerialized":
+        other: "LaunchersSerialized",
+    ) -> "LaunchersSerialized":
         """
         Returns:
             new instance with deepcopied structure.
         """
-        if not isinstance(other, PackageManagersSerialized):
+        if not isinstance(other, LaunchersSerialized):
             raise TypeError(
                 f"Cannot concatenate object of type {type(other)} with {type(self)}"
             )
 
         new_content = _merge_tokenized_dict(over_dict=other, base_dict=self)
-        return PackageManagersSerialized(new_content)
+        return LaunchersSerialized(new_content)
 
-    def get_with_base_merged(self) -> "PackageManagersSerialized":
+    def get_with_base_merged(self) -> "LaunchersSerialized":
         """
         Get a copy of this instance with the ``.base`` launcher merged with the other launchers.
 
@@ -79,7 +79,7 @@ class PackageManagersSerialized(dict[str, dict]):
             return self_copy
 
         base_manager_config = self_copy.pop(BaseLauncher.name())
-        base_managers = PackageManagersSerialized(
+        base_managers = LaunchersSerialized(
             {
                 manager_name: copy.deepcopy(base_manager_config)
                 for manager_name in self_copy
@@ -91,7 +91,7 @@ class PackageManagersSerialized(dict[str, dict]):
         """
         Get the dict structure with all tokens resolved.
 
-        Without tokens, the returned object is not a PackageManagersProfile instance anymore.
+        Without tokens, the returned object is not a LaunchersSerialized instance anymore.
 
         Returns:
             deepcopied dict structure.
@@ -110,9 +110,9 @@ class PackageManagersSerialized(dict[str, dict]):
 
     def unserialize(self) -> list[BaseLauncher]:
         """
-        Unserialize the given dict structure to PackageManager instances.
+        Unserialize the given dict structure to BaseLauncher instances.
 
-        The list can't contain duplicated package launchers subclasses.
+        The list can't contain duplicated launchers subclasses.
         """
         launchers: list[BaseLauncher] = []
 
@@ -143,7 +143,7 @@ class EnvironmentProfile:
     identifier: str
     version: str
     base: Optional["EnvironmentProfile"]
-    launchers: PackageManagersSerialized
+    launchers: LaunchersSerialized
 
     @classmethod
     def from_dict(cls, serialized: dict) -> "EnvironmentProfile":
@@ -156,7 +156,7 @@ class EnvironmentProfile:
         identifier: str = serialized["identifier"]
         version: str = serialized["version"]
         base: Optional["EnvironmentProfile"] = serialized.get("base", None)
-        launchers: PackageManagersSerialized = serialized["launchers"]
+        launchers: LaunchersSerialized = serialized["launchers"]
 
         return EnvironmentProfile(
             identifier=identifier,

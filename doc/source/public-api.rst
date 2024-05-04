@@ -43,7 +43,7 @@ Profile Entities
    import kenvmanager.filesyntax
 
 .. automodule:: kenvmanager
-    :members: EnvironmentProfile, PackageManagersSerialized
+    :members: EnvironmentProfile, LaunchersSerialized
 
 Launchers
 ---------

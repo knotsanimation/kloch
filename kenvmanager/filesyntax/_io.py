@@ -5,7 +5,7 @@ from typing import Optional
 
 import yaml
 
-from ._profile import PackageManagersSerialized
+from ._profile import LaunchersSerialized
 from ._profile import EnvironmentProfile
 
 
@@ -146,7 +146,7 @@ def read_profile_from_file(
         base_profile = read_profile_from_file(base_path)
         asdict["base"] = base_profile
 
-    launchers = PackageManagersSerialized(asdict["launchers"])
+    launchers = LaunchersSerialized(asdict["launchers"])
     if check_resolved:
         # discard output but ensure it doesn't raise error
         launchers.unserialize()

@@ -146,7 +146,7 @@ class BaseLauncher:
         """
         Get the ``environ`` field resolved to be ready to use.
         """
-        # TODO see if its worth to make it part of PackageManagersSerialized token resolving
+        # TODO see if its worth to make it part of LaunchersSerialized token resolving
 
         def process_pair(key: str, value: str):
             if isinstance(value, list):
