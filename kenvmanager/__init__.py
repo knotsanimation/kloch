@@ -28,4 +28,4 @@ from .filesyntax import get_profile_file_path
 from .filesyntax import get_all_profile_file_paths
 
 # keep in sync with pyproject.toml
-__version__ = "0.3.0"
+__version__ = "0.4.0"
