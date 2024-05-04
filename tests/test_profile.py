@@ -1,6 +1,6 @@
 import pytest
 
-import kenvmanager.managers
+import kenvmanager.launchers
 from kenvmanager import EnvironmentProfile
 from kenvmanager import PackageManagersSerialized
 
@@ -109,7 +109,7 @@ def test_PackageManagersSerialized_with_base():
     managers = manager_serial.unserialize()
     assert len(managers) == 1
     manager = managers[0]
-    assert isinstance(manager, kenvmanager.managers.RezEnvManager)
+    assert isinstance(manager, kenvmanager.launchers.RezEnvLauncher)
     assert manager.environ == {"PATH": ["$PATH", "/foo/bar"], "PROD": "unittest"}
     assert manager.get_resolved_environ()["PATH"].endswith("/foo/bar")
     assert not manager.get_resolved_environ()["PATH"].startswith("$PATH")

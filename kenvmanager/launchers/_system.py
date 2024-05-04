@@ -5,16 +5,16 @@ import subprocess
 from pathlib import Path
 from typing import Optional
 
-from ._base import PackageManagerBase
+from ._base import BaseLauncher
 
 
 LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
-class SystemManager(PackageManagerBase):
+class SystemLauncher(BaseLauncher):
     """
-    A minimal manager that just start a subprocess.
+    A minimal launcher that just start a subprocess with the given command.
     """
 
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
@@ -36,11 +36,11 @@ class SystemManager(PackageManagerBase):
 
     @classmethod
     def summary(cls) -> str:
-        return "A simple manager executing the given command in the default system console."
+        return "A simple launcher executing the given command in the default system console."
 
     @classmethod
     def doc(cls) -> list[str]:
         return [
-            "Intended to be used with a command.",
-            "The manager will just set the given environment variables, execute the command, then exit.",
+            "Useless without a command specified.",
+            "The launcher will just set the given environment variables for the session, execute the command, then exit.",
         ]

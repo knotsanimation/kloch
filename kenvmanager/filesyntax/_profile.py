@@ -13,8 +13,8 @@ from typing import Optional
 from ._merging import refacto_dict
 from ._merging import deepmerge_dicts
 from ._merging import MergeRule
-from kenvmanager.managers import get_package_manager_class
-from kenvmanager.managers import PackageManagerBase
+from kenvmanager.launchers import get_launcher_class
+from kenvmanager.launchers import BaseLauncher
 
 
 def _resolve_key_tokens(key: str) -> str:
@@ -75,10 +75,10 @@ class PackageManagersSerialized(dict[str, dict]):
         """
         self_copy = copy.deepcopy(self)
         # extract the potential base that all managers should inherit
-        if not PackageManagerBase.name() in self_copy:
+        if not BaseLauncher.name() in self_copy:
             return self_copy
 
-        base_manager_config = self_copy.pop(PackageManagerBase.name())
+        base_manager_config = self_copy.pop(BaseLauncher.name())
         base_managers = PackageManagersSerialized(
             {
                 manager_name: copy.deepcopy(base_manager_config)
@@ -108,19 +108,19 @@ class PackageManagersSerialized(dict[str, dict]):
         )
         return new_content
 
-    def unserialize(self) -> list[PackageManagerBase]:
+    def unserialize(self) -> list[BaseLauncher]:
         """
         Unserialize the given dict structure to PackageManager instances.
 
         The list can't contain duplicated package managers subclasses.
         """
-        managers: list[PackageManagerBase] = []
+        managers: list[BaseLauncher] = []
 
         serialized = self.get_with_base_merged()
         serialized = serialized.get_resolved()
 
         for manager_name, manager_config in serialized.items():
-            manager_class = get_package_manager_class(manager_name)
+            manager_class = get_launcher_class(manager_name)
             if not manager_class:
                 raise ValueError(
                     f"No manager class registred with the name <{manager_name}>"

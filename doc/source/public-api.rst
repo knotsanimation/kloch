@@ -50,7 +50,7 @@ Package Managers
 
 .. code-block:: python
 
-   import kenvmanager.managers
+   import kenvmanager.launchers
 
-.. automodule:: kenvmanager.managers
-   :members: PackageManagerBase, get_package_manager_class, RezEnvManager
+.. automodule:: kenvmanager.launchers
+   :members: BaseLauncher, get_launcher_class, RezEnvLauncher

@@ -5,10 +5,9 @@ All the information is extracted from the code of the dataclass.
 """
 
 import dataclasses
-import typing
 from typing import Type
 
-import kenvmanager.managers
+import kenvmanager.launchers
 
 
 RowType = tuple[str, str, str]
@@ -71,7 +70,7 @@ def replace_character(src_str: str, character: str, substitution: str) -> str:
     return src_str[:index] + substitution + src_str[index + 1 :]
 
 
-def document_manager(manager: Type[kenvmanager.managers.PackageManagerBase]) -> str:
+def document_manager(manager: Type[kenvmanager.launchers.BaseLauncher]) -> str:
     lines = []
     lines += [manager.name(), "_" * len(manager.name())]
     lines += [""] + manager.doc() + [""]
@@ -109,8 +108,8 @@ def document_manager(manager: Type[kenvmanager.managers.PackageManagerBase]) -> 
 
 
 def main():
-    for manager in kenvmanager.managers.get_available_managers_classes():
-        print(document_manager(manager))
+    for launcher in kenvmanager.launchers.get_available_launchers_classes():
+        print(document_manager(launcher))
 
 
 main()
