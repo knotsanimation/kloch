@@ -14,7 +14,7 @@ those rules are discarded:
 - The file CAN have an abitrary name.
 - The file extension MUST be ``.yml``.
 - The file MUST NOT be empty.
-- The file MUST have a ``__magic__`` root key with a value starting by ``KenvEnvironmentProfile``.
+- The file MUST have a ``__magic__`` root key with a value starting by ``kloch_profile``.
 
 The content of the file is then defined as:
 

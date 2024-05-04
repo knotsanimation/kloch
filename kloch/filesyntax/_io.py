@@ -19,7 +19,7 @@ Name of the user-editable environment variable to add profile locations.
 
 _PROFILE_LOCATIONS_INTERNAL: list[Path] = []
 
-KENV_PROFILE_MAGIC = "KenvEnvironmentProfile"
+KENV_PROFILE_MAGIC = "kloch_profile"
 KENV_PROFILE_VERSION = 2
 
 

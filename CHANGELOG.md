@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### changed
 
 - ! renamed the core repository name to `kloch` (previously `kenvmanager`)
+- ! renamed profile magic name to `kloch_profile` (from `KenvEnvironmentProfile`)
 
 ## [0.4.0] - 2024-05-04
 
