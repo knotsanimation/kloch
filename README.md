@@ -8,6 +8,8 @@
 > Despite being public, this repository is still in development stage and
 > have not been tested extensively yet.
 
+![banner with logo and logotype](./doc/source/_static/banner.svg)
+
 ``kloch`` _/klˈoʃ/_ is a simple environment manager serializing software environment
 configuration to disk.
 

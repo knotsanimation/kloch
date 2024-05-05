@@ -1,18 +1,50 @@
-div.columns > div.column-left {
-  width: 43%;
-  padding: 0px 3px 0px 0px;
-  float: left;
+@font-face {
+    font-family: "Mango Regular";
+    src: url("./fonts/Mango-Regular.woff2");
+}
+@font-face {
+    font-family: "Dosis";
+    src: url("./fonts/Dosis-VariableFont_wght.ttf");
 }
 
-div.columns > div.column-right  {
-  margin-left: 45%;
-  /* float: right; */
+
+img.sidebar-logo {
+    width: 64px;
+    max-width: unset;
+    margin: 5px;
+}
+
+h1 {
+    font-family: "Mango Regular", var(--font-stack--headings), sans-serif;
+    font-size: 4em;
+}
+
+/*sidebar site title*/
+span.sidebar-brand-text {
+    font-family: var(--font-stack--headings);
+    font-weight: 700;
+}
+/*sidebar page listing*/
+div.sidebar-tree .reference:hover {
+    /*we are sure it's always white no matter the theme*/
+    color: #FEFEFE;
+}
+
+/* custom vertical column split system*/
+div.columns > div.column-left {
+    width: 43%;
+    padding: 0px 3px 0px 0px;
+    float: left;
+}
+div.columns > div.column-right {
+    margin-left: 45%;
+    /* float: right; */
 }
 
 /* improve tables look */
 table.docutils {
-  width: 100%;
+    width: 100%;
 }
 table.docutils td, table.docutils th {
-  text-align: left;
+    text-align: left;
 }
