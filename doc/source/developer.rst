@@ -1,5 +1,5 @@
-Developer
-=========
+Developing
+==========
 
 How to work on the library and extend it as needed.
 

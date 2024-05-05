@@ -43,12 +43,18 @@ Contents
 
 .. toctree::
    :maxdepth: 2
+   :caption: user
 
    Home <self>
    install
    usage
    cli
    file-format
+
+.. toctree::
+   :maxdepth: 2
+   :caption: developer
+
    public-api
    developer
    changelog
