@@ -27,4 +27,5 @@ doc/build/
 
 # pyinstaller
 scripts/.pyinstaller/
+scripts/.nuitka/
 scripts/build/
