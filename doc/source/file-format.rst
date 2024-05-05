@@ -1,5 +1,5 @@
-File Format
-===========
+Profile File
+============
 
 An environment profile is serialized as a `yaml <https://en.wikipedia.org/wiki/YAML>`_ file on disk.
 
