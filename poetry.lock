@@ -1017,6 +1017,24 @@ sphinx = ">=4.0"
 docs = ["furo", "ipython", "myst-parser", "sphinx-copybutton", "sphinx-inline-tabs"]
 
 [[package]]
+name = "sphinx-copybutton"
+version = "0.5.0"
+description = "Add a copy button to each of your code cells."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "sphinx-copybutton-0.5.0.tar.gz", hash = "sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6"},
+    {file = "sphinx_copybutton-0.5.0-py3-none-any.whl", hash = "sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48"},
+]
+
+[package.dependencies]
+sphinx = ">=1.8"
+
+[package.extras]
+code-style = ["pre-commit (==2.12.1)"]
+rtd = ["ipython", "myst-nb", "sphinx", "sphinx-book-theme"]
+
+[[package]]
 name = "sphinx-exec-code"
 version = "0.12"
 description = "Execute code blocks in Sphinx and display the output"
@@ -1256,4 +1274,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7"
-content-hash = "ee10dc6c71ae7491f7245d42b4f587728f3f00bccaf2cc38391d37fa42d7b766"
+content-hash = "a19027a0b616f7e864e32902aa2f68e85961258935b54296cd807344f65993fd"

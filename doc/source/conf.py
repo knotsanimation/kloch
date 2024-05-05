@@ -27,6 +27,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_exec_code",
+    "sphinx_copybutton",
     "execinject",
 ]
 
