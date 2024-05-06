@@ -6,36 +6,70 @@ kloch
    Despite being public, this repository is still in development stage and
    have not been tested extensively yet.
 
-``kloch`` `/klˈoʃ/` [1]_ [2]_, is an environment manager which wrap
-:abbr:`requests (usually a collection of software to load with some specific conditions)`
-sent to package managers, which we abstract as "launchers".
+``kloch`` `/klˈoʃ/` [1]_ [2]_, is a configuration system for launching software.
 
-A launcher is a predefined piece of code which on execution will produce
-an environment session as requested, and optionally execute a command.
-
-Those requests are stored as "environment profiles",
-:abbr:`serialized (translating a data structure or object state into a format that can be stored on disk)` on disk
-as files in the `yaml <https://en.wikipedia.org/wiki/YAML>`_ language.
-
-In its current state, it only include support for `rez <https://rez.readthedocs.io>`_.
+Configurations are `yaml <https://en.wikipedia.org/wiki/YAML>`_ files referred
+as `environment profile` which specify the parameters for one or
+multiple pre-defined launchers.
 
 .. literalinclude:: demo-fileformat/profile.yml
    :language: yaml
-   :caption: demo-profile.yml
+   :caption: a profile with the configuration for the `rezenv` launcher
 
-The above profile can be executed by using the
-:abbr:`CLI (Command Line Interface)` tool:
+`Launchers` are internally-defined python objects that specify how to execute
+a combinations of options and (optional) command.
+
+To use the profile, one must call the :abbr:`CLI (Command Line Interface)` tool.
+The profile example shared above can be launched using:
 
 .. code-block:: shell
 
    python -m kloch run knots:echoes
 
+Design
+------
+
+`kloch` was initially designed as the environment manager layer when used with
+the `rez <https://rez.readthedocs.io>`_ package manager.
+
+In a very abstract way, `kloch` is a system that:
+
+-
+   :abbr:`serialize (translating a data structure or object state into a
+   format that can be stored on disk)` the arguments passed to a pre-defined
+   function as yaml files.
+
+   .. code-block:: shell
+
+      myLauncher(optionA="paint.exe", optionB={"PATH": "/foo"})
+
+   becomes:
+
+   .. code-block:: yaml
+      :caption: myProfile.yml
+
+      myLauncher:
+         optionA: paint.exe
+         optionB:
+            PATH: /foo
+
+-
+   execute that function by unserializing the parameters provided at runtime.
+
+   .. code-block:: python
+      :caption: pseudo-code in python
+
+      profile = read_profile("myProfile.yml")
+      for launcher_name, launcher_config in profile.items():
+         launcher = get_launcher(launcher_name)
+         launcher(**launcher_config)
+
 The profile system includes:
 
-- profile inheritance (a profile specify it merge on top of another profile)
+- profile inheritance (a profile specify it merges on top of another profile)
 - token system to determine merging rules during inheritance
 - arbitrary profile locations definition through API and environment variable.
-- abstract launcher system to accomodate any package manager or software launching.
+- abstract launcher system to accomodate for any use-case.
 
 
 Contents
