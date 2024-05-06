@@ -27,6 +27,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_exec_code",
+    "sphinx_copybutton",
     "execinject",
 ]
 
@@ -43,7 +44,26 @@ html_css_files = [
     "extra.css",
 ]
 
+html_logo = "_static/logo-color.svg"
+
 html_theme_options = {
+    "light_css_variables": {
+        "color-highlight-on-target": "#D1DBFF",
+        "color-sidebar-item-background--hover": "#002bc5",
+        "font-stack--headings": "Dosis, var(--font-stack)",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#3953FF",
+        "color-brand-content": "#3953FF",
+        "color-brand-visited": "#6D92C5",
+        "color-highlight-on-target": "#002bc5",
+        "color-sidebar-item-background--hover": "#002bc5",
+        "color-background-primary": "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(28,27,30,1) 50%)",
+        "color-sidebar-background": "transparent",
+        "color-toc-background": "transparent",
+        "color-sidebar-search-background": "#090909",
+        "font-stack--headings": "Dosis, var(--font-stack)",
+    },
     "footer_icons": [
         {
             "name": "GitHub",
