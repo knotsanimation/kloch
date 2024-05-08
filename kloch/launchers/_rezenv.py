@@ -38,7 +38,7 @@ class RezEnvLauncher(BaseLauncher):
         "content of a valid yaml rez config that is created on the fly before the rez-env.",
     ] = dataclasses.field(default_factory=dict)
 
-    required_fields: ClassVar[list[str]] = ["requires"]
+    required_fields: ClassVar[list[str]] = []
 
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
         """
