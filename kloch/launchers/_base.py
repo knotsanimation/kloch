@@ -103,7 +103,9 @@ class BaseLauncher:
     def __post_init__(self):
         for field in dataclasses.fields(self):
             if field.name in self.required_fields and not getattr(self, field.name):
-                raise ValueError(f"Missing required field '{field.name}'")
+                raise ValueError(
+                    f"Missing required field '{field.name}' for instance {self}"
+                )
 
     @classmethod
     @abc.abstractmethod
