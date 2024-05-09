@@ -1,0 +1,16 @@
+__magic__: kloch_profile:2
+identifier: knots
+version: 0.1.0
+launchers:
+  +=.base:
+    +=environ:
+      KNOTS_SKYNET_PATH: "N:"
+      KNOTS_LOCAL_INSTALL_PATH: $LOCALAPPDATA\knots
+      KNOTS_LOCAL_REZ_INSTALL_PATH: $KNOTS_LOCAL_INSTALL_PATH\rez
+      KNOTS_LOCAL_REZ_SCRIPTS_PATH: $KNOTS_LOCAL_REZ_INSTALL_PATH\Scripts\rez
+  +=rezenv:
+    +=requires: []
+    +=environ:
+      PATH:
+        - $PATH
+        - $KNOTS_LOCAL_REZ_SCRIPTS_PATH
