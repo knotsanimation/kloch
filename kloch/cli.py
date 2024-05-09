@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import runpy
 import sys
 import tempfile
 import textwrap
@@ -283,6 +284,33 @@ class ResolveParser(BaseParser):
         )
 
 
+class PythonParser(BaseParser):
+    """
+    A "python" sub-command.
+    """
+
+    @property
+    def file_path(self) -> Path:
+        """
+        A filesysten path to an existing python file to execute or
+        an existing directory that MUST contains a __main__.py file.
+        """
+        return self._args.file_path
+
+    def execute(self):
+        LOGGER.debug(f"about to run '{self.file_path}'")
+        runpy.run_path(str(self.file_path), run_name="__main__")
+
+    @classmethod
+    def add_to_parser(cls, parser: argparse.ArgumentParser):
+        super().add_to_parser(parser)
+        parser.add_argument(
+            "file_path",
+            type=str,
+            help=cls.file_path.__doc__,
+        )
+
+
 class RawFormatter(argparse.HelpFormatter):
     """
     https://stackoverflow.com/a/64102901/13806195
@@ -340,6 +368,14 @@ def get_cli(argv=None) -> BaseParser:
         ),
     )
     ResolveParser.add_to_parser(subparser)
+
+    subparser = subparsers.add_parser(
+        "python",
+        description=(
+            "Execute the given python file with the internal python interpreter."
+        ),
+    )
+    PythonParser.add_to_parser(subparser)
 
     argv: list[str] = argv or sys.argv[1:]
 
