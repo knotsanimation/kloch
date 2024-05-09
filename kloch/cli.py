@@ -77,9 +77,17 @@ def _get_merged_profile(profile_identifiers: list[str]):
     """
     profiles = []
     for profile_id in profile_identifiers:
-        profile_path = kloch.get_profile_file_path(profile_id)
-        if not profile_path:
-            raise ValueError(f"No profile with identifier <{profile_id}> found.")
+        profile_paths = kloch.get_profile_file_path(profile_id)
+        if len(profile_paths) >= 2:
+            raise ValueError(
+                f"Found multiple profile with identifier '{profile_id}' "
+                f": {profile_paths}."
+            )
+
+        if not profile_paths:
+            raise ValueError(f"No profile found with identifier '{profile_id}'.")
+
+        profile_path = profile_paths[0]
         LOGGER.debug(f"reading profile {profile_path}")
         profile = kloch.read_profile_from_file(profile_path)
         profile = profile.get_merged_profile()

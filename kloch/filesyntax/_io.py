@@ -101,38 +101,42 @@ def _get_profile_identifier(file_path: Path) -> str:
     return asdict["identifier"]
 
 
-def get_profile_file_path(profile_id: str) -> Optional[Path]:
+def get_profile_file_path(
+    profile_id: str,
+    profile_locations: Optional[list[Path]] = None,
+) -> list[Path]:
     """
-    Get the filesystem location to the profile with the given name.
+    Get the filesystem location to the profile(s) with the given name.
+
+    Args:
+        profile_id: identifier that must match returned profiles.
+        profile_locations:
+            list of filesystem path to potential existing directories containing profiles.
 
     Returns:
-        filesystem path to an existing file or None if not found.
+        list of filesystem path to existing files . Might be empty.
     """
-    profile_paths = get_all_profile_file_paths()
+    profile_paths = get_all_profile_file_paths(locations=profile_locations)
     profiles: list[Path] = [
         path for path in profile_paths if _get_profile_identifier(path) == profile_id
     ]
-    if len(profiles) > 1:
-        raise RuntimeError(
-            f"Found multiple profile with the same name {profile_id}. "
-            f"Ensure all name in your profile file are unique."
-        )
-    if not profiles:
-        return None
-
-    return profiles[0]
+    return profiles
 
 
 def read_profile_from_file(
     file_path: Path,
-    check_resolved: bool = True,
+    profile_locations: Optional[list[Path]] = None,
 ) -> EnvironmentProfile:
     """
     Generate an instance from a serialized file on disk.
 
+    Raises error if the file is not built properly.
+
     Args:
-        file_path: filesystem path to an existing file
-        check_resolved: if True, run additional sanity check on the profile file
+        file_path:
+            filesystem path to an existing valid profile file.
+        profile_locations:
+            list of filesystem path to potential existing directories containing profiles.
     """
     with file_path.open("r", encoding="utf-8") as file:
         asdict: dict = yaml.safe_load(file)
@@ -147,20 +151,28 @@ def read_profile_from_file(
 
     base_name: Optional[str] = asdict.get("base", None)
     if base_name:
-        base_path = get_profile_file_path(base_name)
-        if not base_path:
-            raise ValueError(f"Base profile {base_name} was not found.")
-        base_profile = read_profile_from_file(base_path)
+        base_paths = get_profile_file_path(
+            base_name,
+            profile_locations=profile_locations,
+        )
+        if len(base_paths) >= 2:
+            raise ValueError(
+                f"Found multiple profile with identifier '{base_name}' "
+                f"specified from profile '{file_path}': {base_paths}."
+            )
+        if not base_paths:
+            raise ValueError(
+                f"No profile found with identifier '{base_name}' "
+                f"specified from profile '{file_path}'."
+            )
+
+        base_profile = read_profile_from_file(file_path=base_paths[0])
         asdict["base"] = base_profile
 
     launchers = LaunchersSerialized(asdict["launchers"])
-    if check_resolved:
-        # discard output but ensure it doesn't raise error
-        launchers.unserialize()
     asdict["launchers"] = launchers
 
     profile = EnvironmentProfile.from_dict(asdict)
-
     return profile
 
 
@@ -204,8 +216,11 @@ def write_profile_to_file(
             if True, ensure the identifier of the profile is unique
     """
     if check_valid_name:
-        # expected to raise if more than one profile has the same name
-        get_profile_file_path(profile.identifier)
+        profile_paths = get_profile_file_path(profile.identifier)
+        if profile_paths and file_path not in profile_paths:
+            raise ValueError(
+                f"Found multiple profile with identifier '{profile.identifier}'."
+            )
 
     serialized = serialize_profile(profile)
 

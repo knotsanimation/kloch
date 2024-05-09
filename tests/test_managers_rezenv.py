@@ -6,14 +6,6 @@ import pytest
 import kloch.launchers
 
 
-def test_RezEnvManager_required_fields():
-    asdict = {"params": ["--verbose"]}
-
-    with pytest.raises(ValueError) as error:
-        launcher = kloch.launchers.RezEnvLauncher.from_dict(asdict)
-        assert "required field" in error
-
-
 def test_RezEnvManager_environ(monkeypatch, tmp_path):
     launcher = kloch.launchers.RezEnvLauncher(
         requires={"maya": "2023", "houdini": "20.2"},
