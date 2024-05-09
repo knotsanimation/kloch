@@ -27,7 +27,7 @@ class SystemLauncher(BaseLauncher):
         environ = self.get_resolved_environ()
         envvars.update(environ)
 
-        LOGGER.debug(f"executing system command={command}")
+        LOGGER.debug(f"executing system command={command} with environ={envvars}")
         result = subprocess.run(command, shell=True, env=envvars)
 
         return result.returncode

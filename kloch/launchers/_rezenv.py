@@ -70,7 +70,9 @@ class RezEnvLauncher(BaseLauncher):
             env_config_path.append(str(config_path))
             envvars["REZ_CONFIG_FILE"] = os.pathsep.join(env_config_path)
 
-        LOGGER.debug(f"executing interactive shell with command={full_command}")
+        LOGGER.debug(
+            f"executing interactive shell with command={full_command} and env={envvars}"
+        )
         result = subprocess.run(full_command, shell=True, env=envvars)
 
         return result.returncode
