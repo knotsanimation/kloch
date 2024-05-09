@@ -74,11 +74,15 @@ class LaunchersSerialized(dict[str, dict]):
             new instance with deepcopied structure.
         """
         self_copy = copy.deepcopy(self)
+
         # extract the potential base that all launchers should inherit
-        if not BaseLauncher.name() in self_copy:
+        for launcher_name in self_copy:
+            if _resolve_key_tokens(launcher_name) == BaseLauncher.name():
+                base_manager_config = self_copy.pop(launcher_name)
+                break
+        else:
             return self_copy
 
-        base_manager_config = self_copy.pop(BaseLauncher.name())
         base_managers = LaunchersSerialized(
             {
                 manager_name: copy.deepcopy(base_manager_config)
