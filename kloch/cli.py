@@ -300,6 +300,7 @@ class PythonParser(BaseParser):
     def execute(self):
         LOGGER.debug(f"about to run '{self.file_path}'")
         runpy.run_path(str(self.file_path), run_name="__main__")
+        sys.exit()
 
     @classmethod
     def add_to_parser(cls, parser: argparse.ArgumentParser):
