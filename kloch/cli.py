@@ -1,5 +1,6 @@
 import abc
 import argparse
+import copy
 import json
 import logging
 import os
@@ -297,8 +298,18 @@ class PythonParser(BaseParser):
         """
         return self._args.file_path
 
+    @property
+    def user_args(self) -> list[str]:
+        """
+        Arbitrary nummber of command line argument passed to the python file.
+        """
+        return self._args.user_args
+
     def execute(self):
-        LOGGER.debug(f"about to run '{self.file_path}'")
+        LOGGER.debug(f"about to run '{self.file_path}' with args={self.user_args}")
+        # we can set it without restoring because we sys.exit anyway
+        sys.argv = [str(self.file_path)] + self.user_args
+
         runpy.run_path(str(self.file_path), run_name="__main__")
         sys.exit()
 
@@ -309,6 +320,12 @@ class PythonParser(BaseParser):
             "file_path",
             type=str,
             help=cls.file_path.__doc__,
+        )
+        parser.add_argument(
+            "user_args",
+            type=str,
+            nargs="*",
+            help=cls.user_args.__doc__,
         )
 
 
@@ -378,7 +395,7 @@ def get_cli(argv=None) -> BaseParser:
     )
     PythonParser.add_to_parser(subparser)
 
-    argv: list[str] = argv or sys.argv[1:]
+    argv: list[str] = copy.copy(argv) or sys.argv[1:]
 
     # retrieve the "--" system that allow to specify an arbitrary command to execute
     user_command = None
@@ -386,6 +403,10 @@ def get_cli(argv=None) -> BaseParser:
         split_index = argv.index("--")
         user_command = argv[split_index + 1 :]
         argv = argv[:split_index]
+
+    # XXX: internal feature for the PythonLauncher. It's ok not having it documented in the CLI.
+    if argv[0] and Path(argv[0]).exists():
+        argv.insert(0, "python")
 
     args = parser.parse_args(argv)
     setattr(args, _ARGS_USER_COMMAND_DEST, user_command)

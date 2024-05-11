@@ -102,10 +102,22 @@ def test__getCli__run__command(monkeypatch, data_dir):
 
 
 def test__getCli__python(data_dir, capsys):
-    argv = ["python", str(data_dir / "test-script-a.py")]
+    argv = ["python", str(data_dir / "test-script-a.py"), "some args ?", "test !"]
     cli = kloch.get_cli(argv=argv)
     with pytest.raises(SystemExit):
         cli.execute()
 
     result = capsys.readouterr()
     assert f"{kloch.__name__} test script working" in result.out
+
+
+def test__getCli__python__implicit(data_dir, capsys):
+    script_path = data_dir / "test-script-a.py"
+    argv = [str(script_path), "some args ?", "test !"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    result = capsys.readouterr()
+    assert f"{kloch.__name__} test script working" in result.out
+    assert result.out.endswith(f"{str(argv)}\n")
