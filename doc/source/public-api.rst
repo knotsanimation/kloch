@@ -53,4 +53,4 @@ Launchers
    import kloch.launchers
 
 .. automodule:: kloch.launchers
-   :members: BaseLauncher, get_launcher_class, RezEnvLauncher
+   :members: BaseLauncher, get_available_launchers_classes, get_launcher_class, RezEnvLauncher, SystemLauncher, PythonLauncher

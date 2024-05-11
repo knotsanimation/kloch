@@ -64,3 +64,15 @@ def test__launcher__required_fields():
     asdict = {"params": ["--verbose"], "environ": {"PATH": "foo"}}
     launcher = TestLauncher.from_dict(asdict)
     assert launcher.environ == {"PATH": "foo"}
+
+
+def test__get_launcher_class():
+
+    result = kloch.launchers.get_launcher_class(".base")
+    assert result is kloch.launchers.BaseLauncher
+
+    result = kloch.launchers.get_launcher_class("system")
+    assert result is kloch.launchers.SystemLauncher
+
+    result = kloch.launchers.get_launcher_class("@python")
+    assert result is kloch.launchers.PythonLauncher
