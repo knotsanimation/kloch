@@ -5,7 +5,7 @@ from kloch import EnvironmentProfile
 from kloch import LaunchersSerialized
 
 
-def test_EnvironmentProfile_merging():
+def test__EnvironmentProfile__merging():
     profile1 = EnvironmentProfile(
         identifier="knots",
         version="0.1.0",
@@ -86,7 +86,7 @@ def test_EnvironmentProfile_merging():
     assert result == expected
 
 
-def test_LaunchersSerialized_with_base():
+def test__LaunchersSerialized__with_base():
     # test rezenv inherit .base properly when rezenv doesn't define the key
 
     launcher_serial = LaunchersSerialized(

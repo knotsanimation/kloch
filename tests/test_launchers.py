@@ -18,7 +18,7 @@ PROFILE_DELTA_ENVIRON = {
 }
 
 
-def test_profile_delta(data_dir):
+def test__profile_delta(data_dir):
     profile_path = data_dir / "profile-delta.yml"
     profile = kloch.read_profile_from_file(profile_path, profile_locations=[data_dir])
     assert profile.base.identifier == "knots"
@@ -33,7 +33,7 @@ def test_profile_delta(data_dir):
     assert launchers[1].environ == PROFILE_DELTA_ENVIRON
 
 
-def test_launcher_required_fields():
+def test__launcher__required_fields():
     @dataclasses.dataclass
     class TestLauncher(kloch.launchers.BaseLauncher):
         params: list[str] = dataclasses.field(default_factory=list)

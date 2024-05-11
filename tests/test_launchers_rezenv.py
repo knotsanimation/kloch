@@ -1,12 +1,10 @@
 import os
 import subprocess
 
-import pytest
-
 import kloch.launchers
 
 
-def test_RezEnvManager_environ(monkeypatch, tmp_path):
+def test__RezEnvLauncher__environ(monkeypatch, tmp_path):
     launcher = kloch.launchers.RezEnvLauncher(
         requires={"maya": "2023", "houdini": "20.2"},
         params=["--verbose"],
