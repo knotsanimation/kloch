@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2024-05-16
+
+### added
+
+- `cli` add `python` subcommand to execute a file with the internal interpreter
+- `launchers` add a new `@python` launcher
+- `launchers` add `cwd` attribute
+
+### changed
+
+- `launchers` improve error message when missing a required field to a launcher
+- `launchers` improve debbug message of subprocess
+- `launchers` resolve `environ` earlier at init instead of in `execute()`
+- `launchers.rezenv` remove `requires` from required_fileds
+- `io` allow to specify a `profile_locations` arg
+
+### fixed
+
+- `profile` merging of `.base` when token in launcher name
+
+### chores
+
+- improved unittesting
+- run unittest in CI
+
+
 ## [0.5.2] - 2024-05-06
 
 ### chores
