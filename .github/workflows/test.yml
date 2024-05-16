@@ -4,9 +4,15 @@ on:
   pull_request:
     paths-ignore:
       - 'doc/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
   push:
     branches:
       - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   tests:
