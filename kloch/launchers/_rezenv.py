@@ -51,13 +51,11 @@ class RezEnvLauncher(BaseLauncher):
             for pkg_name, pkg_version in self.requires.items()
         ]
 
-        command = self.command + (command or [])
-        command = ["--"] + command if command else []
-        full_command = ["rez-env"] + self.params + requires + command
+        _command = self.command + (command or [])
+        _command = ["--"] + command if command else []
+        _command = ["rez-env"] + self.params + requires + _command
 
-        envvars = dict(os.environ)
-        environ = self.get_resolved_environ()
-        envvars.update(environ)
+        environ = self.environ.copy()
 
         if self.config:
             config_path = tmpdir / "rezconfig.yml"
@@ -66,14 +64,14 @@ class RezEnvLauncher(BaseLauncher):
             with config_path.open("w", encoding="utf-8") as config_file:
                 yaml.dump(self.config, config_file)
 
-            env_config_path = envvars.get("REZ_CONFIG_FILE", "").split(os.pathsep)
+            env_config_path = environ.get("REZ_CONFIG_FILE", "").split(os.pathsep)
             env_config_path.append(str(config_path))
-            envvars["REZ_CONFIG_FILE"] = os.pathsep.join(env_config_path)
+            environ["REZ_CONFIG_FILE"] = os.pathsep.join(env_config_path)
 
         LOGGER.debug(
-            f"executing interactive shell with command={full_command} and env={envvars}"
+            f"executing rez command={_command}; environ={environ}; cwd={self.cwd}"
         )
-        result = subprocess.run(full_command, shell=True, env=envvars)
+        result = subprocess.run(_command, shell=True, env=environ, cwd=self.cwd)
 
         return result.returncode
 

@@ -54,6 +54,28 @@ def _resolve_path(src_str: str) -> str:
     return str(Path(src_str).resolve())
 
 
+def _resolve_environ(environ: dict[str, Union[str, list[str]]]) -> dict[str, str]:
+    """
+    Resolve an "environ-like" dict structure to an ``os.environ`` dict structure.
+    """
+    # TODO see if its worth to make it part of LaunchersSerialized token resolving
+
+    def process_pair(key: str, value: str):
+        if isinstance(value, list):
+            value = [_resolve_path(_resolve_env_var(str(path))) for path in value]
+            value = os.pathsep.join(value)
+        else:
+            value = _resolve_path(_resolve_env_var(str(value)))
+
+        # reverted by context manager, we need it so a variable defined after
+        # another one can reuse that first one.
+        os.environ[key] = value
+        return key, value
+
+    with _patch_environ():
+        return refacto_dict(environ, callback=process_pair)
+
+
 @dataclasses.dataclass
 class BaseLauncher:
     """
@@ -72,10 +94,11 @@ class BaseLauncher:
         "",
         "The value can either be a regular string or a list of string.",
         "The list of string has each item joined using the system path separator [2]_.",
-        "All values have environment variables expanded with ``os.expandvars`` [1]_. "
-        "You can escape the expansion by doubling the ``$`` like ``$$``",
         "",
-        "If the variable value is an existing path at resolve time, then it is normalized for the system (correct slashes) [4]_.",
+        "- All values have environment variables expanded with ``os.expandvars`` [1]_. "
+        "  You can escape the expansion by doubling the ``$`` like ``$$``",
+        "- All values are turned absolute and normalized [4]_ if they are existing paths.",
+        "",
     ] = dataclasses.field(default_factory=dict)
     """
     Mapping of environment variables to set when starting the environment.
@@ -93,6 +116,22 @@ class BaseLauncher:
     The developer is reponsible of honoring the field usage in its launcher implementation.
     """
 
+    cwd: Annotated[
+        Optional[str],
+        'Filesystem path to an existing directory to use as "current working directory".',
+        "",
+        "- The path will have environment variables expanded with ``os.expandvars`` [1]_. ",
+        "  You can escape the expansion by doubling the ``$`` like ``$$``.",
+        "  You can also use variables defined in the ``environ`` key.",
+        "- The path is turned absolute and normalized [4]_.",
+        "",
+    ] = None
+    """
+    Current working directory.
+    
+    The developer is reponsible of honoring the field usage in its launcher implementation.
+    """
+
     required_fields: ClassVar[list[str]] = []
     """
     List of dataclass field that are required to build the instance from a dict object.
@@ -106,6 +145,16 @@ class BaseLauncher:
                 raise ValueError(
                     f"Missing required field '{field.name}' for instance {self}"
                 )
+
+        new_environ = dict(os.environ)
+        new_environ.update(_resolve_environ(self.environ))
+        self.environ = new_environ
+
+        if self.cwd:
+            with _patch_environ():
+                os.environ.clear()
+                os.environ.update(new_environ)
+                self.cwd = str(Path((_resolve_env_var(self.cwd))).absolute().resolve())
 
     @classmethod
     @abc.abstractmethod
@@ -155,27 +204,6 @@ class BaseLauncher:
             The exit code of the execution. 0 if successfull, else imply failure.
         """
         pass
-
-    def get_resolved_environ(self) -> dict[str, str]:
-        """
-        Get the ``environ`` field resolved to be ready to use.
-        """
-        # TODO see if its worth to make it part of LaunchersSerialized token resolving
-
-        def process_pair(key: str, value: str):
-            if isinstance(value, list):
-                value = [_resolve_path(_resolve_env_var(str(path))) for path in value]
-                value = os.pathsep.join(value)
-            else:
-                value = _resolve_path(_resolve_env_var(str(value)))
-
-            # reverted by context manager, we need it so a variable defined after
-            # another one can reuse that first one.
-            os.environ[key] = value
-            return key, value
-
-        with _patch_environ():
-            return refacto_dict(self.environ, callback=process_pair)
 
     def to_dict(self) -> dict[str, Any]:
         """

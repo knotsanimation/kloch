@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 import pytest
 
 import kloch.launchers
@@ -110,9 +113,9 @@ def test__LaunchersSerialized__with_base():
     assert len(launchers) == 1
     launcher = launchers[0]
     assert isinstance(launcher, kloch.launchers.RezEnvLauncher)
-    assert launcher.environ == {"PATH": ["$PATH", "/foo/bar"], "PROD": "unittest"}
-    assert launcher.get_resolved_environ()["PATH"].endswith("/foo/bar")
-    assert not launcher.get_resolved_environ()["PATH"].startswith("$PATH")
+    assert not launcher.environ["PATH"].startswith("$PATH")
+    assert launcher.environ["PATH"].endswith("/foo/bar")
+    assert launcher.environ["PROD"] == "unittest"
 
     # test rezenv inherit .base properly when rezenv already define the key
 
@@ -137,12 +140,12 @@ def test__LaunchersSerialized__with_base():
     )
     launchers = launcher_serial.unserialize()
     launcher = launchers[0]
-    assert launcher.environ == {
-        "PATH": ["$PATH", "/foo/bar", "/rez"],
-        "REZVERBOSE": 2,
-        "PROD": "unittest",
-        "SOME_LIST": ["rez"],
-    }
+    assert launcher.environ["PATH"].endswith(
+        os.pathsep.join(["/foo/bar", str(Path("/rez").resolve())])
+    )
+    assert launcher.environ["REZVERBOSE"] == "2"
+    assert launcher.environ["PROD"] == "unittest"
+    assert launcher.environ["SOME_LIST"] == "rez"
 
     # test non-supported key in .base
 

@@ -5,6 +5,18 @@ import kloch.launchers
 
 
 def test__RezEnvLauncher__environ(monkeypatch, tmp_path):
+    class Results:
+        command: list[str] = None
+        env: dict[str, str] = None
+
+    def patched_subprocess(command, shell, env, *args, **kwargs):
+        Results.env = env
+        Results.command = command
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setenv("__TEST__", "SUCCESS")
+    monkeypatch.setattr(subprocess, "run", patched_subprocess)
+
     launcher = kloch.launchers.RezEnvLauncher(
         requires={"maya": "2023", "houdini": "20.2"},
         params=["--verbose"],
@@ -17,18 +29,6 @@ def test__RezEnvLauncher__environ(monkeypatch, tmp_path):
             "SUCCESSIVE": "$NUMBER",
         },
     )
-
-    class Results:
-        command: list[str] = None
-        env: dict[str, str] = None
-
-    def patched_subprocess(command, shell, env, *args, **kwargs):
-        Results.env = env
-        Results.command = command
-        return subprocess.CompletedProcess(command, 0)
-
-    monkeypatch.setenv("__TEST__", "SUCCESS")
-    monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
     launcher.execute(tmpdir=tmp_path)
 

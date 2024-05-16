@@ -27,10 +27,20 @@ def test__profile_delta(data_dir):
     assert len(profile.launchers) == 3
     launchers = profile.launchers.get_with_base_merged()
     assert len(launchers) == 2
+    launchers_resolved = launchers.get_resolved()
+    assert (
+        launchers_resolved[kloch.launchers.SystemLauncher.name()]["environ"]
+        == PROFILE_DELTA_ENVIRON
+    )
+
     launchers = launchers.unserialize()
     assert isinstance(launchers[0], kloch.launchers.RezEnvLauncher)
     assert isinstance(launchers[1], kloch.launchers.SystemLauncher)
-    assert launchers[1].environ == PROFILE_DELTA_ENVIRON
+    # ensure it is resolved
+    assert launchers[1].environ != PROFILE_DELTA_ENVIRON
+    assert launchers[1].cwd == str(
+        Path(PROFILE_DELTA_ENVIRON["KNOTS_SKYNET_PATH"], "/", "test-cwd")
+    )
 
 
 def test__launcher__required_fields():
@@ -61,13 +71,12 @@ def test__launcher__required_fields():
         launcher = TestLauncher.from_dict(asdict)
         assert "required field" in error
 
-    asdict = {"params": ["--verbose"], "environ": {"PATH": "foo"}}
+    asdict = {"params": ["--verbose"], "environ": {"PATH": "ghghghgh"}}
     launcher = TestLauncher.from_dict(asdict)
-    assert launcher.environ == {"PATH": "foo"}
+    assert launcher.environ["PATH"] == "ghghghgh"
 
 
 def test__get_launcher_class():
-
     result = kloch.launchers.get_launcher_class(".base")
     assert result is kloch.launchers.BaseLauncher
 

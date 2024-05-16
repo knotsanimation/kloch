@@ -46,12 +46,10 @@ class PythonLauncher(BaseLauncher):
         _command = [sys.executable, str(python_file)]
         _command += self.command + (command or [])
 
-        envvars = dict(os.environ)
-        environ = self.get_resolved_environ()
-        envvars.update(environ)
-
-        LOGGER.debug(f"executing system command={_command} with environ={envvars}")
-        result = subprocess.run(_command, shell=True, env=envvars)
+        LOGGER.debug(
+            f"executing python command={_command}; environ={self.environ}; cwd={self.cwd}"
+        )
+        result = subprocess.run(_command, shell=True, env=self.environ, cwd=self.cwd)
 
         return result.returncode
 
