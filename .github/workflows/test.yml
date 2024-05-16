@@ -6,6 +6,7 @@ on:
       - 'doc/**'
       - 'README.md'
       - 'CHANGELOG.md'
+      - 'TODO.md'
   push:
     branches:
       - main
