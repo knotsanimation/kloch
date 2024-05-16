@@ -22,6 +22,8 @@ class PythonLauncher(BaseLauncher):
     python_file: Annotated[
         str,
         "Filesystem path to an existing python file.",
+        "The path will have environment variables expanded with ``os.expandvars`` [1]_.",
+        "The path is turned absolute and normalized. [4]_",
     ] = dataclasses.field(default_factory=str)
 
     # we override only for the type hint
@@ -36,9 +38,12 @@ class PythonLauncher(BaseLauncher):
         """
         Just call ``subprocess.run`` with ``sys.executable`` + the file path
         """
+
+        python_file = Path(os.path.expandvars(self.python_file)).absolute().resolve()
+
         # XXX: if packaged with nuitka, sys.executable is the built executable path,
         #   but we support this at the CLI level
-        _command = [sys.executable, self.python_file]
+        _command = [sys.executable, str(python_file)]
         _command += self.command + (command or [])
 
         envvars = dict(os.environ)
