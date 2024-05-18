@@ -12,37 +12,10 @@ from typing import Type
 from typing import Union
 
 from kloch._dictmerge import refacto_dict
+from kloch._utils import expand_envvars
+from kloch._utils import patch_environ
 
 LOGGER = logging.getLogger(__name__)
-
-
-@contextlib.contextmanager
-def _patch_environ(**environ):
-    """
-    Temporarily change ``os.environ`` and restore it once finished.
-    """
-    old_environ = dict(os.environ)
-    os.environ.update(environ)
-    try:
-        yield
-    finally:
-        os.environ.clear()
-        os.environ.update(old_environ)
-
-
-def _resolve_env_var(src_str: str) -> str:
-    """
-    Resolve environment variable pattern in the given string.
-
-    Using ``os.path.expandvars``.
-    """
-    # temporary remove escape character
-    new_str = src_str.replace("$$", "##tmp##")
-    # environment variable expansion
-    new_str = os.path.expandvars(new_str)
-    # restore escaped character
-    new_str = new_str.replace("##tmp##", "$")
-    return new_str
 
 
 def _resolve_path(src_str: str) -> str:
@@ -62,17 +35,17 @@ def _resolve_environ(environ: dict[str, Union[str, list[str]]]) -> dict[str, str
 
     def process_pair(key: str, value: str):
         if isinstance(value, list):
-            value = [_resolve_path(_resolve_env_var(str(path))) for path in value]
+            value = [_resolve_path(expand_envvars(str(path))) for path in value]
             value = os.pathsep.join(value)
         else:
-            value = _resolve_path(_resolve_env_var(str(value)))
+            value = _resolve_path(expand_envvars(str(value)))
 
         # reverted by context manager, we need it so a variable defined after
         # another one can reuse that first one.
         os.environ[key] = value
         return key, value
 
-    with _patch_environ():
+    with patch_environ():
         return refacto_dict(environ, callback=process_pair)
 
 
@@ -151,10 +124,10 @@ class BaseLauncher:
         self.environ = new_environ
 
         if self.cwd:
-            with _patch_environ():
+            with patch_environ():
                 os.environ.clear()
                 os.environ.update(new_environ)
-                self.cwd = str(Path((_resolve_env_var(self.cwd))).absolute().resolve())
+                self.cwd = str(Path((expand_envvars(self.cwd))).absolute().resolve())
 
     @classmethod
     @abc.abstractmethod
