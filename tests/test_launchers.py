@@ -29,7 +29,7 @@ def test__profile_delta(data_dir):
     assert len(launchers) == 2
     launchers_resolved = launchers.get_resolved()
     assert (
-        launchers_resolved[kloch.launchers.SystemLauncher.name()]["environ"]
+        launchers_resolved[kloch.launchers.SystemLauncher.name]["environ"]
         == PROFILE_DELTA_ENVIRON
     )
 

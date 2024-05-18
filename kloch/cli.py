@@ -156,12 +156,12 @@ class RunParser(BaseParser):
         launcher = launchers[0]
         command = self.command or None
 
-        print(f"starting launcher {launcher.name()}")
+        print(f"starting launcher {launcher.name}")
         LOGGER.debug(f"executing launcher={launcher} with command={command}")
         LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
 
         with tempfile.TemporaryDirectory(
-            prefix=f"{kloch.__name__}-{launcher.name()}",
+            prefix=f"{kloch.__name__}-{launcher.name}",
         ) as tmpdir:
             sys.exit(launcher.execute(tmpdir=Path(tmpdir), command=command))
 

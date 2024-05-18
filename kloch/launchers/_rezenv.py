@@ -3,7 +3,6 @@ import logging
 import os
 import subprocess
 from pathlib import Path
-from typing import Annotated
 from typing import ClassVar
 from typing import Optional
 
@@ -21,24 +20,15 @@ class RezEnvLauncher(BaseLauncher):
     Describe how to start a rez shell interactive session.
     """
 
-    requires: Annotated[
-        dict[str, str],
-        "mapping of rez `package name`: `package version`",
-    ] = dataclasses.field(default_factory=dict)
+    requires: dict[str, str] = dataclasses.field(default_factory=dict)
 
-    params: Annotated[
-        list[str],
-        "list of command line arguments passed to rez-env.",
-        "",
-        "Check the `rez documentation <https://rez.readthedocs.io/en/stable/commands/rez-env.html>`_.",
-    ] = dataclasses.field(default_factory=list)
+    params: list[str] = dataclasses.field(default_factory=list)
 
-    config: Annotated[
-        dict[...],
-        "content of a valid yaml rez config that is created on the fly before the rez-env.",
-    ] = dataclasses.field(default_factory=dict)
+    config: dict = dataclasses.field(default_factory=dict)
 
     required_fields: ClassVar[list[str]] = []
+
+    name = "rezenv"
 
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
         """
@@ -74,15 +64,3 @@ class RezEnvLauncher(BaseLauncher):
         result = subprocess.run(_command, shell=True, env=environ, cwd=self.cwd)
 
         return result.returncode
-
-    @classmethod
-    def name(cls):
-        return "rezenv"
-
-    @classmethod
-    def summary(cls) -> str:
-        return "Start an interactive rez shell using the ``rez-env`` command."
-
-    @classmethod
-    def doc(cls) -> list[str]:
-        return ["The implementation will call ``rez-env`` in a python subprocess [3]_."]

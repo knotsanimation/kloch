@@ -77,7 +77,7 @@ class LaunchersSerialized(dict[str, dict]):
 
         # extract the potential base that all launchers should inherit
         for launcher_name in self_copy:
-            if _resolve_key_tokens(launcher_name) == BaseLauncher.name():
+            if _resolve_key_tokens(launcher_name) == BaseLauncher.name:
                 base_manager_config = self_copy.pop(launcher_name)
                 break
         else:

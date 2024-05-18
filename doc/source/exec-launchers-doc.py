@@ -8,6 +8,7 @@ import dataclasses
 from typing import Type
 
 import kloch.launchers
+from kloch.filesyntax._doc import LauncherDoc
 
 
 RowType = tuple[str, str, str]
@@ -38,20 +39,23 @@ def unify_columns(table: list[RowType]) -> list[str]:
 
 def create_field_table(
     field: dataclasses.Field,
+    field_name: str,
+    field_doc: str,
     required: bool,
 ) -> list[RowType]:
     required = "yes" if required else "no"
 
+    doc = field_doc.split("\n")
+
+    # typing.Annotated
     if hasattr(field.type, "__metadata__"):
-        doc = list(field.type.__metadata__)
         ftype = field.type.__origin__
     else:
-        doc = [""]
         ftype = field.type
 
     ftype = str(ftype).replace("typing.", "")
 
-    row1 = (f" ``{field.name}`` ", " **required** ", f" {required} ")
+    row1 = (f" ``{field_name}`` ", " **required** ", f" {required} ")
     row2 = ("-", "-", "-")
     row3 = ("", " **type** ", f" `{ftype}` ")
     row4 = ("", "-", "-")
@@ -71,20 +75,28 @@ def replace_character(src_str: str, character: str, substitution: str) -> str:
 
 
 def document_launcher(launcher: Type[kloch.launchers.BaseLauncher]) -> str:
-    lines = []
-    lines += [launcher.name(), "_" * len(launcher.name())]
-    lines += [""] + launcher.doc() + [""]
+    launcher_doc = LauncherDoc.get_launcher_doc(launcher)
 
-    fields = dataclasses.fields(launcher)
+    lines = []
+    lines += [launcher.name, "_" * len(launcher.name)]
+    lines += [""] + [launcher_doc.description] + [""]
+
+    fields = {field.name: field for field in dataclasses.fields(launcher)}
 
     fields_table: list[RowType] = []
-    for field in fields:
-        required = field.name in launcher.required_fields
-        fields_table += create_field_table(field=field, required=required)
+    for field_name, field_doc in launcher_doc.fields.items():
+        required = field_name in launcher.required_fields
+        field = fields[field_name]
+        fields_table += create_field_table(
+            field=field,
+            field_name=field_name,
+            field_doc=field_doc,
+            required=required,
+        )
 
     header_table = [
         ("-", "-", "-"),
-        (" ➡parent ", f" :launchers:{launcher.name()} ", ""),
+        (" ➡parent ", f" :launchers:{launcher.name} ", ""),
         ("-", "-", "-"),
         (" ⬇key ", "", ""),
         ("=", "=", "="),

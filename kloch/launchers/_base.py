@@ -58,47 +58,21 @@ class BaseLauncher:
     # XXX: all fields defined MUST specify a default value (else inheritance issues)
     #   instead add them to the `required_fields` class variable.
 
-    # XXX: all fields are automatically extracted in the static doc, you must
-    #   typing.Annotated to add string metadata that is used as description (list of lines).
-
-    environ: Annotated[
-        dict[str, Union[str, list[str]]],
-        "mapping of environment variable to set before starting the environment.",
-        "",
-        "The value can either be a regular string or a list of string.",
-        "The list of string has each item joined using the system path separator [2]_.",
-        "",
-        "- All values have environment variables expanded with ``os.expandvars`` [1]_. "
-        "  You can escape the expansion by doubling the ``$`` like ``$$``",
-        "- All values are turned absolute and normalized [4]_ if they are existing paths.",
-        "",
-    ] = dataclasses.field(default_factory=dict)
+    environ: dict[str, Union[str, list[str]]] = dataclasses.field(default_factory=dict)
     """
     Mapping of environment variables to set when starting the environment.
     
     The developer is reponsible of honoring the field usage in its launcher implementation.
     """
 
-    command: Annotated[
-        list[str],
-        "Arbitrary list of command line arguments to call at the end of the launcher execution.",
-    ] = dataclasses.field(default_factory=list)
+    command: list[str] = dataclasses.field(default_factory=list)
     """
     Arbitrary list of command line arguments to call at the end of the launcher execution.
     
     The developer is reponsible of honoring the field usage in its launcher implementation.
     """
 
-    cwd: Annotated[
-        Optional[str],
-        'Filesystem path to an existing directory to use as "current working directory".',
-        "",
-        "- The path will have environment variables expanded with ``os.expandvars`` [1]_. ",
-        "  You can escape the expansion by doubling the ``$`` like ``$$``.",
-        "  You can also use variables defined in the ``environ`` key.",
-        "- The path is turned absolute and normalized [4]_.",
-        "",
-    ] = None
+    cwd: Optional[str] = None
     """
     Current working directory.
     
@@ -110,6 +84,11 @@ class BaseLauncher:
     List of dataclass field that are required to build the instance from a dict object.
     
     "Required" imply they have a non-empty value.
+    """
+
+    name: ClassVar[str] = ".base"
+    """
+    A unique name among all subclasses.
     """
 
     def __post_init__(self):
@@ -128,39 +107,6 @@ class BaseLauncher:
                 os.environ.clear()
                 os.environ.update(new_environ)
                 self.cwd = str(Path((expand_envvars(self.cwd))).absolute().resolve())
-
-    @classmethod
-    @abc.abstractmethod
-    def name(cls) -> str:
-        """
-        A unique name among all subclasses.
-        """
-        return ".base"
-
-    @classmethod
-    @abc.abstractmethod
-    def summary(cls) -> str:
-        """
-        Short one-line summary of what is this instance. Used for user documentation.
-
-        Standard rst formatting can be used.
-        """
-        return "An abstract launcher that whose purpose is to be merged with other launchers."
-
-    @classmethod
-    @abc.abstractmethod
-    def doc(cls) -> list[str]:
-        """
-        Extended documentation describing this launcher purpose. For user documentation.
-
-        Standard rst formatting can be used.
-
-        Returns:
-            a list of text lines
-        """
-        return [
-            "This launcher is never launched and is simply merged with other launchers defined in the profile."
-        ]
 
     @abc.abstractmethod
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None) -> int:
@@ -211,6 +157,6 @@ def get_launcher_class(name: str) -> Optional[Type[BaseLauncher]]:
     Get the launcher class which match the given unique name.
     """
     for sub_class in get_available_launchers_classes():
-        if sub_class.name() == name:
+        if sub_class.name == name:
             return sub_class
     return None

@@ -1,6 +1,5 @@
 import dataclasses
 import logging
-import os
 import subprocess
 from pathlib import Path
 from typing import Optional
@@ -17,6 +16,8 @@ class SystemLauncher(BaseLauncher):
     A minimal launcher that just start a subprocess with the given command.
     """
 
+    name = "system"
+
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
         """
         Just call subprocess.run.
@@ -29,18 +30,3 @@ class SystemLauncher(BaseLauncher):
         result = subprocess.run(_command, shell=True, env=self.environ, cwd=self.cwd)
 
         return result.returncode
-
-    @classmethod
-    def name(cls):
-        return "system"
-
-    @classmethod
-    def summary(cls) -> str:
-        return "A simple launcher executing the given command in the default system console."
-
-    @classmethod
-    def doc(cls) -> list[str]:
-        return [
-            "Useless without a command specified.",
-            "The launcher will just set the given environment variables for the session, execute the command, then exit.",
-        ]

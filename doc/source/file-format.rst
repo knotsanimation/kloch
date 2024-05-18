@@ -145,9 +145,10 @@ List of available launchers:
 .. exec-inject::
 
    import kloch.launchers
+   from kloch.filesyntax._doc import LauncherDoc
 
    launchers = kloch.launchers.get_available_launchers_classes()
-   txt = "\n- ".join([""] + [f"``{launcher.name()}`` : {launcher.summary()}" for launcher in launchers])
+   txt = "\n- ".join([""] + [f"``{launcherdoc.launcher.name}`` : {launcherdoc.summary}" for launcherdoc in LauncherDoc.iterate()])
    print(txt)
 
 .. exec-inject::
