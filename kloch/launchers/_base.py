@@ -11,7 +11,7 @@ from typing import Optional
 from typing import Type
 from typing import Union
 
-from kloch.filesyntax import refacto_dict
+from kloch._dictmerge import refacto_dict
 
 LOGGER = logging.getLogger(__name__)
 

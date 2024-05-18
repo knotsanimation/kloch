@@ -10,9 +10,9 @@ import dataclasses
 from typing import Any
 from typing import Optional
 
-from ._merging import refacto_dict
-from ._merging import deepmerge_dicts
-from ._merging import MergeRule
+from kloch._dictmerge import refacto_dict
+from kloch._dictmerge import deepmerge_dicts
+from kloch._dictmerge import MergeRule
 from kloch.launchers import get_launcher_class
 from kloch.launchers import BaseLauncher
 
