@@ -6,82 +6,64 @@ import pytest
 
 import kloch
 import kloch.launchers
-
-PROFILE_DELTA_ENVIRON = {
-    "KNOTS_SKYNET_PATH": "N:",
-    "KNOTS_LOCAL_INSTALL_PATH": r"$LOCALAPPDATA\knots",
-    "KNOTS_LOCAL_REZ_INSTALL_PATH": r"$KNOTS_LOCAL_INSTALL_PATH\rez",
-    "KNOTS_LOCAL_REZ_SCRIPTS_PATH": r"$KNOTS_LOCAL_REZ_INSTALL_PATH\Scripts\rez",
-    "REZ_VERSION": "2.114.1",
-    "REZ_PYTHON_VERSION": "3.10.11",
-    "UNINSTALL_LOG_PATH": r"$KNOTS_LOCAL_INSTALL_PATH\user-rez-uninstall.log",
-}
-
-
-def test__profile_delta(data_dir):
-    profile_path = data_dir / "profile-delta.yml"
-    profile = kloch.read_profile_from_file(profile_path, profile_locations=[data_dir])
-    assert profile.base.identifier == "knots"
-    assert len(profile.launchers) == 2
-    profile = profile.get_merged_profile()
-    assert len(profile.launchers) == 3
-    launchers = profile.launchers.get_with_base_merged()
-    assert len(launchers) == 2
-    launchers_resolved = launchers.get_resolved()
-    assert (
-        launchers_resolved[kloch.launchers.SystemLauncher.name]["environ"]
-        == PROFILE_DELTA_ENVIRON
-    )
-
-    launchers = launchers.unserialize()
-    assert isinstance(launchers[0], kloch.launchers.RezEnvLauncher)
-    assert isinstance(launchers[1], kloch.launchers.SystemLauncher)
-    # ensure it is resolved
-    assert launchers[1].environ != PROFILE_DELTA_ENVIRON
-    assert launchers[1].cwd == str(
-        Path(PROFILE_DELTA_ENVIRON["KNOTS_SKYNET_PATH"], "/", "test-cwd")
-    )
-
-
-def test__launcher__required_fields():
-    @dataclasses.dataclass
-    class TestLauncher(kloch.launchers.BaseLauncher):
-        params: list[str] = dataclasses.field(default_factory=list)
-
-        required_fields = ["environ"]
-
-        @classmethod
-        def name(cls) -> str:
-            return ""
-
-        @classmethod
-        def summary(cls) -> str:
-            return ""
-
-        @classmethod
-        def doc(cls) -> list[str]:
-            return [""]
-
-        def execute(self, tmpdir: Path, command: Optional[list[str]] = None) -> int:
-            pass
-
-    asdict = {"params": ["--verbose"]}
-
-    with pytest.raises(ValueError) as error:
-        launcher = TestLauncher.from_dict(asdict)
-        assert "required field" in error
-
-    asdict = {"params": ["--verbose"], "environ": {"PATH": "ghghghgh"}}
-    launcher = TestLauncher.from_dict(asdict)
-    assert launcher.environ["PATH"] == "ghghghgh"
+from kloch.launchers import BaseLauncher
+from kloch.launchers import BaseLauncherSerialized
+from kloch.launchers import get_launcher_class
+from kloch.launchers import get_available_launchers_classes
+from kloch.launchers import get_launcher_serialized_class
+from kloch.launchers import get_available_launchers_serialized_classes
 
 
 def test__get_launcher_class():
-    result = kloch.launchers.get_launcher_class(".base")
+    result = get_launcher_class(".base")
     assert result is kloch.launchers.BaseLauncher
 
-    result = kloch.launchers.get_launcher_class("system")
+    result = get_launcher_class("system")
     assert result is kloch.launchers.SystemLauncher
 
-    result = kloch.launchers.get_launcher_class("@python")
+    result = get_launcher_class("@python")
     assert result is kloch.launchers.PythonLauncher
+
+
+# ensure the subclasses have properly overridden class attributes
+# (this is because there is no way of having abstract attribute with abc module)
+def test__launchers__implementation():
+    for launcher in get_available_launchers_classes():
+        if launcher is not BaseLauncher:
+            assert launcher.name != BaseLauncher.name
+        assert issubclass(launcher, BaseLauncher)
+
+
+# ensure developer didn't missed to add documentation before adding a new subclass
+def test__launchers__serialized_implementation():
+    # ensure each launcher have a serialized class
+    assert len(get_available_launchers_classes()) == len(
+        get_available_launchers_serialized_classes()
+    )
+    for serialized in get_available_launchers_serialized_classes():
+        assert issubclass(serialized, BaseLauncherSerialized)
+
+    ser_launchers = get_available_launchers_serialized_classes()
+
+    # ensure each serialized class have correctly implemented attributes
+    for lnch_ser in ser_launchers:
+        assert hasattr(lnch_ser, "fields")
+        assert hasattr(lnch_ser, "source")
+        assert hasattr(lnch_ser, "identifier")
+        assert hasattr(lnch_ser, "summary")
+        assert hasattr(lnch_ser, "description")
+
+        if lnch_ser is not BaseLauncherSerialized:
+            assert lnch_ser.source is not BaseLauncherSerialized
+            assert lnch_ser.fields is not BaseLauncherSerialized.fields
+            assert lnch_ser.summary is not BaseLauncherSerialized.summary
+            assert lnch_ser.description is not BaseLauncherSerialized.description
+            assert lnch_ser.identifier is not BaseLauncherSerialized.identifier
+
+        fields_ser = dataclasses.fields(lnch_ser.fields)
+        fields_source = dataclasses.fields(lnch_ser.source)
+
+        assert len(fields_ser) >= len(fields_source), lnch_ser
+        for field_ser in fields_ser:
+            assert "required" in field_ser.metadata
+            assert "description" in field_ser.metadata

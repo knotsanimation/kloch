@@ -18,7 +18,7 @@ for obj_name in sorted(kloch.__all__):
 
     obj = getattr(kloch, obj_name)
     doc = ""
-    if hasattr(obj, "__doc__"):
+    if hasattr(obj, "__doc__") and obj.__doc__:
         doc = obj.__doc__.lstrip(" ").lstrip("\n")
         doc = doc.split("\n")
         doc = doc[0].lstrip(" ")

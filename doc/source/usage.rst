@@ -175,6 +175,13 @@ to profile during the lifetime of your production/studio.
 This is especially important if change made to a profile actually break the
 environment and you need to quickly rollback to its previous state.
 
+Advices
+-------
+
+- When defining paths, always avoid adding trailling slash (``/`` or ``\``).
+  That way you know that when joining paths you can always starts by one.
+
+
 ----
 
 **References**

@@ -8,7 +8,6 @@ import dataclasses
 from typing import Type
 
 import kloch.launchers
-from kloch.filesyntax._doc import LauncherDoc
 
 
 RowType = tuple[str, str, str]
@@ -39,10 +38,10 @@ def unify_columns(table: list[RowType]) -> list[str]:
 
 def create_field_table(
     field: dataclasses.Field,
-    field_name: str,
-    field_doc: str,
     required: bool,
 ) -> list[RowType]:
+    field_name = field.default
+    field_doc = field.metadata["description"]
     required = "yes" if required else "no"
 
     doc = field_doc.split("\n")
@@ -74,29 +73,22 @@ def replace_character(src_str: str, character: str, substitution: str) -> str:
     return src_str[:index] + substitution + src_str[index + 1 :]
 
 
-def document_launcher(launcher: Type[kloch.launchers.BaseLauncher]) -> str:
-    launcher_doc = LauncherDoc.get_launcher_doc(launcher)
-
+def document_launcher(launcher: Type[kloch.launchers.BaseLauncherSerialized]) -> str:
     lines = []
-    lines += [launcher.name, "_" * len(launcher.name)]
-    lines += [""] + [launcher_doc.description] + [""]
-
-    fields = {field.name: field for field in dataclasses.fields(launcher)}
+    lines += [launcher.identifier, "_" * len(launcher.identifier)]
+    lines += [""] + [launcher.description] + [""]
 
     fields_table: list[RowType] = []
-    for field_name, field_doc in launcher_doc.fields.items():
-        required = field_name in launcher.required_fields
-        field = fields[field_name]
+    for field in launcher.fields.iterate():
+        required = field.metadata["required"]
         fields_table += create_field_table(
             field=field,
-            field_name=field_name,
-            field_doc=field_doc,
             required=required,
         )
 
     header_table = [
         ("-", "-", "-"),
-        (" ➡parent ", f" :launchers:{launcher.name} ", ""),
+        (" ➡parent ", f" :launchers:{launcher.identifier} ", ""),
         ("-", "-", "-"),
         (" ⬇key ", "", ""),
         ("=", "=", "="),
@@ -120,7 +112,7 @@ def document_launcher(launcher: Type[kloch.launchers.BaseLauncher]) -> str:
 
 
 def main():
-    for launcher in kloch.launchers.get_available_launchers_classes():
+    for launcher in kloch.launchers.get_available_launchers_serialized_classes():
         print(document_launcher(launcher))
 
 

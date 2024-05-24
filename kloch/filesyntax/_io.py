@@ -5,7 +5,7 @@ from typing import Optional
 
 import yaml
 
-from ._profile import LaunchersSerialized
+from ._profile import LauncherSerializedDict
 from ._profile import EnvironmentProfile
 
 
@@ -169,7 +169,7 @@ def read_profile_from_file(
         base_profile = read_profile_from_file(file_path=base_paths[0])
         asdict["base"] = base_profile
 
-    launchers = LaunchersSerialized(asdict["launchers"])
+    launchers = LauncherSerializedDict(asdict["launchers"])
     asdict["launchers"] = launchers
 
     profile = EnvironmentProfile.from_dict(asdict)

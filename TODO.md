@@ -4,7 +4,7 @@ Collection of various ideas to improve kloch.
 
 ## features
 
-- [ ] validation of keys/value on profile read
+- [x] validation of keys/value on profile read
 - [ ] token replacement system ?
   - [ ] PROFILE_DIR token
   - [ ] environment variable resolving ?

@@ -1,12 +1,11 @@
 import dataclasses
 import logging
-import os
 import subprocess
 import sys
 from pathlib import Path
 from typing import Optional
 
-from ._base import BaseLauncher
+from kloch.launchers import BaseLauncher
 
 
 LOGGER = logging.getLogger(__name__)
@@ -18,10 +17,10 @@ class PythonLauncher(BaseLauncher):
     A launcher that execute the given python file with kloch's own interpreter.
     """
 
-    python_file: str = dataclasses.field(default_factory=str)
-
-    # we override only for the type hint
-    command: list[str] = dataclasses.field(default_factory=list)
+    python_file: str = None
+    """
+    Filesystem path to an existing python file.
+    """
 
     required_fields = ["python_file"]
 
@@ -31,12 +30,9 @@ class PythonLauncher(BaseLauncher):
         """
         Just call ``subprocess.run`` with ``sys.executable`` + the file path
         """
-
-        python_file = Path(os.path.expandvars(self.python_file)).absolute().resolve()
-
         # XXX: if packaged with nuitka, sys.executable is the built executable path,
         #   but we support this at the CLI level
-        _command = [sys.executable, str(python_file)]
+        _command = [sys.executable, self.python_file]
         _command += self.command + (command or [])
 
         LOGGER.debug(

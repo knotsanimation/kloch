@@ -1,16 +1,20 @@
+import os
 import subprocess
 
-import kloch.launchers
+import pytest
+
+import kloch
+from kloch.launchers import BaseLauncherSerialized
+from kloch.launchers import PythonLauncherSerialized
+from kloch.launchers import PythonLauncher
 
 
 def test__PythonLauncher(tmp_path, data_dir, capfd):
     script_path = data_dir / "test-script-a.py"
-    launcher = kloch.launchers.PythonLauncher(
+    launcher = PythonLauncher(
         command=["first arg"],
         python_file=str(script_path),
-        environ={
-            "PATH": ["$PATH", "D:\\some\\path"],
-        },
+        environ=os.environ.copy(),
     )
     expected_argv = [str(script_path), "first arg", "second arg"]
 
@@ -21,45 +25,47 @@ def test__PythonLauncher(tmp_path, data_dir, capfd):
     assert result.out.endswith(f"{str(expected_argv)}\r\n")
 
 
-def test__PythonLauncher_resolving_envvar(tmp_path, data_dir, monkeypatch):
-    class Results:
-        command: list[str] = None
-        env: dict[str, str] = None
+def test__PythonLauncherSerialized(data_dir, monkeypatch):
+    src_dict = {
+        "command": ["first arg", "second arg"],
+    }
+    instance = PythonLauncherSerialized(src_dict)
+    with pytest.raises(AssertionError):
+        instance.validate()
 
-    def patched_subprocess(command, shell, env, *args, **kwargs):
-        Results.env = env
-        Results.command = command
-        return subprocess.CompletedProcess(command, 0)
+    script_path = data_dir / "test-script-a.py"
 
-    monkeypatch.setenv("SCRIPTROOT", str(data_dir))
-    monkeypatch.setattr(subprocess, "run", patched_subprocess)
+    src_dict = {
+        "python_file": script_path,
+    }
+    instance = PythonLauncherSerialized(src_dict)
+    with pytest.raises(AssertionError):
+        instance.validate()
 
-    script_path = "${SCRIPTROOT}/test-script-a.py"
-    launcher = kloch.launchers.PythonLauncher(
-        python_file=script_path,
-    )
-    expected_path = data_dir / "test-script-a.py"
-    launcher.execute(tmpdir=tmp_path)
-    assert Results.command[-1] == str(expected_path)
+    src_dict = {
+        "python_file": str(script_path),
+    }
+    instance = PythonLauncherSerialized(src_dict)
+    instance.validate()
+    resolved = instance.resolved()
+    assert resolved["python_file"] == str(script_path)
+
+    monkeypatch.setenv("XXUNITTEST", str(data_dir))
+
+    src_dict = {
+        "python_file": "${XXUNITTEST}/test-script-a.py",
+    }
+    instance = PythonLauncherSerialized(src_dict)
+    instance.validate()
+    resolved = instance.resolved()
+    assert resolved["python_file"] == str(script_path)
+
+    launcher = instance.unserialize()
+    assert isinstance(launcher, PythonLauncher)
+    assert launcher.python_file == str(script_path)
 
 
-def test__PythonLauncher_resolving_cwd(tmp_path, data_dir, monkeypatch):
-    class Results:
-        command: list[str] = None
-        env: dict[str, str] = None
-
-    def patched_subprocess(command, shell, env, *args, **kwargs):
-        Results.env = env
-        Results.command = command
-        return subprocess.CompletedProcess(command, 0)
-
-    monkeypatch.chdir(str(data_dir))
-    monkeypatch.setattr(subprocess, "run", patched_subprocess)
-
-    script_path = "./test-script-a.py"
-    launcher = kloch.launchers.PythonLauncher(
-        python_file=script_path,
-    )
-    expected_path = data_dir / "test-script-a.py"
-    launcher.execute(tmpdir=tmp_path)
-    assert Results.command[-1] == str(expected_path)
+def test__PythonLauncherSerialized__fields():
+    base_fields = BaseLauncherSerialized.fields.iterate()
+    python_fields = PythonLauncherSerialized.fields.iterate()
+    assert len(python_fields) == len(base_fields) + 1

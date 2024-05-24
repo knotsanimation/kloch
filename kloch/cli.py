@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Optional
 
 import kloch
+from kloch.launchers import BaseLauncher
+from kloch.launchers import BaseLauncherSerialized
 
 LOGGER = logging.getLogger(__name__)
 
@@ -136,24 +138,30 @@ class RunParser(BaseParser):
         print(f"loading {len(self.profile_ids)} profiles ...")
         profile = _get_merged_profile(self.profile_ids)
 
-        launchers = profile.launchers.unserialize()
-        if len(launchers) > 1 or self.launcher:
+        launchers_dict = profile.launchers
+        launchers_list = launchers_dict.to_serialized_list()
+        launchers_list = launchers_list.with_base_merged()
+        if len(launchers_list) > 1 or self.launcher:
             if not self.launcher:
                 raise ValueError(
                     f"More than one launcher defined in profile "
                     f"<{self.profile_ids}>: you need to specify a launcher name with --launcher"
                 )
 
-            launchers = [
-                launcher for launcher in launchers if launcher.name() == self.launcher
+            launchers_dict = [
+                _launcher
+                for _launcher in launchers_list
+                if _launcher.name == self.launcher
             ]
-            if not launchers:
+            if not launchers_dict:
                 raise ValueError(
                     f"No launcher with name <{self.launcher}> "
                     f"found in profile <{self.profile_ids}>"
                 )
 
-        launcher = launchers[0]
+        launcher_serial: BaseLauncherSerialized = launchers_list[0]
+        launcher_serial.validate()
+        launcher: BaseLauncher = launcher_serial.unserialize()
         command = self.command or None
 
         print(f"starting launcher {launcher.name}")

@@ -3,12 +3,11 @@ import logging
 import os
 import subprocess
 from pathlib import Path
-from typing import ClassVar
 from typing import Optional
 
 import yaml
 
-from ._base import BaseLauncher
+from kloch.launchers import BaseLauncher
 
 
 LOGGER = logging.getLogger(__name__)
@@ -21,12 +20,19 @@ class RezEnvLauncher(BaseLauncher):
     """
 
     requires: dict[str, str] = dataclasses.field(default_factory=dict)
+    """
+    List of rez package requirement as a mapping of 'package name': 'package version (if any)'
+    """
 
     params: list[str] = dataclasses.field(default_factory=list)
+    """
+    List of command line arguments passed to rez-env command.
+    """
 
     config: dict = dataclasses.field(default_factory=dict)
-
-    required_fields: ClassVar[list[str]] = []
+    """
+    A valid rez config in the yaml syntax.
+    """
 
     name = "rezenv"
 

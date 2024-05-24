@@ -1,52 +1,9 @@
 import abc
-import contextlib
 import dataclasses
-import logging
-import os
 from pathlib import Path
-from typing import Annotated
 from typing import Any
 from typing import ClassVar
 from typing import Optional
-from typing import Type
-from typing import Union
-
-from kloch._dictmerge import refacto_dict
-from kloch._utils import expand_envvars
-from kloch._utils import patch_environ
-
-LOGGER = logging.getLogger(__name__)
-
-
-def _resolve_path(src_str: str) -> str:
-    """
-    Ensure the path is system compliant if it looks like one.
-    """
-    if not Path(src_str).exists():
-        return src_str
-    return str(Path(src_str).resolve())
-
-
-def _resolve_environ(environ: dict[str, Union[str, list[str]]]) -> dict[str, str]:
-    """
-    Resolve an "environ-like" dict structure to an ``os.environ`` dict structure.
-    """
-    # TODO see if its worth to make it part of LaunchersSerialized token resolving
-
-    def process_pair(key: str, value: str):
-        if isinstance(value, list):
-            value = [_resolve_path(expand_envvars(str(path))) for path in value]
-            value = os.pathsep.join(value)
-        else:
-            value = _resolve_path(expand_envvars(str(value)))
-
-        # reverted by context manager, we need it so a variable defined after
-        # another one can reuse that first one.
-        os.environ[key] = value
-        return key, value
-
-    with patch_environ():
-        return refacto_dict(environ, callback=process_pair)
 
 
 @dataclasses.dataclass
@@ -58,7 +15,7 @@ class BaseLauncher:
     # XXX: all fields defined MUST specify a default value (else inheritance issues)
     #   instead add them to the `required_fields` class variable.
 
-    environ: dict[str, Union[str, list[str]]] = dataclasses.field(default_factory=dict)
+    environ: dict[str, str] = dataclasses.field(default_factory=dict)
     """
     Mapping of environment variables to set when starting the environment.
     
@@ -81,9 +38,19 @@ class BaseLauncher:
 
     required_fields: ClassVar[list[str]] = []
     """
-    List of dataclass field that are required to build the instance from a dict object.
+    List of dataclass field that are required to have a non-None value when instancing.
     
-    "Required" imply they have a non-empty value.
+    Note that your subclass must have the default field value set to None for this to work.
+    
+    Example::
+    
+          @dataclasses.dataclass
+          class DemoLauncher(BaseLauncher):
+              # override the BaseLauncher.environ field to make it required
+              environ: dict[str, str] = None
+        
+              required_fields = ["environ"]
+    
     """
 
     name: ClassVar[str] = ".base"
@@ -93,20 +60,10 @@ class BaseLauncher:
 
     def __post_init__(self):
         for field in dataclasses.fields(self):
-            if field.name in self.required_fields and not getattr(self, field.name):
+            if field.name in self.required_fields and getattr(self, field.name) is None:
                 raise ValueError(
                     f"Missing required field '{field.name}' for instance {self}"
                 )
-
-        new_environ = dict(os.environ)
-        new_environ.update(_resolve_environ(self.environ))
-        self.environ = new_environ
-
-        if self.cwd:
-            with patch_environ():
-                os.environ.clear()
-                os.environ.update(new_environ)
-                self.cwd = str(Path((expand_envvars(self.cwd))).absolute().resolve())
 
     @abc.abstractmethod
     def execute(self, tmpdir: Path, command: Optional[list[str]] = None) -> int:
@@ -143,20 +100,3 @@ class BaseLauncher:
         Generate an instance from a python dict object with a specific structure.
         """
         return cls(**src_dict)
-
-
-def get_available_launchers_classes() -> list[Type[BaseLauncher]]:
-    """
-    Get all list of available launcher classes that are registred.
-    """
-    return [BaseLauncher] + BaseLauncher.__subclasses__()
-
-
-def get_launcher_class(name: str) -> Optional[Type[BaseLauncher]]:
-    """
-    Get the launcher class which match the given unique name.
-    """
-    for sub_class in get_available_launchers_classes():
-        if sub_class.name == name:
-            return sub_class
-    return None

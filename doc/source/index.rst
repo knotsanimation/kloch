@@ -89,7 +89,7 @@ Contents
    :maxdepth: 2
    :caption: developer
 
-   public-api
+   public-api/index
    developer
    changelog
 

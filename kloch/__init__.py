@@ -1,6 +1,7 @@
 # XXX: any addition/change here need to be update in the doc too
 __all__ = [
     "add_profile_location",
+    "deepmerge_dicts",
     "EnvironmentProfile",
     "filesyntax",
     "get_all_profile_file_paths",
@@ -8,15 +9,21 @@ __all__ = [
     "get_profile_file_path",
     "get_cli",
     "KENV_PROFILE_PATH_ENV_VAR",
-    "LaunchersSerialized",
+    "launchers",
+    "MergeableDict",
+    "MergeRule",
     "read_profile_from_file",
+    "refacto_dict",
     "serialize_profile",
     "write_profile_to_file",
 ]
-
+from ._dictmerge import MergeableDict
+from ._dictmerge import MergeRule
+from ._dictmerge import refacto_dict
+from ._dictmerge import deepmerge_dicts
 from .cli import get_cli
+from . import launchers
 from . import filesyntax
-from .filesyntax import LaunchersSerialized
 from .filesyntax import EnvironmentProfile
 from .filesyntax import KENV_PROFILE_PATH_ENV_VAR
 from .filesyntax import serialize_profile
