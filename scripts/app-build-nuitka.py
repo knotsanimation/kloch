@@ -11,9 +11,10 @@ import kloch
 
 THIS_DIR = Path(__file__).parent.resolve()
 REPO_ROOT = THIS_DIR.parent.resolve()
+OVERWRITE_EXISTING = True
 
 
-def main(repo_root: Path):
+def main(repo_root: Path, overwrite_existing: bool = True):
     app_name = f"{kloch.__name__}-v{kloch.__version__}"
     as_one_file = False
 
@@ -64,6 +65,11 @@ def main(repo_root: Path):
 
     build_src_dir = workdir / (start_script_path.stem + ".dist")
     build_dst_dir = build_dir / (app_name + "-nuitka")
+
+    if overwrite_existing and build_dst_dir.exists():
+        LOGGER.debug(f"removing existing {build_dst_dir}")
+        shutil.rmtree(build_dst_dir)
+
     LOGGER.info("copying build ...")
     shutil.copytree(build_src_dir, build_dst_dir)
 
@@ -78,4 +84,4 @@ if __name__ == "__main__":
         stream=sys.stdout,
     )
     LOGGER = logging.getLogger(__name__)
-    main(REPO_ROOT)
+    main(REPO_ROOT, OVERWRITE_EXISTING)

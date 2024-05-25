@@ -1,16 +1,13 @@
-import pytest
-
-import kloch.launchers
 from kloch import EnvironmentProfile
-from kloch import LaunchersSerialized
+from kloch.launchers import LauncherSerializedDict
 
 
-def test_EnvironmentProfile_merging():
+def test__EnvironmentProfile__merging():
     profile1 = EnvironmentProfile(
         identifier="knots",
         version="0.1.0",
         base=None,
-        launchers=LaunchersSerialized(
+        launchers=LauncherSerializedDict(
             {
                 "rezenv": {
                     "+=config": {"exclude": "whatever"},
@@ -31,7 +28,7 @@ def test_EnvironmentProfile_merging():
         identifier="knots:echoes",
         version="0.1.0",
         base=profile1,
-        launchers=LaunchersSerialized(
+        launchers=LauncherSerializedDict(
             {
                 "+=rezenv": {
                     "config": {"include": "yes"},
@@ -67,7 +64,7 @@ def test_EnvironmentProfile_merging():
     }
     assert result == expected
 
-    result = profile2.get_merged_profile().launchers.get_resolved()
+    result = profile2.get_merged_profile().launchers.resolved()
     expected = {
         "rezenv": {
             "config": {"include": "yes"},
@@ -84,77 +81,3 @@ def test_EnvironmentProfile_merging():
         "testenv": {"command": "echo $cwd"},
     }
     assert result == expected
-
-
-def test_LaunchersSerialized_with_base():
-    # test rezenv inherit .base properly when rezenv doesn't define the key
-
-    launcher_serial = LaunchersSerialized(
-        {
-            "+=rezenv": {
-                "+=config": {"exclude": "whatever"},
-                "requires": {
-                    "echoes": "2",
-                    "maya": "2023",
-                },
-            },
-            ".base": {
-                "environ": {
-                    "PATH": ["$PATH", "/foo/bar"],
-                    "PROD": "unittest",
-                },
-            },
-        },
-    )
-    launchers = launcher_serial.unserialize()
-    assert len(launchers) == 1
-    launcher = launchers[0]
-    assert isinstance(launcher, kloch.launchers.RezEnvLauncher)
-    assert launcher.environ == {"PATH": ["$PATH", "/foo/bar"], "PROD": "unittest"}
-    assert launcher.get_resolved_environ()["PATH"].endswith("/foo/bar")
-    assert not launcher.get_resolved_environ()["PATH"].startswith("$PATH")
-
-    # test rezenv inherit .base properly when rezenv already define the key
-
-    launcher_serial = LaunchersSerialized(
-        {
-            "+=rezenv": {
-                "requires": {"echoes": "2", "maya": "2023"},
-                "+=environ": {
-                    "+=PATH": ["/rez"],
-                    "REZVERBOSE": 2,
-                    "SOME_LIST": ["rez"],
-                },
-            },
-            ".base": {
-                "environ": {
-                    "PATH": ["$PATH", "/foo/bar"],
-                    "PROD": "unittest",
-                    "SOME_LIST": [".base"],
-                },
-            },
-        },
-    )
-    launchers = launcher_serial.unserialize()
-    launcher = launchers[0]
-    assert launcher.environ == {
-        "PATH": ["$PATH", "/foo/bar", "/rez"],
-        "REZVERBOSE": 2,
-        "PROD": "unittest",
-        "SOME_LIST": ["rez"],
-    }
-
-    # test non-supported key in .base
-
-    launcher_serial = LaunchersSerialized(
-        {
-            "+=rezenv": {"requires": {"echoes": "2"}},
-            ".base": {
-                "environ": {"PROD": "unittest"},
-                "error_key": 5,
-            },
-        },
-    )
-    with pytest.raises(TypeError) as error:
-        launchers = launcher_serial.unserialize()
-        assert "error_key" in str(error)

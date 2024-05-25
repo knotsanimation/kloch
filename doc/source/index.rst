@@ -12,7 +12,7 @@ Configurations are `yaml <https://en.wikipedia.org/wiki/YAML>`_ files referred
 as `environment profile` which specify the parameters for one or
 multiple pre-defined launchers.
 
-.. literalinclude:: demo-fileformat/profile.yml
+.. literalinclude:: _injected/demo-fileformat/profile.yml
    :language: yaml
    :caption: a profile with the configuration for the `rezenv` launcher
 
@@ -84,14 +84,16 @@ Contents
    usage
    cli
    file-format
+   config
 
 .. toctree::
    :maxdepth: 2
    :caption: developer
 
-   public-api
+   public-api/index
    developer
    changelog
+   GitHub <https://github.com/knotsanimation/kloch>
 
 ----
 

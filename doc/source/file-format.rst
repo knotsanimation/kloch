@@ -146,12 +146,12 @@ List of available launchers:
 
    import kloch.launchers
 
-   launchers = kloch.launchers.get_available_launchers_classes()
-   txt = "\n- ".join([""] + [f"``{launcher.name()}`` : {launcher.summary()}" for launcher in launchers])
+   launchers = kloch.launchers.get_available_launchers_serialized_classes()
+   txt = "\n- ".join([""] + [f"``{launcher.identifier}`` : {launcher.summary}" for launcher in launchers])
    print(txt)
 
 .. exec-inject::
-   :filename: exec-launchers-doc.py
+   :filename: _injected/exec-launchers-doc.py
 
 
 Examples
@@ -163,13 +163,13 @@ Assuming the file structure:
 
    .. container:: column-left
 
-      .. literalinclude:: demo-fileformat/profile-beta.yml
+      .. literalinclude:: _injected/demo-fileformat/profile-beta.yml
          :language: yaml
          :caption: ./profiles/beta.yml
 
    .. container:: column-right
 
-      .. literalinclude:: demo-fileformat/profile.yml
+      .. literalinclude:: _injected/demo-fileformat/profile.yml
          :language: yaml
          :caption: ./profiles/prod.yml
 
@@ -182,7 +182,7 @@ We execute the following command:
 
 .. exec_code::
    :hide_code:
-   :filename: demo-fileformat/exec-merge.py
+   :filename: _injected/demo-fileformat/exec-merge.py
    :language_output: yaml
 
 ----

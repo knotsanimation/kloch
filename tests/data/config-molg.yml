@@ -1,0 +1,4 @@
+NON_VALID_KEY: "oops"
+
+cli_logging_default_level: "WARNING"
+cli_logging_format: "{levelname: <7}: {message}"

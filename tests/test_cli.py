@@ -1,4 +1,6 @@
 import re
+from typing import Dict
+from typing import List
 
 import pytest
 
@@ -7,7 +9,7 @@ import kloch.cli
 import kloch.launchers
 
 
-def test_getCli_subcommands():
+def test__getCli__subcommands():
     argv = [""]
     with pytest.raises(SystemExit):
         kloch.get_cli(argv=argv)
@@ -21,7 +23,7 @@ def test_getCli_subcommands():
     assert isinstance(cli, kloch.cli.ListParser)
 
 
-def test_getCli_list(monkeypatch, data_dir, capsys):
+def test__getCli__list(monkeypatch, data_dir, capsys):
     monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
 
     argv = ["list"]
@@ -36,7 +38,7 @@ def test_getCli_list(monkeypatch, data_dir, capsys):
     assert int(profile_capture.group(1)) >= 1
 
 
-def test_getCli_list_filter(monkeypatch, data_dir, capsys):
+def test__getCli__list__filter(monkeypatch, data_dir, capsys):
     monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
 
     name_filter = ".*es:beta"
@@ -50,12 +52,12 @@ def test_getCli_list_filter(monkeypatch, data_dir, capsys):
     assert "Found 1 valid profiles" in captured.out
 
 
-def test_getCli_run(monkeypatch, data_dir):
+def test__getCli__run(monkeypatch, data_dir):
     import subprocess
 
     class Results:
-        command: list[str] = None
-        env: dict[str, str] = None
+        command: List[str] = None
+        env: Dict[str, str] = None
 
     def patched_subprocess(command, shell, env, *args, **kwargs):
         Results.command = command
@@ -76,12 +78,12 @@ def test_getCli_run(monkeypatch, data_dir):
     assert Results.env.get("LXMCUSTOM") == "1"
 
 
-def test_getCli_command(monkeypatch, data_dir):
+def test__getCli__run__command(monkeypatch, data_dir):
     import subprocess
 
     class Results:
-        command: list[str] = None
-        env: dict[str, str] = None
+        command: List[str] = None
+        env: Dict[str, str] = None
 
     def patched_subprocess(command, shell, env, *args, **kwargs):
         Results.command = command
@@ -99,3 +101,25 @@ def test_getCli_command(monkeypatch, data_dir):
 
     assert Results.command == ["paint.exe", "new"] + extra_command
     assert Results.env["HEH"] == "(╯°□°）╯︵ ┻━┻)"
+
+
+def test__getCli__python(data_dir, capsys):
+    argv = ["python", str(data_dir / "test-script-a.py"), "some args ?", "test !"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    result = capsys.readouterr()
+    assert f"{kloch.__name__} test script working" in result.out
+
+
+def test__getCli__python__implicit(data_dir, capsys):
+    script_path = data_dir / "test-script-a.py"
+    argv = [str(script_path), "some args ?", "test !"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    result = capsys.readouterr()
+    assert f"{kloch.__name__} test script working" in result.out
+    assert result.out.endswith(f"{str(argv)}\n")

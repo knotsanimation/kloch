@@ -53,3 +53,11 @@ _______
 
    import kloch
    kloch.get_cli(["resolve", "--help"])
+
+python
+______
+
+.. exec_code::
+
+   import kloch
+   kloch.get_cli(["python", "--help"])

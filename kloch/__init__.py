@@ -1,22 +1,33 @@
-# XXX: any addition/change here need to be update in the doc too
 __all__ = [
     "add_profile_location",
+    "config",
+    "deepmerge_dicts",
     "EnvironmentProfile",
     "filesyntax",
     "get_all_profile_file_paths",
     "get_profile_locations",
     "get_profile_file_path",
     "get_cli",
+    "get_config",
     "KENV_PROFILE_PATH_ENV_VAR",
-    "LaunchersSerialized",
+    "KlochConfig",
+    "launchers",
+    "MergeableDict",
+    "MergeRule",
     "read_profile_from_file",
+    "refacto_dict",
     "serialize_profile",
     "write_profile_to_file",
 ]
-
-from .cli import get_cli
+from ._dictmerge import MergeableDict
+from ._dictmerge import MergeRule
+from ._dictmerge import refacto_dict
+from ._dictmerge import deepmerge_dicts
+from .config import KlochConfig
+from .config import get_config
+from . import config
+from . import launchers
 from . import filesyntax
-from .filesyntax import LaunchersSerialized
 from .filesyntax import EnvironmentProfile
 from .filesyntax import KENV_PROFILE_PATH_ENV_VAR
 from .filesyntax import serialize_profile
@@ -26,6 +37,7 @@ from .filesyntax import add_profile_location
 from .filesyntax import get_profile_locations
 from .filesyntax import get_profile_file_path
 from .filesyntax import get_all_profile_file_paths
+from .cli import get_cli
 
 # keep in sync with pyproject.toml
-__version__ = "0.5.2"
+__version__ = "0.6.0"

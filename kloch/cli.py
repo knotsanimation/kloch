@@ -1,16 +1,21 @@
 import abc
 import argparse
+import copy
 import json
 import logging
 import os
 import re
+import runpy
 import sys
 import tempfile
 import textwrap
 from pathlib import Path
+from typing import List
 from typing import Optional
 
 import kloch
+from kloch.launchers import BaseLauncher
+from kloch.launchers import BaseLauncherSerialized
 
 LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +43,7 @@ class BaseParser:
         return self._args.debug
 
     @property
-    def profile_paths(self) -> list[Path]:
+    def profile_paths(self) -> List[Path]:
         """
         One or multiple filesystem path to existing directory containing profile file.
         The paths are append to the global profile path variable.
@@ -71,15 +76,23 @@ class BaseParser:
         parser.set_defaults(func=cls)
 
 
-def _get_merged_profile(profile_identifiers: list[str]):
+def _get_merged_profile(profile_identifiers: List[str]):
     """
     Merge each profile with its base then merge all of them from left to right.
     """
     profiles = []
     for profile_id in profile_identifiers:
-        profile_path = kloch.get_profile_file_path(profile_id)
-        if not profile_path:
-            raise ValueError(f"No profile with identifier <{profile_id}> found.")
+        profile_paths = kloch.get_profile_file_path(profile_id)
+        if len(profile_paths) >= 2:
+            raise ValueError(
+                f"Found multiple profile with identifier '{profile_id}' "
+                f": {profile_paths}."
+            )
+
+        if not profile_paths:
+            raise ValueError(f"No profile found with identifier '{profile_id}'.")
+
+        profile_path = profile_paths[0]
         LOGGER.debug(f"reading profile {profile_path}")
         profile = kloch.read_profile_from_file(profile_path)
         profile = profile.get_merged_profile()
@@ -108,7 +121,7 @@ class RunParser(BaseParser):
         return self._args.launcher
 
     @property
-    def profile_ids(self) -> list[str]:
+    def profile_ids(self) -> List[str]:
         """
         One or more identifier of existing environment profile(s).
         The profiles are concatenated together from left to right.
@@ -116,7 +129,7 @@ class RunParser(BaseParser):
         return self._args.profile_ids
 
     @property
-    def command(self) -> list[str]:
+    def command(self) -> List[str]:
         """
         A command to execute in the environment that is launched by the given profile.
         """
@@ -126,32 +139,38 @@ class RunParser(BaseParser):
         print(f"loading {len(self.profile_ids)} profiles ...")
         profile = _get_merged_profile(self.profile_ids)
 
-        launchers = profile.launchers.unserialize()
-        if len(launchers) > 1 or self.launcher:
+        launchers_dict = profile.launchers
+        launchers_list = launchers_dict.to_serialized_list()
+        launchers_list = launchers_list.with_base_merged()
+        if len(launchers_list) > 1 or self.launcher:
             if not self.launcher:
                 raise ValueError(
                     f"More than one launcher defined in profile "
                     f"<{self.profile_ids}>: you need to specify a launcher name with --launcher"
                 )
 
-            launchers = [
-                launcher for launcher in launchers if launcher.name() == self.launcher
+            launchers_dict = [
+                _launcher
+                for _launcher in launchers_list
+                if _launcher.name == self.launcher
             ]
-            if not launchers:
+            if not launchers_dict:
                 raise ValueError(
                     f"No launcher with name <{self.launcher}> "
                     f"found in profile <{self.profile_ids}>"
                 )
 
-        launcher = launchers[0]
+        launcher_serial: BaseLauncherSerialized = launchers_list[0]
+        launcher_serial.validate()
+        launcher: BaseLauncher = launcher_serial.unserialize()
         command = self.command or None
 
-        print(f"starting launcher {launcher.name()}")
+        print(f"starting launcher {launcher.name}")
         LOGGER.debug(f"executing launcher={launcher} with command={command}")
         LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
 
         with tempfile.TemporaryDirectory(
-            prefix=f"{kloch.__name__}-{launcher.name()}",
+            prefix=f"{kloch.__name__}-{launcher.name}",
         ) as tmpdir:
             sys.exit(launcher.execute(tmpdir=Path(tmpdir), command=command))
 
@@ -207,7 +226,7 @@ class ListParser(BaseParser):
         )
 
         profile_paths = kloch.get_all_profile_file_paths(profile_locations)
-        profiles: list[kloch.EnvironmentProfile] = []
+        profiles: List[kloch.EnvironmentProfile] = []
 
         for path in profile_paths:
             try:
@@ -252,7 +271,7 @@ class ResolveParser(BaseParser):
     """
 
     @property
-    def profile_ids(self) -> list[str]:
+    def profile_ids(self) -> List[str]:
         """
         One or more identifier of existing environment profile(s).
         The profiles are concatenated together from left to right.
@@ -272,6 +291,50 @@ class ResolveParser(BaseParser):
             type=str,
             nargs="+",
             help=cls.profile_ids.__doc__,
+        )
+
+
+class PythonParser(BaseParser):
+    """
+    A "python" sub-command.
+    """
+
+    @property
+    def file_path(self) -> Path:
+        """
+        A filesysten path to an existing python file to execute or
+        an existing directory that MUST contains a __main__.py file.
+        """
+        return self._args.file_path
+
+    @property
+    def user_args(self) -> List[str]:
+        """
+        Arbitrary nummber of command line argument passed to the python file.
+        """
+        return self._args.user_args
+
+    def execute(self):
+        LOGGER.debug(f"about to run '{self.file_path}' with args={self.user_args}")
+        # we can set it without restoring because we sys.exit anyway
+        sys.argv = [str(self.file_path)] + self.user_args
+
+        runpy.run_path(str(self.file_path), run_name="__main__")
+        sys.exit()
+
+    @classmethod
+    def add_to_parser(cls, parser: argparse.ArgumentParser):
+        super().add_to_parser(parser)
+        parser.add_argument(
+            "file_path",
+            type=str,
+            help=cls.file_path.__doc__,
+        )
+        parser.add_argument(
+            "user_args",
+            type=str,
+            nargs="*",
+            help=cls.user_args.__doc__,
         )
 
 
@@ -333,7 +396,15 @@ def get_cli(argv=None) -> BaseParser:
     )
     ResolveParser.add_to_parser(subparser)
 
-    argv: list[str] = argv or sys.argv[1:]
+    subparser = subparsers.add_parser(
+        "python",
+        description=(
+            "Execute the given python file with the internal python interpreter."
+        ),
+    )
+    PythonParser.add_to_parser(subparser)
+
+    argv: List[str] = copy.copy(argv) or sys.argv[1:]
 
     # retrieve the "--" system that allow to specify an arbitrary command to execute
     user_command = None
@@ -341,6 +412,10 @@ def get_cli(argv=None) -> BaseParser:
         split_index = argv.index("--")
         user_command = argv[split_index + 1 :]
         argv = argv[:split_index]
+
+    # XXX: internal feature for the PythonLauncher. It's ok not having it documented in the CLI.
+    if argv[0] and Path(argv[0]).exists():
+        argv.insert(0, "python")
 
     args = parser.parse_args(argv)
     setattr(args, _ARGS_USER_COMMAND_DEST, user_command)
