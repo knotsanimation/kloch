@@ -41,7 +41,8 @@ class LauncherSerializedList(List[BaseLauncherSerialized]):
         )
 
 
-class LauncherSerializedDict(MergeableDict[str, Dict]):
+# revert to `MergeableDict[str, Dict]` when python-3.7 support dropped
+class LauncherSerializedDict(MergeableDict):
     """
     A list of launchers instance serialized as a dict structure.
 
