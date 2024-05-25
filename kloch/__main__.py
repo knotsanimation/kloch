@@ -7,11 +7,12 @@ LOGGER = logging.getLogger(__name__)
 
 
 def main():
+    config = kloch.get_config()
     cli = kloch.get_cli()
-    log_level = logging.DEBUG if cli.debug else logging.INFO
+    log_level = logging.DEBUG if cli.debug else config.cli_logging_default_level
     logging.basicConfig(
         level=log_level,
-        format="{levelname: <7} | {asctime} [{name}] {message}",
+        format=config.cli_logging_format,
         style="{",
         stream=sys.stdout,
     )

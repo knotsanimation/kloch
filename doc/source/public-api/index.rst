@@ -9,6 +9,7 @@ Public API
 
 .. toctree::
 
+   config
    cli
    io
    profile

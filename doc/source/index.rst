@@ -84,6 +84,7 @@ Contents
    usage
    cli
    file-format
+   config
 
 .. toctree::
    :maxdepth: 2

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `cli` add `python` subcommand to execute a file with the internal interpreter
 - `launchers` add a new `@python` launcher
 - `launchers` add `cwd` attribute
+- add configuration system
 
 ### changed
 
