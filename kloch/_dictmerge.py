@@ -119,6 +119,12 @@ def deepmerge_dicts(
     return new_content
 
 
+def _remove_prefix(text: str, prefix: str) -> str:
+    if text.startswith(prefix):
+        return text[len(prefix) :]
+    return text
+
+
 class MergeableDict(dict):
     """
     A dict that can be deep-merged with another dict.
@@ -170,7 +176,8 @@ class MergeableDict(dict):
         """
         Ensure the given key has all potential tokens removed.
         """
-        return key.removeprefix(cls.tokens.append).removeprefix(cls.tokens.remove)
+        resolved = _remove_prefix(key, cls.tokens.append)
+        return _remove_prefix(resolved, cls.tokens.remove)
 
     @classmethod
     def get_merge_rule(cls, key: str) -> MergeRule:
