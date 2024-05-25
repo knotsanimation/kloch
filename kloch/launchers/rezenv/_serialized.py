@@ -1,5 +1,7 @@
 import dataclasses
 import logging
+from typing import Dict
+from typing import List
 
 import yaml
 
@@ -13,14 +15,14 @@ LOGGER = logging.getLogger(__name__)
 # noinspection PyTypeChecker
 @dataclasses.dataclass(frozen=True)
 class RezEnvLauncherFields(BaseLauncherFields):
-    requires: dict[str, str] = dataclasses.field(
+    requires: Dict[str, str] = dataclasses.field(
         default="requires",
         metadata={
             "description": "mapping of rez `package name`: `package version`",
             "required": False,
         },
     )
-    params: list[str] = dataclasses.field(
+    params: List[str] = dataclasses.field(
         default="params",
         metadata={
             "description": (
@@ -31,7 +33,7 @@ class RezEnvLauncherFields(BaseLauncherFields):
             "required": False,
         },
     )
-    config: dict = dataclasses.field(
+    config: Dict = dataclasses.field(
         default="config",
         metadata={
             "description": "content of a valid yaml rez config that is created on the fly before the rez-env.",

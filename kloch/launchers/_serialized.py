@@ -1,12 +1,14 @@
 import copy
+from typing import Dict
+from typing import List
 
 from kloch import MergeableDict
 from kloch.launchers import get_launcher_serialized_class
 from kloch.launchers import BaseLauncherSerialized
 
 
-class LauncherSerializedList(list[BaseLauncherSerialized]):
-    def to_dict(self) -> dict[str, dict]:
+class LauncherSerializedList(List[BaseLauncherSerialized]):
+    def to_dict(self) -> Dict[str, Dict]:
         """
         Convert the list to a builtin dict structure (noc ustom class used).
 
@@ -39,7 +41,7 @@ class LauncherSerializedList(list[BaseLauncherSerialized]):
         )
 
 
-class LauncherSerializedDict(MergeableDict[str, dict]):
+class LauncherSerializedDict(MergeableDict[str, Dict]):
     """
     A list of launchers instance serialized as a dict structure.
 

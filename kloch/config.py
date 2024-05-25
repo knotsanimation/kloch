@@ -6,6 +6,7 @@ import dataclasses
 import logging
 import os
 from pathlib import Path
+from typing import Dict
 from typing import Optional
 from typing import Union
 
@@ -57,7 +58,7 @@ class KlochConfig:
         Generate an instance from a serialized file.
         """
         with file_path.open("r", encoding="utf-8") as file:
-            asdict: dict = yaml.safe_load(file)
+            asdict: Dict = yaml.safe_load(file)
         return cls(**asdict)
 
     @classmethod

@@ -10,6 +10,7 @@ import sys
 import tempfile
 import textwrap
 from pathlib import Path
+from typing import List
 from typing import Optional
 
 import kloch
@@ -42,7 +43,7 @@ class BaseParser:
         return self._args.debug
 
     @property
-    def profile_paths(self) -> list[Path]:
+    def profile_paths(self) -> List[Path]:
         """
         One or multiple filesystem path to existing directory containing profile file.
         The paths are append to the global profile path variable.
@@ -75,7 +76,7 @@ class BaseParser:
         parser.set_defaults(func=cls)
 
 
-def _get_merged_profile(profile_identifiers: list[str]):
+def _get_merged_profile(profile_identifiers: List[str]):
     """
     Merge each profile with its base then merge all of them from left to right.
     """
@@ -120,7 +121,7 @@ class RunParser(BaseParser):
         return self._args.launcher
 
     @property
-    def profile_ids(self) -> list[str]:
+    def profile_ids(self) -> List[str]:
         """
         One or more identifier of existing environment profile(s).
         The profiles are concatenated together from left to right.
@@ -128,7 +129,7 @@ class RunParser(BaseParser):
         return self._args.profile_ids
 
     @property
-    def command(self) -> list[str]:
+    def command(self) -> List[str]:
         """
         A command to execute in the environment that is launched by the given profile.
         """
@@ -225,7 +226,7 @@ class ListParser(BaseParser):
         )
 
         profile_paths = kloch.get_all_profile_file_paths(profile_locations)
-        profiles: list[kloch.EnvironmentProfile] = []
+        profiles: List[kloch.EnvironmentProfile] = []
 
         for path in profile_paths:
             try:
@@ -270,7 +271,7 @@ class ResolveParser(BaseParser):
     """
 
     @property
-    def profile_ids(self) -> list[str]:
+    def profile_ids(self) -> List[str]:
         """
         One or more identifier of existing environment profile(s).
         The profiles are concatenated together from left to right.
@@ -307,7 +308,7 @@ class PythonParser(BaseParser):
         return self._args.file_path
 
     @property
-    def user_args(self) -> list[str]:
+    def user_args(self) -> List[str]:
         """
         Arbitrary nummber of command line argument passed to the python file.
         """
@@ -403,7 +404,7 @@ def get_cli(argv=None) -> BaseParser:
     )
     PythonParser.add_to_parser(subparser)
 
-    argv: list[str] = copy.copy(argv) or sys.argv[1:]
+    argv: List[str] = copy.copy(argv) or sys.argv[1:]
 
     # retrieve the "--" system that allow to specify an arbitrary command to execute
     user_command = None

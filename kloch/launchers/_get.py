@@ -1,3 +1,4 @@
+from typing import List
 from typing import Optional
 from typing import Type
 
@@ -6,7 +7,7 @@ from kloch.launchers import BaseLauncher
 from kloch.launchers import BaseLauncherSerialized
 
 
-def get_available_launchers_classes() -> list[Type[BaseLauncher]]:
+def get_available_launchers_classes() -> List[Type[BaseLauncher]]:
     """
     Get all list of available launcher classes that are registred.
     """
@@ -23,7 +24,7 @@ def get_launcher_class(name: str) -> Optional[Type[BaseLauncher]]:
     return None
 
 
-def get_available_launchers_serialized_classes() -> list[Type[BaseLauncherSerialized]]:
+def get_available_launchers_serialized_classes() -> List[Type[BaseLauncherSerialized]]:
     """
     Get all list of available serialized launcher classes that are registred.
     """

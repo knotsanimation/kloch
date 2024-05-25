@@ -8,6 +8,7 @@ The config system can handle the merging of 2 configs structure.
 import copy
 import dataclasses
 from typing import Any
+from typing import Dict
 from typing import Optional
 
 from kloch.launchers import LauncherSerializedDict
@@ -28,7 +29,7 @@ class EnvironmentProfile:
     launchers: LauncherSerializedDict
 
     @classmethod
-    def from_dict(cls, serialized: dict) -> "EnvironmentProfile":
+    def from_dict(cls, serialized: Dict) -> "EnvironmentProfile":
         """
         Generate a profile instance from a serialized dict object.
 
@@ -47,7 +48,7 @@ class EnvironmentProfile:
             launchers=launchers,
         )
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """
         Convert a profile instance to a serialized dict object.
         """

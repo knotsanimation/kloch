@@ -3,7 +3,9 @@ import enum
 import logging
 from typing import Any
 from typing import Callable
+from typing import Dict
 from typing import Optional
+from typing import Tuple
 
 LOGGER = logging.getLogger(__name__)
 
@@ -19,10 +21,10 @@ class MergeRule(enum.IntEnum):
 
 
 def refacto_dict(
-    src_dict: dict,
-    callback: Callable[[Any, Any], tuple[Any, Any]],
+    src_dict: Dict,
+    callback: Callable[[Any, Any], Tuple[Any, Any]],
     recursive=True,
-) -> dict:
+) -> Dict:
     """
     Iterate through all key/value pairs of the given dict and execute the given callback
     at each step which return a new key/value pair for the output dict.
@@ -45,11 +47,11 @@ def refacto_dict(
 
 
 def deepmerge_dicts(
-    over_content: dict[str, Any],
-    base_content: dict,
+    over_content: Dict[str, Any],
+    base_content: Dict,
     merge_rule_callback: Optional[Callable[[str], MergeRule]] = None,
     key_resolve_callback: Optional[Callable[[str], str]] = None,
-) -> dict[str, Any]:
+) -> Dict[str, Any]:
     """
     Recursively merge the 2 given dict "over one another".
 
@@ -205,7 +207,7 @@ class MergeableDict(dict):
 
         return super().get(new_key, default)
 
-    def resolved(self) -> dict:
+    def resolved(self) -> Dict:
         """
         Get the dict structure with all tokens resolved.
 

@@ -1,6 +1,8 @@
 import logging
 import os
 from pathlib import Path
+from typing import Dict
+from typing import List
 from typing import Optional
 
 import yaml
@@ -17,7 +19,7 @@ KENV_PROFILE_PATH_ENV_VAR: str = "KENV_PROFILE_PATHS"
 Name of the user-editable environment variable to add profile locations.
 """
 
-_PROFILE_LOCATIONS_INTERNAL: list[Path] = []
+_PROFILE_LOCATIONS_INTERNAL: List[Path] = []
 
 KENV_PROFILE_MAGIC = "kloch_profile"
 KENV_PROFILE_VERSION = 2
@@ -57,7 +59,7 @@ def add_profile_location(location: Path):
     _PROFILE_LOCATIONS_INTERNAL.append(location)
 
 
-def get_profile_locations() -> list[Path]:
+def get_profile_locations() -> List[Path]:
     """
     Get the user-defined directories where profile are stored.
 
@@ -79,7 +81,7 @@ def get_profile_locations() -> list[Path]:
     return locations
 
 
-def get_all_profile_file_paths(locations: Optional[list[Path]] = None) -> list[Path]:
+def get_all_profile_file_paths(locations: Optional[List[Path]] = None) -> List[Path]:
     """
     Get all the environment-profile file paths as registred by the user.
 
@@ -97,14 +99,14 @@ def get_all_profile_file_paths(locations: Optional[list[Path]] = None) -> list[P
 
 def _get_profile_identifier(file_path: Path) -> str:
     with file_path.open("r", encoding="utf-8") as file:
-        asdict: dict = yaml.safe_load(file)
+        asdict: Dict = yaml.safe_load(file)
     return asdict["identifier"]
 
 
 def get_profile_file_path(
     profile_id: str,
-    profile_locations: Optional[list[Path]] = None,
-) -> list[Path]:
+    profile_locations: Optional[List[Path]] = None,
+) -> List[Path]:
     """
     Get the filesystem location to the profile(s) with the given name.
 
@@ -117,7 +119,7 @@ def get_profile_file_path(
         list of filesystem path to existing files . Might be empty.
     """
     profile_paths = get_all_profile_file_paths(locations=profile_locations)
-    profiles: list[Path] = [
+    profiles: List[Path] = [
         path for path in profile_paths if _get_profile_identifier(path) == profile_id
     ]
     return profiles
@@ -125,7 +127,7 @@ def get_profile_file_path(
 
 def read_profile_from_file(
     file_path: Path,
-    profile_locations: Optional[list[Path]] = None,
+    profile_locations: Optional[List[Path]] = None,
 ) -> EnvironmentProfile:
     """
     Generate an instance from a serialized file on disk.
@@ -139,7 +141,7 @@ def read_profile_from_file(
             list of filesystem path to potential existing directories containing profiles.
     """
     with file_path.open("r", encoding="utf-8") as file:
-        asdict: dict = yaml.safe_load(file)
+        asdict: Dict = yaml.safe_load(file)
 
     profile_version = int(asdict["__magic__"].split(":")[-1])
     if not profile_version == KENV_PROFILE_VERSION:

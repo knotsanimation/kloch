@@ -3,6 +3,8 @@ import logging
 import os
 import subprocess
 from pathlib import Path
+from typing import Dict
+from typing import List
 from typing import Optional
 
 import yaml
@@ -19,24 +21,24 @@ class RezEnvLauncher(BaseLauncher):
     Describe how to start a rez shell interactive session.
     """
 
-    requires: dict[str, str] = dataclasses.field(default_factory=dict)
+    requires: Dict[str, str] = dataclasses.field(default_factory=dict)
     """
     List of rez package requirement as a mapping of 'package name': 'package version (if any)'
     """
 
-    params: list[str] = dataclasses.field(default_factory=list)
+    params: List[str] = dataclasses.field(default_factory=list)
     """
     List of command line arguments passed to rez-env command.
     """
 
-    config: dict = dataclasses.field(default_factory=dict)
+    config: Dict = dataclasses.field(default_factory=dict)
     """
     A valid rez config in the yaml syntax.
     """
 
     name = "rezenv"
 
-    def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
+    def execute(self, tmpdir: Path, command: Optional[List[str]] = None):
         """
         Start a rez environment by calling rez-env in a subprocess.
 

@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### fixed
 
 - `profile` merging of `.base` when token in launcher name
+- python 3.7 compaitiblity (invalid type hints)
 
 ### chores
 

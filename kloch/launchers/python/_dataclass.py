@@ -3,6 +3,7 @@ import logging
 import subprocess
 import sys
 from pathlib import Path
+from typing import List
 from typing import Optional
 
 from kloch.launchers import BaseLauncher
@@ -26,7 +27,7 @@ class PythonLauncher(BaseLauncher):
 
     name = "@python"
 
-    def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
+    def execute(self, tmpdir: Path, command: Optional[List[str]] = None):
         """
         Just call ``subprocess.run`` with ``sys.executable`` + the file path
         """

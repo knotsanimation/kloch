@@ -3,6 +3,8 @@ import dataclasses
 from pathlib import Path
 from typing import Any
 from typing import ClassVar
+from typing import Dict
+from typing import List
 from typing import Optional
 
 
@@ -15,14 +17,14 @@ class BaseLauncher:
     # XXX: all fields defined MUST specify a default value (else inheritance issues)
     #   instead add them to the `required_fields` class variable.
 
-    environ: dict[str, str] = dataclasses.field(default_factory=dict)
+    environ: Dict[str, str] = dataclasses.field(default_factory=dict)
     """
     Mapping of environment variables to set when starting the environment.
     
     The developer is reponsible of honoring the field usage in its launcher implementation.
     """
 
-    command: list[str] = dataclasses.field(default_factory=list)
+    command: List[str] = dataclasses.field(default_factory=list)
     """
     Arbitrary list of command line arguments to call at the end of the launcher execution.
     
@@ -36,7 +38,7 @@ class BaseLauncher:
     The developer is reponsible of honoring the field usage in its launcher implementation.
     """
 
-    required_fields: ClassVar[list[str]] = []
+    required_fields: ClassVar[List[str]] = []
     """
     List of dataclass field that are required to have a non-None value when instancing.
     
@@ -47,7 +49,7 @@ class BaseLauncher:
           @dataclasses.dataclass
           class DemoLauncher(BaseLauncher):
               # override the BaseLauncher.environ field to make it required
-              environ: dict[str, str] = None
+              environ: Dict[str, str] = None
         
               required_fields = ["environ"]
     
@@ -66,7 +68,7 @@ class BaseLauncher:
                 )
 
     @abc.abstractmethod
-    def execute(self, tmpdir: Path, command: Optional[list[str]] = None) -> int:
+    def execute(self, tmpdir: Path, command: Optional[List[str]] = None) -> int:
         """
         Start the given environment and execute this python session.
 
@@ -81,7 +83,7 @@ class BaseLauncher:
         """
         pass
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """
         Convert the instance to a python dict object.
         """
@@ -95,7 +97,7 @@ class BaseLauncher:
         return as_dict
 
     @classmethod
-    def from_dict(cls, src_dict: dict[str, Any]) -> "BaseLauncher":
+    def from_dict(cls, src_dict: Dict[str, Any]) -> "BaseLauncher":
         """
         Generate an instance from a python dict object with a specific structure.
         """

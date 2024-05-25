@@ -3,6 +3,8 @@ import dataclasses
 import logging
 import os
 from pathlib import Path
+from typing import Dict
+from typing import List
 from typing import Type
 from typing import Union
 
@@ -25,13 +27,13 @@ def _resolve_path(src_str: str) -> str:
     return str(Path(src_str).resolve())
 
 
-def resolve_environ(environ: dict[str, Union[str, list[str]]]) -> dict[str, str]:
+def resolve_environ(environ: Dict[str, Union[str, List[str]]]) -> Dict[str, str]:
     """
     Resolve an "environ-like" dict structure to an ``os.environ`` dict structure.
     """
 
     def process_pair(key: str, value: str):
-        if isinstance(value, list):
+        if isinstance(value, List):
             value = [_resolve_path(expand_envvars(str(path))) for path in value]
             value = os.pathsep.join(value)
         else:
@@ -78,7 +80,7 @@ class BaseLauncherFields:
     # note: fields type hint are types expected in the serialized representation.
     # note: field.metadata is used in the static documentation implying it's rst syntax.
 
-    environ: dict[str, Union[str, list[str]]] = dataclasses.field(
+    environ: Dict[str, Union[str, List[str]]] = dataclasses.field(
         default="environ",
         metadata={
             "description": (
@@ -107,7 +109,7 @@ class BaseLauncherFields:
         },
     )
 
-    command: list[str] = dataclasses.field(
+    command: List[str] = dataclasses.field(
         default="command",
         metadata={
             "description": "Arbitrary list of command line arguments to call at the end of the launcher execution.",
@@ -130,7 +132,7 @@ class BaseLauncherFields:
     )
 
     @classmethod
-    def iterate(cls) -> list[dataclasses.Field]:
+    def iterate(cls) -> List[dataclasses.Field]:
         """
         Return all the fields defined on this dataclass
         """
@@ -190,7 +192,7 @@ class BaseLauncherSerialized(MergeableDict):
             for value in self[command]:
                 assert isinstance(value, str), f"'{command}': item '{value}' be str."
 
-    def resolved(self) -> dict:
+    def resolved(self) -> Dict:
         """
         Modify the dict structure, so it can be unserialized properly.
         """
@@ -224,7 +226,7 @@ class BaseLauncherSerialized(MergeableDict):
                 )
 
         # mapping of {'serialized key': 'dataclass field name'}
-        fields: dict[str, str] = {
+        fields: Dict[str, str] = {
             getattr(self.fields, field.name): field.name
             for field in dataclasses.fields(self.fields)
         }

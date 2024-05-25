@@ -2,6 +2,7 @@ import dataclasses
 import logging
 import subprocess
 from pathlib import Path
+from typing import List
 from typing import Optional
 
 from kloch.launchers import BaseLauncher
@@ -18,7 +19,7 @@ class SystemLauncher(BaseLauncher):
 
     name = "system"
 
-    def execute(self, tmpdir: Path, command: Optional[list[str]] = None):
+    def execute(self, tmpdir: Path, command: Optional[List[str]] = None):
         """
         Just call subprocess.run.
         """

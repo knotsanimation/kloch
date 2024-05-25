@@ -2,6 +2,8 @@ import dataclasses
 import logging
 import os
 from pathlib import Path
+from typing import Dict
+from typing import List
 
 from kloch.launchers import BaseLauncherSerialized
 from kloch.launchers import BaseLauncherFields
@@ -26,7 +28,7 @@ class PythonLauncherFields(BaseLauncherFields):
     )
     # we override just for the metadata attribute
     # noinspection PyDataclass
-    command: list[str] = dataclasses.field(
+    command: List[str] = dataclasses.field(
         default=BaseLauncherFields.command,
         metadata={
             "description": "Arbitrary list of command line arguments passed to the python file.",
@@ -57,7 +59,7 @@ class PythonLauncherSerialized(BaseLauncherSerialized):
         assert python_file in self, f"'{python_file}': missing or empty attribute."
         assert isinstance(self[python_file], str), f"'{python_file}': must be a str."
 
-    def resolved(self) -> dict:
+    def resolved(self) -> Dict:
         resolved = super().resolved()
         python_file = self.fields.python_file
 
