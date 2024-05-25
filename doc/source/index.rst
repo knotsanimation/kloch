@@ -93,6 +93,7 @@ Contents
    public-api/index
    developer
    changelog
+   GitHub <https://github.com/knotsanimation/kloch>
 
 ----
 
