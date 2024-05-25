@@ -8,13 +8,19 @@ Configuration are serialized on disk using yaml file with a simple flat key/valu
 .. exec-inject::
    :filename: _injected/exec-config-yaml.py
 
-You specify which configuration file to use using the environment variable:
+You specify which configuration file to use with the environment variable:
 
 .. exec_code::
    :hide_code:
 
    import kloch.config
    print(kloch.config.KLOCH_CONFIG_ENV_VAR)
+
+Each config key can also be set using an individual environment variable:
+
+.. exec_code::
+   :hide_code:
+   :filename: _injected/exec-config-envvar.py
 
 
 Content

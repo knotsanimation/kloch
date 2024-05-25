@@ -43,11 +43,19 @@ def create_field_table(field: dataclasses.Field) -> list[RowType]:
 
     ftype = str(ftype).replace("typing.", "")
 
-    default_value = repr(field.default)
+    default_value = repr(
+        field.default_factory()
+        if field.default is dataclasses.MISSING
+        else field.default
+    )
+
+    env_var = field.metadata["environ"]
 
     row1 = (f" ``{field_name}`` ", " **type** ", f" `{ftype}` ")
     row2 = ("-", "-", "-")
     row3 = ("", " **default** ", f" ``{default_value}`` ")
+    row4 = ("", "-", "-")
+    row3 = ("", " **environment variable** ", f" ``{env_var}`` ")
     row4 = ("", "-", "-")
     row5 = ("", " **description** ", f" {doc.pop(0)} ")
     rows = [row1, row2, row3, row4, row5]
