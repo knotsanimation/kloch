@@ -21,8 +21,8 @@ def test__PythonLauncher(tmp_path, data_dir, capfd):
     launcher.execute(command=["second arg"], tmpdir=tmp_path)
     result = capfd.readouterr()
     assert f"{kloch.__name__} test script working" in result.out
-    # XXX: test might fail on unix due to the \r ?
-    assert result.out.endswith(f"{str(expected_argv)}\r\n")
+    result_out = result.out.rstrip("\n").rstrip("\r")
+    assert result_out.endswith(f"{str(expected_argv)}")
 
 
 def test__PythonLauncherSerialized(data_dir, monkeypatch):
