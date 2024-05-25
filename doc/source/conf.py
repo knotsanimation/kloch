@@ -19,7 +19,7 @@ release = version
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-sys.path.append(str(Path("extensions").resolve()))
+sys.path.append(str(Path("_extensions").resolve()))
 
 extensions = [
     "myst_parser",

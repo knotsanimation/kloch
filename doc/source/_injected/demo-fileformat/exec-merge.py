@@ -2,7 +2,7 @@ from pathlib import Path
 
 import kloch
 
-THISDIR = Path(".", "source", "demo-fileformat").absolute()
+THISDIR = Path(".", "source", "_injected", "demo-fileformat").absolute()
 
 profile_path = THISDIR / "profile.yml"
 kloch.add_profile_location(THISDIR)

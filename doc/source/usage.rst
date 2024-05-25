@@ -38,7 +38,7 @@ like `maya-2023`, `houdini-20`, ...
 With ``kloch`` you will be able to create a profile that will "save" this
 request of packages:
 
-.. literalinclude:: demo-usage-basics/profile.yml
+.. literalinclude:: _injected/demo-usage-basics/profile.yml
       :language: yaml
       :caption: basic-profile.yml
 
@@ -69,7 +69,7 @@ imply we will be using ``kloch`` as a `Command Line Interface` tool [2]_:
 
 .. exec_code::
    :hide_code:
-   :filename: demo-usage-basics/exec-list.py
+   :filename: _injected/demo-usage-basics/exec-list.py
 
 Time to use your profile:
 
@@ -119,13 +119,13 @@ profile.
 
    .. container:: column-left
 
-      .. literalinclude:: demo-usage-standard/profile-a.yml
+      .. literalinclude:: _injected/demo-usage-standard/profile-a.yml
          :language: yaml
          :caption: /d/pipeline/profiles/studio.yml
 
    .. container:: column-right
 
-      .. literalinclude:: demo-usage-standard/profile-b.yml
+      .. literalinclude:: _injected/demo-usage-standard/profile-b.yml
          :language: yaml
          :caption: /d/pipeline/profiles/myMovie.yml
 
@@ -147,7 +147,7 @@ to rez will be :
 
 .. exec_code::
    :hide_code:
-   :filename: demo-usage-standard/exec-merge.py
+   :filename: _injected/demo-usage-standard/exec-merge.py
    :language_output: yaml
 
 As you can see the ``requires`` key contain the ``studio_util`` package defined

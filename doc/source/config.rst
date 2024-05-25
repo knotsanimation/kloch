@@ -6,7 +6,7 @@ Tweak the behavior of the kloch runtime using a configuration system.
 Configuration are serialized on disk using yaml file with a simple flat key/value structure:
 
 .. exec-inject::
-   :filename: exec-config-yaml.py
+   :filename: _injected/exec-config-yaml.py
 
 You specify which configuration file to use using the environment variable:
 
@@ -21,4 +21,4 @@ Content
 -------
 
 .. exec-inject::
-   :filename: exec-config-autodoc.py
+   :filename: _injected/exec-config-autodoc.py
