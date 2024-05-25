@@ -1,5 +1,8 @@
 import dataclasses
 import os
+from typing import Dict
+from typing import List
+
 import pytest
 
 from kloch.launchers import BaseLauncher
@@ -31,9 +34,9 @@ def test__resolve_environ(monkeypatch):
 def test__BaseLauncher__required_fields():
     @dataclasses.dataclass
     class TestLauncher(BaseLauncher):
-        params: list[str] = dataclasses.field(default_factory=list)
+        params: List[str] = dataclasses.field(default_factory=list)
         # any required field must have a default value of None
-        environ: dict[str, str] = None
+        environ: Dict[str, str] = None
 
         required_fields = ["environ"]
 

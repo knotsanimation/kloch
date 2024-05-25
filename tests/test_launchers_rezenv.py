@@ -1,5 +1,7 @@
 import os
 import subprocess
+from typing import Dict
+from typing import List
 
 import pytest
 
@@ -9,8 +11,8 @@ from kloch.launchers import RezEnvLauncherSerialized
 
 def test__RezEnvLauncher(monkeypatch, tmp_path):
     class Results:
-        command: list[str] = None
-        env: dict[str, str] = None
+        command: List[str] = None
+        env: Dict[str, str] = None
 
     def patched_subprocess(command, shell, env, *args, **kwargs):
         Results.env = env

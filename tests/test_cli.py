@@ -1,4 +1,6 @@
 import re
+from typing import Dict
+from typing import List
 
 import pytest
 
@@ -54,8 +56,8 @@ def test__getCli__run(monkeypatch, data_dir):
     import subprocess
 
     class Results:
-        command: list[str] = None
-        env: dict[str, str] = None
+        command: List[str] = None
+        env: Dict[str, str] = None
 
     def patched_subprocess(command, shell, env, *args, **kwargs):
         Results.command = command
@@ -80,8 +82,8 @@ def test__getCli__run__command(monkeypatch, data_dir):
     import subprocess
 
     class Results:
-        command: list[str] = None
-        env: dict[str, str] = None
+        command: List[str] = None
+        env: Dict[str, str] = None
 
     def patched_subprocess(command, shell, env, *args, **kwargs):
         Results.command = command
