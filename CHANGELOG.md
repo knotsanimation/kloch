@@ -16,16 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### changed
 
+- !! complex refacto of launcher serialization system.
 - `launchers` improve error message when missing a required field to a launcher
 - `launchers` improve debbug message of subprocess
 - `launchers` resolve `environ` earlier at init instead of in `execute()`
 - `launchers.rezenv` remove `requires` from required_fileds
-- `io` allow to specify a `profile_locations` arg
+- ! `io` allow to specify a `profile_locations` arg
 
 ### fixed
 
 - `profile` merging of `.base` when token in launcher name
-- python 3.7 compaitiblity (invalid type hints)
+- ensure python 3.7 compatibility (mostly invalid type hints)
 
 ### chores
 
