@@ -22,8 +22,14 @@ def _resolve_path(src_str: str) -> str:
     """
     Ensure the path is system compliant if it looks like one.
     """
-    if not Path(src_str).exists():
+    try:
+        exists = Path(src_str).exists()
+    except OSError:
         return src_str
+
+    if not exists:
+        return src_str
+
     return str(Path(src_str).resolve())
 
 
