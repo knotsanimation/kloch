@@ -22,7 +22,7 @@ def test__resolve_environ(monkeypatch):
     assert result["PATH"] != f"$PATH{os.pathsep}D:\\some\\path"
     assert len(result["PATH"]) > len("D:\\some\\path") + 2
     assert result["PATH"].endswith(f"{os.pathsep}D:\\some\\path")
-    assert result["NOTRESOLVED"] == f"foo{os.pathsep}$PATH{os.pathsep}D:\\some\\path"
+    assert result["NOTRESOLVED"] == f"foo;$PATH;D:\\some\\path"
     assert result["NUMBER"] == "1"
     assert result["ANOTHERONE"] == "SUCCESS"
     assert result["SUCCESSIVE"] == "1"
