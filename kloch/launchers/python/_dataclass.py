@@ -38,6 +38,6 @@ class PythonLauncher(BaseLauncher):
         LOGGER.debug(
             f"executing python command={_command}; environ={self.environ}; cwd={self.cwd}"
         )
-        result = subprocess.run(_command, shell=True, env=self.environ, cwd=self.cwd)
+        result = subprocess.run(_command, env=self.environ, cwd=self.cwd)
 
         return result.returncode
