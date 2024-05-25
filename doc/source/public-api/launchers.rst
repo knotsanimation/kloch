@@ -48,15 +48,6 @@ BaseLauncher
 BaseLauncher Subclasses
 -----------------------
 
-.. autoclass:: kloch.launchers.RezEnvLauncher
-   :members:
-   :inherited-members:
-   :show-inheritance:
-
-.. autoclass:: kloch.launchers.RezEnvLauncherSerialized
-   :members:
-   :show-inheritance:
-
 .. autoclass:: kloch.launchers.SystemLauncher
    :members:
    :inherited-members:

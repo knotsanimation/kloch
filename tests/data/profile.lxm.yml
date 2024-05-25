@@ -2,10 +2,7 @@ __magic__: kloch_profile:2
 identifier: lxm
 version: 0.1.0
 launchers:
-  +=rezenv:
-    +=params:
-      - --stats
-    +=requires:
-      python: 3.9
+  +=@python:
+    python_file: test-script-a.py
     environ:
       LXMCUSTOM: 1

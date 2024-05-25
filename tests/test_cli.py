@@ -59,7 +59,7 @@ def test__getCli__run(monkeypatch, data_dir):
         command: List[str] = None
         env: Dict[str, str] = None
 
-    def patched_subprocess(command, shell, env, *args, **kwargs):
+    def patched_subprocess(command, env, *args, **kwargs):
         Results.command = command
         Results.env = env
         return subprocess.CompletedProcess(command, 0)
@@ -72,9 +72,8 @@ def test__getCli__run(monkeypatch, data_dir):
     with pytest.raises(SystemExit):
         cli.execute()
 
-    assert Results.command[0].startswith("rez-env")
-    assert "python-3.9" in Results.command
-    assert "--stats" in Results.command
+    assert Results.command[0].endswith("python.exe")
+    assert "test-script-a.py" in Results.command[1]
     assert Results.env.get("LXMCUSTOM") == "1"
 
 

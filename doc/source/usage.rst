@@ -23,6 +23,9 @@ Basics
 
    `The following instructions assume you have completed` :doc:`install`.
 
+
+.. TODO update this
+
 In its current state, ``kloch`` is designed to work with `rez <https://rez.readthedocs.io>`_.
 
 You can store the `rez-env` request of packages in a config file

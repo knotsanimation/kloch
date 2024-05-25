@@ -6,8 +6,7 @@ from .base import BaseLauncher
 from .base import BaseLauncherSerialized
 from .base import BaseLauncherFields
 
-from .rezenv import RezEnvLauncher
-from .rezenv import RezEnvLauncherSerialized
+
 from .system import SystemLauncher
 from .system import SystemLauncherSerialized
 from .python import PythonLauncher
@@ -23,7 +22,6 @@ from ._serialized import LauncherSerializedList
 
 LAUNCHERS = [
     BaseLauncher,
-    RezEnvLauncher,
     SystemLauncher,
     PythonLauncher,
 ]
@@ -33,7 +31,6 @@ List of launchers class implementation, including the base one.
 
 LAUNCHERS_SERIALIZED = [
     BaseLauncherSerialized,
-    RezEnvLauncherSerialized,
     SystemLauncherSerialized,
     PythonLauncherSerialized,
 ]
