@@ -72,7 +72,7 @@ def test__getCli__run(monkeypatch, data_dir):
     with pytest.raises(SystemExit):
         cli.execute()
 
-    assert Results.command[0].endswith("python.exe")
+    assert Results.command[0].rstrip(".exe").endswith("python")
     assert "test-script-a.py" in Results.command[1]
     assert Results.env.get("LXMCUSTOM") == "1"
 
