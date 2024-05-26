@@ -29,11 +29,3 @@ dependencies are installed.
    ls ./scripts/build/
 
 Both scripts generate the packaged application in the ``scripts/build`` directory.
-
-adding a new launcher
----------------------
-
-.. warning::
-
-   todo, in the meanwhile check ``kloch.launchers``
-

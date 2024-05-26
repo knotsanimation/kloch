@@ -12,15 +12,18 @@ from .system import SystemLauncherSerialized
 from .python import PythonLauncher
 from .python import PythonLauncherSerialized
 
+from ._plugins import check_launcher_plugins
+
 from ._get import get_available_launchers_classes
 from ._get import get_launcher_class
 from ._get import get_available_launchers_serialized_classes
 from ._get import get_launcher_serialized_class
+from ._get import is_launcher_plugin
 
 from ._serialized import LauncherSerializedDict
 from ._serialized import LauncherSerializedList
 
-LAUNCHERS = [
+_BUILTINS_LAUNCHERS = [
     BaseLauncher,
     SystemLauncher,
     PythonLauncher,
@@ -29,7 +32,7 @@ LAUNCHERS = [
 List of launchers class implementation, including the base one.
 """
 
-LAUNCHERS_SERIALIZED = [
+_BUILTINS_LAUNCHERS_SERIALIZED = [
     BaseLauncherSerialized,
     SystemLauncherSerialized,
     PythonLauncherSerialized,

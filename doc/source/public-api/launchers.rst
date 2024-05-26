@@ -17,6 +17,14 @@ Getters
 .. autofunction:: kloch.launchers.get_launcher_serialized_class
 
 
+Plugins
+-------
+
+.. autofunction:: kloch.launchers.check_launcher_plugins
+
+.. autofunction:: kloch.launchers.is_launcher_plugin
+
+
 Serialized
 ----------
 

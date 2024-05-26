@@ -122,3 +122,51 @@ def test__getCli__python__implicit(data_dir, capsys):
     result = capsys.readouterr()
     assert f"{kloch.__name__} test script working" in result.out
     assert result.out.endswith(f"{str(argv)}\n")
+
+
+def test__getCli__plugins__undefined(data_dir, capsys):
+    argv = ["plugins"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    result = capsys.readouterr()
+    assert "found" not in result.out
+
+
+def test__getCli__plugins(monkeypatch, data_dir, capsys):
+
+    plugin_path = data_dir / "plugins-behr"
+    monkeypatch.syspath_prepend(plugin_path)
+    plugin_path = data_dir / "plugins-tyfa"
+    monkeypatch.syspath_prepend(plugin_path)
+    monkeypatch.setenv(
+        kloch.KlochConfig.get_field("launcher_plugins").metadata["environ"],
+        "kloch_behr,kloch_tyfa",
+    )
+
+    argv = ["plugins"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    result = capsys.readouterr()
+    assert "found 2" in result.out
+    assert str(plugin_path) in result.out
+
+
+def test__getCli__plugins__arg__launcher_plugin(monkeypatch, data_dir, capsys):
+
+    plugin_path = data_dir / "plugins-behr"
+    monkeypatch.syspath_prepend(plugin_path)
+    plugin_path = data_dir / "plugins-tyfa"
+    monkeypatch.syspath_prepend(plugin_path)
+
+    argv = ["plugins", "--launcher_plugins", "kloch_behr", "kloch_tyfa"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    result = capsys.readouterr()
+    assert "found 2" in result.out
+    assert str(plugin_path) in result.out

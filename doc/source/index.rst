@@ -91,6 +91,7 @@ Contents
    :caption: developer
 
    public-api/index
+   launcher-plugins
    developer
    changelog
    GitHub <https://github.com/knotsanimation/kloch>

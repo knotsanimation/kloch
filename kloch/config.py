@@ -23,11 +23,27 @@ Environment variable that must specify a file path to an existing configuration 
 """
 
 
+def _cast_list(src_str: str) -> list[str]:
+    return src_str.split(",")
+
+
 @dataclasses.dataclass
 class KlochConfig:
     """
     Configure kloch using a simple key/value pair dataclass system.
     """
+
+    launcher_plugins: List[str] = dataclasses.field(
+        default_factory=list,
+        metadata={
+            "documentation": (
+                "A list of importable python module names containing new launchers to support.\n\n"
+                "If specified in environment variable, this must be a comma-separated list of str like ``module1,module2,module3``"
+            ),
+            "environ": f"{KLOCH_CONFIG_PREFIX}_launcher_plugins".upper(),
+            "environ_cast": _cast_list,
+        },
+    )
 
     cli_logging_format: str = dataclasses.field(
         default="{levelname: <7} | {asctime} [{name}] {message}",

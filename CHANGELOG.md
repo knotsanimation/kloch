@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### added
 
--  individual config values can now be retrieved from environment variable
+- plugin system for launchers
+- individual config values can now be retrieved from environment variable
 
 ## [0.6.0] - 2024-05-25
 

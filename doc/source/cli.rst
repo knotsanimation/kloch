@@ -61,3 +61,11 @@ ______
 
    import kloch
    kloch.get_cli(["python", "--help"])
+
+plugins
+_______
+
+.. exec_code::
+
+   import kloch
+   kloch.get_cli(["plugins", "--help"])

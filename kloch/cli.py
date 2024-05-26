@@ -1,6 +1,7 @@
 import abc
 import argparse
 import copy
+import inspect
 import json
 import logging
 import os
@@ -338,6 +339,59 @@ class PythonParser(BaseParser):
         )
 
 
+class PluginsParser(BaseParser):
+    """
+    A "plugins" sub-command.
+    """
+
+    @property
+    def launcher_plugins(self) -> list[str]:
+        """
+        Manually specify the launcher_plugins configuration key instead of using
+        the default/user-generated one.
+
+        This is a list of module names.
+        """
+        return self._args.launcher_plugins
+
+    def execute(self):
+
+        launcher_plugins = self.launcher_plugins or kloch.get_config().launcher_plugins
+
+        print(f"Parsing {len(launcher_plugins)} launcher plugins: {launcher_plugins}")
+        try:
+            kloch.launchers.check_launcher_plugins(launcher_plugins)
+        except Exception as error:
+            print(f"WARNING | invalid plugin implementation: {error}", file=sys.stderr)
+
+        serialized_launchers = [
+            launcher
+            for launcher in kloch.launchers.get_available_launchers_serialized_classes(
+                launcher_plugins=launcher_plugins
+            )
+            if kloch.launchers.is_launcher_plugin(launcher)
+        ]
+        if serialized_launchers:
+            print(f"found {len(serialized_launchers)} launchers:")
+            for launcher in serialized_launchers:
+                module_path = inspect.getfile(launcher)
+                print(
+                    f"- {launcher.source.__name__}: {launcher.__name__} ({module_path})"
+                )
+
+        sys.exit()
+
+    @classmethod
+    def add_to_parser(cls, parser: argparse.ArgumentParser):
+        super().add_to_parser(parser)
+        parser.add_argument(
+            "--launcher_plugins",
+            type=str,
+            nargs="*",
+            help=cls.launcher_plugins.__doc__,
+        )
+
+
 class RawFormatter(argparse.HelpFormatter):
     """
     https://stackoverflow.com/a/64102901/13806195
@@ -403,6 +457,12 @@ def get_cli(argv=None) -> BaseParser:
         ),
     )
     PythonParser.add_to_parser(subparser)
+
+    subparser = subparsers.add_parser(
+        "plugins",
+        description="List information about the currently registred plugins.",
+    )
+    PluginsParser.add_to_parser(subparser)
 
     argv: List[str] = copy.copy(argv) or sys.argv[1:]
 
