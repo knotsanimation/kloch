@@ -345,7 +345,7 @@ class PluginsParser(BaseParser):
     """
 
     @property
-    def launcher_plugins(self) -> list[str]:
+    def launcher_plugins(self) -> List[str]:
         """
         Manually specify the launcher_plugins configuration key instead of using
         the default/user-generated one.
