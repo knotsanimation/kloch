@@ -15,6 +15,9 @@ def test__KlochConfig():
     config = kloch.config.KlochConfig(cli_logging_default_level=logging.DEBUG)
     assert config.cli_logging_default_level == logging.DEBUG
 
+    field = kloch.config.KlochConfig.get_field("cli_logging_default_level")
+    assert field.name == "cli_logging_default_level"
+
 
 def test__KlochConfig__from_environment(monkeypatch, data_dir):
     config = kloch.config.KlochConfig.from_environment()

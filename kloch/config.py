@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Union
 
 import yaml
@@ -82,6 +83,15 @@ class KlochConfig:
                 asdict[field.name] = value
 
         return cls(**asdict)
+
+    @classmethod
+    def get_field(cls, field_name: str) -> Optional[dataclasses.Field]:
+        """
+        Return the dataclass field that match the given name else None.
+        """
+        fields = dataclasses.fields(cls)
+        field = [field for field in fields if field.name == field_name]
+        return field[0] if field else None
 
 
 def get_config() -> KlochConfig:
