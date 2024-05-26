@@ -23,7 +23,7 @@ Environment variable that must specify a file path to an existing configuration 
 """
 
 
-def _cast_list(src_str: str) -> list[str]:
+def _cast_list(src_str: str) -> List[str]:
     return src_str.split(",")
 
 
