@@ -17,6 +17,14 @@ Getters
 .. autofunction:: kloch.launchers.get_launcher_serialized_class
 
 
+Plugins
+-------
+
+.. autofunction:: kloch.launchers.check_launcher_plugins
+
+.. autofunction:: kloch.launchers.is_launcher_plugin
+
+
 Serialized
 ----------
 
@@ -47,15 +55,6 @@ BaseLauncher
 
 BaseLauncher Subclasses
 -----------------------
-
-.. autoclass:: kloch.launchers.RezEnvLauncher
-   :members:
-   :inherited-members:
-   :show-inheritance:
-
-.. autoclass:: kloch.launchers.RezEnvLauncherSerialized
-   :members:
-   :show-inheritance:
 
 .. autoclass:: kloch.launchers.SystemLauncher
    :members:

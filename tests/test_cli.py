@@ -59,7 +59,7 @@ def test__getCli__run(monkeypatch, data_dir):
         command: List[str] = None
         env: Dict[str, str] = None
 
-    def patched_subprocess(command, shell, env, *args, **kwargs):
+    def patched_subprocess(command, env, *args, **kwargs):
         Results.command = command
         Results.env = env
         return subprocess.CompletedProcess(command, 0)
@@ -72,9 +72,8 @@ def test__getCli__run(monkeypatch, data_dir):
     with pytest.raises(SystemExit):
         cli.execute()
 
-    assert Results.command[0].startswith("rez-env")
-    assert "python-3.9" in Results.command
-    assert "--stats" in Results.command
+    assert Results.command[0].rstrip(".exe").endswith("python")
+    assert "test-script-a.py" in Results.command[1]
     assert Results.env.get("LXMCUSTOM") == "1"
 
 
@@ -123,3 +122,51 @@ def test__getCli__python__implicit(data_dir, capsys):
     result = capsys.readouterr()
     assert f"{kloch.__name__} test script working" in result.out
     assert result.out.endswith(f"{str(argv)}\n")
+
+
+def test__getCli__plugins__undefined(data_dir, capsys):
+    argv = ["plugins"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    result = capsys.readouterr()
+    assert "found" not in result.out
+
+
+def test__getCli__plugins(monkeypatch, data_dir, capsys):
+
+    plugin_path = data_dir / "plugins-behr"
+    monkeypatch.syspath_prepend(plugin_path)
+    plugin_path = data_dir / "plugins-tyfa"
+    monkeypatch.syspath_prepend(plugin_path)
+    monkeypatch.setenv(
+        kloch.KlochConfig.get_field("launcher_plugins").metadata["environ"],
+        "kloch_behr,kloch_tyfa",
+    )
+
+    argv = ["plugins"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    result = capsys.readouterr()
+    assert "found 2" in result.out
+    assert str(plugin_path) in result.out
+
+
+def test__getCli__plugins__arg__launcher_plugin(monkeypatch, data_dir, capsys):
+
+    plugin_path = data_dir / "plugins-behr"
+    monkeypatch.syspath_prepend(plugin_path)
+    plugin_path = data_dir / "plugins-tyfa"
+    monkeypatch.syspath_prepend(plugin_path)
+
+    argv = ["plugins", "--launcher_plugins", "kloch_behr", "kloch_tyfa"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    result = capsys.readouterr()
+    assert "found 2" in result.out
+    assert str(plugin_path) in result.out

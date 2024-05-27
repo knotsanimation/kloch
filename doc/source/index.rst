@@ -14,7 +14,7 @@ multiple pre-defined launchers.
 
 .. literalinclude:: _injected/demo-fileformat/profile.yml
    :language: yaml
-   :caption: a profile with the configuration for the `rezenv` launcher
+   :caption: a profile with the configuration for a `rezenv` launcher
 
 `Launchers` are internally-defined python objects that specify how to execute
 a combinations of options and (optional) command.
@@ -69,7 +69,7 @@ The profile system includes:
 - profile inheritance (a profile specify it merges on top of another profile)
 - token system to determine merging rules during inheritance
 - arbitrary profile locations definition through API and environment variable.
-- abstract launcher system to accomodate for any use-case.
+- launcher plugin system to accomodate for any use-case.
 
 
 Contents
@@ -91,6 +91,7 @@ Contents
    :caption: developer
 
    public-api/index
+   launcher-plugins
    developer
    changelog
    GitHub <https://github.com/knotsanimation/kloch>

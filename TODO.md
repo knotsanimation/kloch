@@ -16,6 +16,7 @@ Collection of various ideas to improve kloch.
 - [ ] do something with the version attribute ? allow duplicate identifier in path, but with different version ?
 - [ ] log on disk ?
 - [ ] private profiles ? with a dot prefix signifying they can only be inherited and not used directly ?
+- [ ] allow `python_file` to be an url to a python file to download
 
 ## refacto
 
@@ -34,6 +35,7 @@ Collection of various ideas to improve kloch.
   - `==` override
   - `+=` append (default)
 - [ ] ~~internalise PyYaml dependenciyes (add it to vendor module)~~ (impossible) 
+- [ ] rename profile `base` key to `inherit` (limit similarities with `.base`)
 
 ## chore
 

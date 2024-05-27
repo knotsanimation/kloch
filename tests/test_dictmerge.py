@@ -106,6 +106,22 @@ def test__MergeableDict__add():
     assert not isinstance(result, MergeableDict)
 
 
+def test__MergeableDict__add__subclass():
+    class MyDict(MergeableDict):
+        pass
+
+    class ConfigSystem(MergeableDict):
+        pass
+
+    md1 = MyDict({"+=requires": {"maya": "2020", "houdini": "20"}})
+    assert isinstance(md1, MyDict)
+
+    md2 = ConfigSystem({"+=requires": {"maya": "2023", "nuke": "20"}})
+
+    mm = md1 + md2
+    assert isinstance(mm, MyDict)
+
+
 def test__MergeableDict__add__different_type():
     dm1 = MergeableDict(
         {
@@ -163,3 +179,26 @@ def test__MergeableDict__add__nested():
         "exclude": "whatever",
         "include": "IAMINCLUDED",
     }
+
+
+def test__MergeableDict__add__order():
+    dm1 = MergeableDict(
+        {
+            "+=rezenv": {
+                "+=config": {"exclude": "whatever"},
+                "+=requires": ["foo"],
+            }
+        }
+    )
+
+    dm2 = MergeableDict(
+        {
+            "+=rezenv": {
+                "+=config": {"exclude": "whatever"},
+                "+=requires": ["foo"],
+                "newkey": True,
+            }
+        }
+    )
+    dmmerged = dm1 + dm2
+    assert list(dmmerged["+=rezenv"].keys()) == ["+=config", "+=requires", "newkey"]

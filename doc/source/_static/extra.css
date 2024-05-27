@@ -31,14 +31,11 @@ div.sidebar-tree .reference:hover {
 }
 
 /* custom vertical column split system*/
-div.columns > div.column-left {
-    width: 43%;
-    padding: 0px 3px 0px 0px;
-    float: left;
-}
-div.columns > div.column-right {
-    margin-left: 45%;
-    /* float: right; */
+div.columns {
+    display: grid;
+    gap: 2%;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
 }
 
 /* improve tables look */

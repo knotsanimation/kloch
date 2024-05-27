@@ -128,6 +128,9 @@ The following merge tokens are available:
 Launchers
 ---------
 
+Specified as key/value pair where the key is the launcher name and the value
+its configuration.
+
 +---------------------+------------------------------------------------------------------------------------------------+
 | ➡parent             | :launchers                                                                                     |
 +---------------------+------------------------------------------------------------------------------------------------+
@@ -140,7 +143,7 @@ Launchers
 |                     | **description** | a registred launcher name with its configuration                             |
 +---------------------+-----------------+------------------------------------------------------------------------------+
 
-List of available launchers:
+List of available built-in launchers (see :doc:`launcher-plugins` for extending it):
 
 .. exec-inject::
 
@@ -191,5 +194,4 @@ We execute the following command:
 
 .. [1] https://docs.python.org/3/library/os.path.html#os.path.expandvars
 .. [2] ``:`` on UNIX, ``;`` on Windows
-.. [3] There was multiple way of doing it. See `rez ASWF slack discussion <https://academysoftwarefdn.slack.com/archives/C0321B828FM/p1714383583013449>`_
 .. [4] with https://docs.python.org/3.9/library/pathlib.html#pathlib.Path.resolve

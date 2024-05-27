@@ -25,6 +25,26 @@ def test__PythonLauncher(tmp_path, data_dir, capfd):
     assert result_out.endswith(f"{str(expected_argv)}")
 
 
+def test__PythonLauncherSerialized__add():
+    # we test BaseLauncherSerialized.__add__
+
+    instance1 = BaseLauncherSerialized(
+        {
+            "command": ["first arg"],
+        }
+    )
+    instance2 = PythonLauncherSerialized(
+        {
+            "+=command": ["second arg", "third arg"],
+        }
+    )
+    merged = instance1 + instance2
+    assert isinstance(merged, PythonLauncherSerialized)
+    assert merged == {
+        "+=command": ["first arg", "second arg", "third arg"],
+    }
+
+
 def test__PythonLauncherSerialized(data_dir, monkeypatch):
     src_dict = {
         "command": ["first arg", "second arg"],

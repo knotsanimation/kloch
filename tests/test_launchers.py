@@ -1,37 +1,80 @@
 import dataclasses
-from pathlib import Path
-from typing import Optional
-
-import pytest
 
 import kloch
 import kloch.launchers
-from kloch.launchers import BaseLauncher
-from kloch.launchers import BaseLauncherSerialized
 from kloch.launchers import get_launcher_class
 from kloch.launchers import get_available_launchers_classes
-from kloch.launchers import get_launcher_serialized_class
+from kloch.launchers import is_launcher_plugin
+from kloch.launchers._plugins import check_launcher_serialized_implementation
+from kloch.launchers._plugins import check_launcher_implementation
 from kloch.launchers import get_available_launchers_serialized_classes
 
 
-def test__get_launcher_class():
+def test__get_launcher_class(data_dir, monkeypatch):
     result = get_launcher_class(".base")
     assert result is kloch.launchers.BaseLauncher
+    assert not is_launcher_plugin(result)
 
     result = get_launcher_class("system")
     assert result is kloch.launchers.SystemLauncher
+    assert not is_launcher_plugin(result)
 
     result = get_launcher_class("@python")
     assert result is kloch.launchers.PythonLauncher
+    assert not is_launcher_plugin(result)
+
+    result = get_launcher_class("behr")
+    assert result is None
+    result = get_launcher_class("tyfa")
+    assert result is None
+
+    plugin_path = data_dir / "plugins-behr"
+    monkeypatch.syspath_prepend(plugin_path)
+    plugin_path = data_dir / "plugins-tyfa"
+    monkeypatch.syspath_prepend(plugin_path)
+    monkeypatch.setenv(
+        kloch.KlochConfig.get_field("launcher_plugins").metadata["environ"],
+        "kloch_behr,kloch_tyfa",
+    )
+
+    result = get_launcher_class("behr")
+    assert result.name == "behr"
+    assert is_launcher_plugin(result)
+    result = get_launcher_class("tyfa")
+    assert result.name == "tyfa"
+    assert is_launcher_plugin(result)
+
+
+def test__get_available_launchers_classes__config_edit(data_dir, monkeypatch):
+    plugin_path = data_dir / "plugins-behr"
+    monkeypatch.syspath_prepend(plugin_path)
+    plugin_path = data_dir / "plugins-tyfa"
+    monkeypatch.syspath_prepend(plugin_path)
+    monkeypatch.setenv(
+        kloch.KlochConfig.get_field("launcher_plugins").metadata["environ"],
+        "kloch_behr,kloch_tyfa",
+    )
+    launchers = get_available_launchers_classes()
+    assert len(launchers) == len(kloch.launchers._BUILTINS_LAUNCHERS) + 2
+
+
+def test__get_available_launchers_classes__arg(data_dir, monkeypatch):
+    plugin_path = data_dir / "plugins-behr"
+    monkeypatch.syspath_prepend(plugin_path)
+    plugin_path = data_dir / "plugins-tyfa"
+    monkeypatch.syspath_prepend(plugin_path)
+
+    launchers = get_available_launchers_classes(
+        launcher_plugins=["kloch_behr", "kloch_tyfa"]
+    )
+    assert len(launchers) == len(kloch.launchers._BUILTINS_LAUNCHERS) + 2
 
 
 # ensure the subclasses have properly overridden class attributes
 # (this is because there is no way of having abstract attribute with abc module)
 def test__launchers__implementation():
     for launcher in get_available_launchers_classes():
-        if launcher is not BaseLauncher:
-            assert launcher.name != BaseLauncher.name
-        assert issubclass(launcher, BaseLauncher)
+        check_launcher_implementation(launcher)
 
 
 # ensure developer didn't missed to add documentation before adding a new subclass
@@ -41,29 +84,4 @@ def test__launchers__serialized_implementation():
         get_available_launchers_serialized_classes()
     )
     for serialized in get_available_launchers_serialized_classes():
-        assert issubclass(serialized, BaseLauncherSerialized)
-
-    ser_launchers = get_available_launchers_serialized_classes()
-
-    # ensure each serialized class have correctly implemented attributes
-    for lnch_ser in ser_launchers:
-        assert hasattr(lnch_ser, "fields")
-        assert hasattr(lnch_ser, "source")
-        assert hasattr(lnch_ser, "identifier")
-        assert hasattr(lnch_ser, "summary")
-        assert hasattr(lnch_ser, "description")
-
-        if lnch_ser is not BaseLauncherSerialized:
-            assert lnch_ser.source is not BaseLauncherSerialized
-            assert lnch_ser.fields is not BaseLauncherSerialized.fields
-            assert lnch_ser.summary is not BaseLauncherSerialized.summary
-            assert lnch_ser.description is not BaseLauncherSerialized.description
-            assert lnch_ser.identifier is not BaseLauncherSerialized.identifier
-
-        fields_ser = dataclasses.fields(lnch_ser.fields)
-        fields_source = dataclasses.fields(lnch_ser.source)
-
-        assert len(fields_ser) >= len(fields_source), lnch_ser
-        for field_ser in fields_ser:
-            assert "required" in field_ser.metadata
-            assert "description" in field_ser.metadata
+        check_launcher_serialized_implementation(serialized)

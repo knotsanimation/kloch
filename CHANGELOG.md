@@ -5,7 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.0] - 2024-05-16
+## [0.7.0] - 2024-05-25
+
+### added
+
+- plugin system for launchers
+- individual config values can now be retrieved from environment variable
+
+### refacto
+
+- ! removed `rezenv` launcher to be extracted as plugin at https://github.com/knotsanimation/kloch-launcher-rezenv
+- logic change in the MergeableDict class when subclassing to return the 
+  proper subclass when adding 2 instances.
+
+### chores
+
+- updated `Usage` documentation 
+
+## [0.6.0] - 2024-05-25
 
 ### added
 

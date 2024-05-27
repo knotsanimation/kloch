@@ -10,12 +10,8 @@ LOGGER = logging.getLogger(__name__)
 def test__LauncherSerializedDict():
     launcher_serial = LauncherSerializedDict(
         {
-            "+=rezenv": {
-                "+=config": {"exclude": "whatever"},
-                "requires": {
-                    "echoes": "2",
-                    "maya": "2023",
-                },
+            "+=@python": {
+                "python_file": "/foo",
             },
             ".base": {
                 "environ": {
@@ -27,8 +23,8 @@ def test__LauncherSerializedDict():
     )
     launchers = launcher_serial.to_serialized_list()
     assert len(launchers) == 2
-    assert isinstance(launchers[0], kloch.launchers.RezEnvLauncherSerialized)
-    assert launchers[0]["requires"]["maya"] == "2023"
+    assert isinstance(launchers[0], kloch.launchers.PythonLauncherSerialized)
+    assert launchers[0]["python_file"] == "/foo"
     assert isinstance(launchers[1], kloch.launchers.BaseLauncherSerialized)
     assert launchers[1]["environ"]["PATH"] == ["$PATH", "/foo/bar"]
 
@@ -44,9 +40,9 @@ def test__LauncherSerializedList():
                 },
             }
         ),
-        kloch.launchers.RezEnvLauncherSerialized(
+        kloch.launchers.PythonLauncherSerialized(
             {
-                "requires": {"echoes": "2", "maya": "2023"},
+                "python_file": "/foo",
                 "+=environ": {
                     "+=PATH": ["/rez"],
                     "REZVERBOSE": 2,

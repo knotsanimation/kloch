@@ -1,0 +1,12 @@
+__magic__: kloch_profile:2
+identifier: myStudio
+version: 0.1.0
+launchers:
+  .base:
+    environ:
+      STUDIO_PIPELINE_PATH: /d/pipeline
+      STUDIO_LOCAL_PREFS_PATH: ~/studio
+      STUDIO_COMMON_TOOLS_PATH: $STUDIO_PIPELINE_PATH/tools/bin
+      PATH:
+        - $PATH
+        - $STUDIO_COMMON_TOOLS_PATH

@@ -21,21 +21,37 @@ is an arbitrary set of instruction to start an environment and execute software.
 Basics
 ------
 
-   `The following instructions assume you have completed` :doc:`install`.
+For those explanations we will assume the following context:
 
-In its current state, ``kloch`` is designed to work with `rez <https://rez.readthedocs.io>`_.
+- we are a VFX production working on an animated movie project.
+- we have `developers` working on the software pipeline, and `artists` which are consumers of this pipeline.
+- we are using `rez <https://rez.readthedocs.io>`_ as package manager to manage our software infrastructure.
 
-You can store the `rez-env` request of packages in a config file
-that we will refer as `environment profile` or just `profile`.
+Installation
+____________
 
-Imagine you are a VFX production working on an animted movie project. For
-that project you wish to use specific version of your creative software and
-wish all artists use those same version without having to remember them.
+- First, ensure you have completed the :doc:`install` page.
 
-With rez, you have already installed a package for all the desired software version,
+We then need to ensure our package-manager is available as `launcher`
+with kloch. In our case we need to install the `rez env plugin <https://github.com/knotsanimation/kloch-launcher-rezenv>`_.
+
+- Follow the instructions in :doc:`launcher-plugins`.
+
+Goal
+____
+
+Now for our goal we would like for our animated movie project, all artists use
+the same software versions without having to remember them. So they just say
+they want to load the profile "animated movie" and they have access to all
+the software in its expected version.
+
+With our package-manager rez, we have already installed a package for all the desired software version,
 like `maya-2023`, `houdini-20`, ...
 
-With ``kloch`` you will be able to create a profile that will "save" this
+Instructions
+____________
+
+With ``kloch`` we will be able to create a profile that will "save" this
 request of packages:
 
 .. literalinclude:: _injected/demo-usage-basics/profile.yml
@@ -61,7 +77,13 @@ use environment variable:
 
 
 Then you can validate your manipulation by using the ``list`` command. This
-imply we will be using ``kloch`` as a `Command Line Interface` tool [2]_:
+imply we will be using ``kloch`` as a `Command Line Interface` tool [2]_.
+
+.. note::
+
+   Calling kloch will depends on how you installed it, here we will assume kloch
+   have been installed in the currently activated python virtual environment and
+   we will use ``python -m kloch`` to launch it.
 
 .. code-block:: shell
 
@@ -71,17 +93,17 @@ imply we will be using ``kloch`` as a `Command Line Interface` tool [2]_:
    :hide_code:
    :filename: _injected/demo-usage-basics/exec-list.py
 
-Time to use your profile:
+All good, which mean we can use our profile using the ``run`` command:
+
+.. tip::
+
+   The command line interface tool is documented in :doc:`cli`.
 
 .. code-block:: shell
 
    python -m kloch run myMovie
 
 Which in our case should start a rez interactive shell.
-
-.. tip::
-
-   The command line interface tool is documented in :doc:`cli`.
 
 You can also execute a command as multiple argument
 specified after a ``--``:
@@ -92,8 +114,16 @@ specified after a ``--``:
 
 .. note::
 
-   Because profiles can also specify a command, the CLI command is always
+   Because profiles can also store a command, the CLI command is always
    **appened** to whatever is already defined.
+
+And that are really the fundamentals of kloch design. We have in a way "aliased"
+the build of a complex software environment to a `profile` that can be launched
+in one line by artists.
+
+Of course nothing force your artist to use the command-line and you could create
+a GUI that wraps kloch and yoru available profile to offer a more intuitive
+user-experience for them !
 
 
 Standard workflow
@@ -112,18 +142,22 @@ It usually lead to a tree-like pipeline hierarchy:
 To reduce maintenance we would like not to rewrite all our requests
 in each profile but instead inherit from each hierarchy level requests.
 
+
+Profile inheritance
+___________________
+
 This is possible with ``kloch`` where a profile can inherit from another
 profile.
 
 .. container:: columns
 
-   .. container:: column-left
+   .. container:: _column
 
       .. literalinclude:: _injected/demo-usage-standard/profile-a.yml
          :language: yaml
          :caption: /d/pipeline/profiles/studio.yml
 
-   .. container:: column-right
+   .. container:: _column
 
       .. literalinclude:: _injected/demo-usage-standard/profile-b.yml
          :language: yaml
@@ -138,7 +172,7 @@ We can notice a few points:
   override the one in ``myStudio``.
 - we can only inherit one profile at once
 
-If we resolve the ``myMovie`` profile we can see exactly what the final request
+If we ``resolve`` the ``myMovie`` profile we can see exactly what the final request
 to rez will be :
 
 .. code-block:: shell
@@ -158,7 +192,44 @@ in ``myStudio`` profile.
    The token logic can be tricky to understand at first. Make sure to read
    the full documentation in :doc:`file-format` page.
 
-This example should give you a rough idea at how to build your profiles.
+.base inheritance
+_________________
+
+The above example works fine if you only have one launcher. But profile can
+define multiple of them and it is highly probable that you will not use `rez`
+to start all your software.
+
+With this use-case comes the need of sharing information between launcher. And
+this where the ``.base`` launcher comes into play:
+
+.. container:: columns
+
+   .. container:: _column
+
+      .. literalinclude:: _injected/demo-usage-.base/profile-a.yml
+         :language: yaml
+         :caption: /d/pipeline/profiles/studio.yml
+
+   .. container:: _column
+
+      .. literalinclude:: _injected/demo-usage-.base/profile-b.yml
+         :language: yaml
+         :caption: /d/pipeline/profiles/diagnose.yml
+
+
+Which once merged internally by kloch will produce a ``launchers`` structure like:
+
+.. exec_code::
+   :hide_code:
+   :filename: _injected/demo-usage-.base/exec-merge.py
+   :language_output: yaml
+
+As you can view, we inherit the ``environ`` keys that were defined in the
+``.base`` launcher (that is deleted) for both ``system`` and ``@python`` launchers.
+
+It is also good to notice that we define environment variable that re-use previously
+defined environment variable, at profile level or system level (``$PATH``).
+
 
 Storing profiles
 ________________
