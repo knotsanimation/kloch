@@ -120,13 +120,13 @@ profile.
 
 .. container:: columns
 
-   .. container:: column-left
+   .. container:: _column
 
       .. literalinclude:: _injected/demo-usage-standard/profile-a.yml
          :language: yaml
          :caption: /d/pipeline/profiles/studio.yml
 
-   .. container:: column-right
+   .. container:: _column
 
       .. literalinclude:: _injected/demo-usage-standard/profile-b.yml
          :language: yaml
