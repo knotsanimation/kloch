@@ -55,16 +55,16 @@ def resolve_environ(environ: Dict[str, Union[str, List[str]]]) -> Dict[str, str]
 
 
 class _MergeableSystemEnviron(MergeableDict):
-    def __init__(self):
-        environ = os.environ.copy()
-        super().__init__({"environ": environ})
-
     @classmethod
     def get_merge_rule(cls, key: str) -> MergeRule:
         # we force to always append the environ keys even if not token
         if cls.resolve_key_tokens(key) == "environ":
             return MergeRule.append
         return super().get_merge_rule(key)
+
+
+def _get_mergeable_system_environ():
+    return _MergeableSystemEnviron({"environ": os.environ.copy()})
 
 
 # we use a dataclass over enum because we need inheritance
@@ -205,7 +205,7 @@ class BaseLauncherSerialized(MergeableDict):
         use_system_environ = self.fields.merge_system_environ
 
         if self.get(use_system_environ, True):
-            base = self.__class__(_MergeableSystemEnviron() + self)
+            base = self.__class__(_get_mergeable_system_environ() + self)
             # need to disable else infinite recursion
             base[use_system_environ] = False
             resolved = base.resolved()

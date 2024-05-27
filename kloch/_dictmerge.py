@@ -6,6 +6,7 @@ from typing import Callable
 from typing import Dict
 from typing import Optional
 from typing import Tuple
+from typing import TypeVar
 
 LOGGER = logging.getLogger(__name__)
 
@@ -125,6 +126,9 @@ def _remove_prefix(text: str, prefix: str) -> str:
     return text
 
 
+T = TypeVar("T", bound="MergeableDict")
+
+
 class MergeableDict(dict):
     """
     A dict that can be deep-merged with another dict.
@@ -153,7 +157,7 @@ class MergeableDict(dict):
         append = "+="
         remove = "-="
 
-    def __add__(self, other: "MergeableDict") -> "MergeableDict":
+    def __add__(self: T, other: T) -> T:
         """
         Returns:
             new instance with deepcopied structure.
@@ -169,7 +173,7 @@ class MergeableDict(dict):
             key_resolve_callback=self.resolve_key_tokens,
             merge_rule_callback=self.get_merge_rule,
         )
-        return MergeableDict(new_content)
+        return self.__class__(new_content)
 
     @classmethod
     def resolve_key_tokens(cls, key: str) -> str:

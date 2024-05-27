@@ -106,6 +106,19 @@ def test__MergeableDict__add():
     assert not isinstance(result, MergeableDict)
 
 
+def test__MergeableDict__add__subclass():
+    class MyDict(MergeableDict):
+        pass
+
+    md1 = MyDict({"+=requires": {"maya": "2020", "houdini": "20"}})
+    assert isinstance(md1, MyDict)
+
+    md2 = MyDict({"+=requires": {"maya": "2023", "nuke": "20"}})
+
+    mm = md1 + md2
+    assert isinstance(mm, MyDict)
+
+
 def test__MergeableDict__add__different_type():
     dm1 = MergeableDict(
         {
