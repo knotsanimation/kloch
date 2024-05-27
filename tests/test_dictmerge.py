@@ -179,3 +179,26 @@ def test__MergeableDict__add__nested():
         "exclude": "whatever",
         "include": "IAMINCLUDED",
     }
+
+
+def test__MergeableDict__add__order():
+    dm1 = MergeableDict(
+        {
+            "+=rezenv": {
+                "+=config": {"exclude": "whatever"},
+                "+=requires": ["foo"],
+            }
+        }
+    )
+
+    dm2 = MergeableDict(
+        {
+            "+=rezenv": {
+                "+=config": {"exclude": "whatever"},
+                "+=requires": ["foo"],
+                "newkey": True,
+            }
+        }
+    )
+    dmmerged = dm1 + dm2
+    assert list(dmmerged["+=rezenv"].keys()) == ["+=config", "+=requires", "newkey"]
