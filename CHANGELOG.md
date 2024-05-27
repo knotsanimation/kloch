@@ -12,6 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - plugin system for launchers
 - individual config values can now be retrieved from environment variable
 
+### refacto
+
+- ! removed `rezenv` launcher to be extracted as plugin at https://github.com/knotsanimation/kloch-launcher-rezenv
+- logic change in the MergeableDict class when subclassing to return the 
+  proper subclass when adding 2 instances.
+
+### chores
+
+- updated `Usage` documentation 
+
 ## [0.6.0] - 2024-05-25
 
 ### added
