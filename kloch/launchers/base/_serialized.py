@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Dict
 from typing import List
 from typing import Type
+from typing import TypeVar
 from typing import Union
 
 from kloch._dictmerge import refacto_dict
@@ -145,6 +146,9 @@ class BaseLauncherFields:
         return list(dataclasses.fields(cls))
 
 
+T = TypeVar("T", bound="BaseLauncherSerialized")
+
+
 class BaseLauncherSerialized(MergeableDict):
     """
     A BaseLauncher instance as a serialized dict object.
@@ -174,6 +178,18 @@ class BaseLauncherSerialized(MergeableDict):
         "An abstract launcher that whose purpose is to be merged with other launchers."
     )
     description = "This launcher is never launched and is simply merged with other launchers defined in the profile."
+
+    def __add__(self: T, other: T) -> T:
+        """
+        Returns:
+            new instance with deepcopied structure.
+        """
+        if not isinstance(other, BaseLauncherSerialized):
+            raise TypeError(
+                f"Cannot concatenate object of type {type(other)} with {type(self)}"
+            )
+        # XXX: we override so the class type is defined by the right member of the + operation
+        return other.__class__(super().__add__(other))
 
     @abc.abstractmethod
     def validate(self):

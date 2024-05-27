@@ -159,6 +159,10 @@ class MergeableDict(dict):
 
     def __add__(self: T, other: T) -> T:
         """
+        Merge the 2 dict structure together with ``other`` merged over ``self``.
+
+        The returned class type is of the left member of the + operation.
+
         Returns:
             new instance with deepcopied structure.
         """
