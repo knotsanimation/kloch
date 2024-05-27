@@ -128,6 +128,9 @@ The following merge tokens are available:
 Launchers
 ---------
 
+Specified as key/value pair where the key is the launcher name and the value
+its configuration.
+
 +---------------------+------------------------------------------------------------------------------------------------+
 | ➡parent             | :launchers                                                                                     |
 +---------------------+------------------------------------------------------------------------------------------------+
@@ -140,7 +143,7 @@ Launchers
 |                     | **description** | a registred launcher name with its configuration                             |
 +---------------------+-----------------+------------------------------------------------------------------------------+
 
-List of available launchers:
+List of available built-in launchers (see :doc:`launcher-plugins` for extending it):
 
 .. exec-inject::
 

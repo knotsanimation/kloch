@@ -69,7 +69,7 @@ The profile system includes:
 - profile inheritance (a profile specify it merges on top of another profile)
 - token system to determine merging rules during inheritance
 - arbitrary profile locations definition through API and environment variable.
-- abstract launcher system to accomodate for any use-case.
+- launcher plugin system to accomodate for any use-case.
 
 
 Contents

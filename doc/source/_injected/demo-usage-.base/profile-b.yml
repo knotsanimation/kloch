@@ -1,0 +1,14 @@
+__magic__: kloch_profile:2
+identifier: diagnose
+base: myStudio
+version: 0.1.0
+launchers:
+  +=.base:
+    +=environ:
+      LOG_LEVEL: DEBUG
+  +=system:
+    command:
+      - diagnose
+  +=@python:
+    cwd: $STUDIO_COMMON_TOOLS_PATH
+    python_file: ./diagnose.py
