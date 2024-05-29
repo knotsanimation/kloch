@@ -33,8 +33,9 @@ class BaseParser:
         args: user command line argument already parsed by argparse
     """
 
-    def __init__(self, args):
+    def __init__(self, args: argparse.Namespace, config: kloch.KlochConfig):
         self._args: argparse.Namespace = args
+        self._config = config
 
     @property
     def debug(self) -> bool:
@@ -355,7 +356,6 @@ class PluginsParser(BaseParser):
         return self._args.launcher_plugins
 
     def execute(self):
-
         launcher_plugins = self.launcher_plugins or kloch.get_config().launcher_plugins
 
         print(f"Parsing {len(launcher_plugins)} launcher plugins: {launcher_plugins}")
@@ -407,13 +407,16 @@ class RawFormatter(argparse.HelpFormatter):
         return text
 
 
-def get_cli(argv=None) -> BaseParser:
+def get_cli(argv=None, config: kloch.KlochConfig = None) -> BaseParser:
     """
     Return the command line interface generated from user arguments provided.
 
     Args:
         argv: source command line argument to use instea dof the usual sys.argv
+        config: the kloch config instance to use for running the cli
     """
+    config = config or kloch.get_config()
+
     parser = argparse.ArgumentParser(
         kloch.__name__,
         description=(
@@ -479,4 +482,4 @@ def get_cli(argv=None) -> BaseParser:
 
     args = parser.parse_args(argv)
     setattr(args, _ARGS_USER_COMMAND_DEST, user_command)
-    return args.func(args)
+    return args.func(args, config)

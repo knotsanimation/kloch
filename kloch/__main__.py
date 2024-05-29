@@ -8,7 +8,7 @@ LOGGER = logging.getLogger(__name__)
 
 def main():
     config = kloch.get_config()
-    cli = kloch.get_cli()
+    cli = kloch.get_cli(config=config)
     log_level = logging.DEBUG if cli.debug else config.cli_logging_default_level
     logging.basicConfig(
         level=log_level,
