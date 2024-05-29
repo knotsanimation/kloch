@@ -3,6 +3,7 @@ __all__ = [
     "config",
     "deepmerge_dicts",
     "EnvironmentProfile",
+    "Environ",
     "filesyntax",
     "get_all_profile_file_paths",
     "get_profile_locations",
@@ -20,6 +21,7 @@ __all__ = [
     "serialize_profile",
     "write_profile_to_file",
 ]
+from .constants import Environ
 from ._dictmerge import MergeableDict
 from ._dictmerge import MergeRule
 from ._dictmerge import refacto_dict

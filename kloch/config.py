@@ -13,14 +13,9 @@ from typing import Union
 
 import yaml
 
+from kloch.constants import Environ
+
 LOGGER = logging.getLogger(__name__)
-
-KLOCH_CONFIG_PREFIX = "KLOCH_CONFIG"
-
-KLOCH_CONFIG_ENV_VAR = f"{KLOCH_CONFIG_PREFIX}_PATH"
-"""
-Environment variable that must specify a file path to an existing configuration file.
-"""
 
 
 def _cast_list(src_str: str) -> List[str]:
@@ -40,7 +35,7 @@ class KlochConfig:
                 "A list of importable python module names containing new launchers to support.\n\n"
                 "If specified in environment variable, this must be a comma-separated list of str like ``module1,module2,module3``"
             ),
-            "environ": f"{KLOCH_CONFIG_PREFIX}_launcher_plugins".upper(),
+            "environ": Environ.KLOCH_CONFIG_LAUNCHER_PLUGINS,
             "environ_cast": _cast_list,
         },
     )
@@ -52,7 +47,7 @@ class KlochConfig:
                 "Formatting to use for all logged messages. See python logging module documentation.\n"
                 "The tokens must use the ``{`` style."
             ),
-            "environ": f"{KLOCH_CONFIG_PREFIX}_cli_logging_format".upper(),
+            "environ": Environ.KLOCH_CONFIG_CLI_LOGGING_FORMAT,
             "environ_cast": str,
         },
     )
@@ -65,7 +60,7 @@ class KlochConfig:
                 "Can be an int or a level name as string as long as it is understandable"
                 " by ``logging.getLevelName``."
             ),
-            "environ": f"{KLOCH_CONFIG_PREFIX}_cli_logging_default_level".upper(),
+            "environ": Environ.KLOCH_CONFIG_CLI_LOGGING_DEFAULT_LEVEL,
             "environ_cast": str,
         },
     )
@@ -84,7 +79,7 @@ class KlochConfig:
         """
         Generate an instance from a serialized file specified in an environment variable.
         """
-        environ = os.getenv(KLOCH_CONFIG_ENV_VAR)
+        environ = os.getenv(Environ.KLOCH_CONFIG_ENV_VAR)
 
         asdict = {}
         if environ:

@@ -24,7 +24,7 @@ def test__KlochConfig__from_environment(monkeypatch, data_dir):
     assert config == kloch.config.KlochConfig()
 
     config_path = data_dir / "config-blaj.yml"
-    monkeypatch.setenv(kloch.config.KLOCH_CONFIG_ENV_VAR, str(config_path))
+    monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_ENV_VAR, str(config_path))
     config = kloch.config.KlochConfig.from_environment()
     assert config.cli_logging_default_level == "WARNING"
     assert config.cli_logging_format == "{levelname: <7}: {message}"
