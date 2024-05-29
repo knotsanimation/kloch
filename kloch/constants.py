@@ -24,3 +24,5 @@ class Environ:
     KLOCH_CONFIG_CLI_LOGGING_DEFAULT_LEVEL = (
         f"{_KLOCH_CONFIG_PREFIX}_cli_logging_default_level".upper()
     )
+
+    KLOCH_CONFIG_PROFILE_PATHS = f"{_KLOCH_CONFIG_PREFIX}_profile_paths".upper()

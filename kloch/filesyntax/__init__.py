@@ -3,9 +3,6 @@ Serialization and unserialization of environment profile to disk.
 """
 
 from ._profile import EnvironmentProfile
-from ._io import KENV_PROFILE_PATH_ENV_VAR
-from ._io import add_profile_location
-from ._io import get_profile_locations
 from ._io import get_profile_file_path
 from ._io import get_all_profile_file_paths
 from ._io import read_profile_from_file

@@ -77,35 +77,42 @@ class BaseParser:
         )
         parser.set_defaults(func=cls)
 
+    def _get_merged_profile(self, profile_identifiers: List[str]):
+        """
+        Merge each profile with its base then merge all of them from left to right.
+        """
+        profile_locations = self._config.profile_paths
 
-def _get_merged_profile(profile_identifiers: List[str]):
-    """
-    Merge each profile with its base then merge all of them from left to right.
-    """
-    profiles = []
-    for profile_id in profile_identifiers:
-        profile_paths = kloch.get_profile_file_path(profile_id)
-        if len(profile_paths) >= 2:
-            raise ValueError(
-                f"Found multiple profile with identifier '{profile_id}' "
-                f": {profile_paths}."
+        profiles = []
+        for profile_id in profile_identifiers:
+            profile_paths = kloch.get_profile_file_path(
+                profile_id,
+                profile_locations=profile_locations,
             )
+            if len(profile_paths) >= 2:
+                raise ValueError(
+                    f"Found multiple profile with identifier '{profile_id}' "
+                    f": {profile_paths}."
+                )
 
-        if not profile_paths:
-            raise ValueError(f"No profile found with identifier '{profile_id}'.")
+            if not profile_paths:
+                raise ValueError(f"No profile found with identifier '{profile_id}'.")
 
-        profile_path = profile_paths[0]
-        LOGGER.debug(f"reading profile {profile_path}")
-        profile = kloch.read_profile_from_file(profile_path)
-        profile = profile.get_merged_profile()
-        profiles.append(profile)
+            profile_path = profile_paths[0]
+            LOGGER.debug(f"reading profile {profile_path}")
+            profile = kloch.read_profile_from_file(
+                profile_path,
+                profile_locations=profile_locations,
+            )
+            profile = profile.get_merged_profile()
+            profiles.append(profile)
 
-    profile = profiles.pop(-1)
-    for base_profile in profiles:
-        profile.base = base_profile
-        profile = profile.get_merged_profile()
+        profile = profiles.pop(-1)
+        for base_profile in profiles:
+            profile.base = base_profile
+            profile = profile.get_merged_profile()
 
-    return profile
+        return profile
 
 
 class RunParser(BaseParser):
@@ -139,7 +146,7 @@ class RunParser(BaseParser):
 
     def execute(self):
         print(f"loading {len(self.profile_ids)} profiles ...")
-        profile = _get_merged_profile(self.profile_ids)
+        profile = self._get_merged_profile(self.profile_ids)
 
         launchers_dict = profile.launchers
         launchers_list = launchers_dict.to_serialized_list()
@@ -219,9 +226,7 @@ class ListParser(BaseParser):
         return self._args.id_filter
 
     def execute(self):
-        print(f"Parsing environment variable {kloch.KENV_PROFILE_PATH_ENV_VAR} ...")
-
-        profile_locations = kloch.get_profile_locations()
+        profile_locations = self._config.profile_paths
         profile_locations_txt = [str(path) for path in profile_locations]
         print(
             f"Searching {len(profile_locations)} locations: {profile_locations_txt} ..."
@@ -281,7 +286,7 @@ class ResolveParser(BaseParser):
         return self._args.profile_ids
 
     def execute(self):
-        profile = _get_merged_profile(self.profile_ids)
+        profile = self._get_merged_profile(self.profile_ids)
         serialized = kloch.serialize_profile(profile)
         print(serialized)
 

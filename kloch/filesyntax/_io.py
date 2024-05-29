@@ -1,5 +1,4 @@
 import logging
-import os
 from pathlib import Path
 from typing import Dict
 from typing import List
@@ -13,13 +12,6 @@ from ._profile import EnvironmentProfile
 
 LOGGER = logging.getLogger(__name__)
 
-
-KENV_PROFILE_PATH_ENV_VAR: str = "KENV_PROFILE_PATHS"
-"""
-Name of the user-editable environment variable to add profile locations.
-"""
-
-_PROFILE_LOCATIONS_INTERNAL: List[Path] = []
 
 KENV_PROFILE_MAGIC = "kloch_profile"
 KENV_PROFILE_VERSION = 2
@@ -44,43 +36,6 @@ def is_file_environment_profile(file_path: Path) -> bool:
     return content.get("__magic__", "").startswith(KENV_PROFILE_MAGIC)
 
 
-def add_profile_location(location: Path):
-    """
-    Add a location where profile can be found.
-
-    Locations added thorugh here are appended to the environment defined locations.
-
-    Args:
-        location: filesystem path to an existing directory.
-    """
-    global _PROFILE_LOCATIONS_INTERNAL
-    if location in _PROFILE_LOCATIONS_INTERNAL:
-        return
-    _PROFILE_LOCATIONS_INTERNAL.append(location)
-
-
-def get_profile_locations() -> List[Path]:
-    """
-    Get the user-defined directories where profile are stored.
-
-    Returns:
-         list of filesystem path to directory that might exist
-    """
-    locations = os.getenv(KENV_PROFILE_PATH_ENV_VAR)
-    if not locations and not _PROFILE_LOCATIONS_INTERNAL:
-        return []
-
-    if locations:
-        locations = [
-            Path(location).absolute() for location in locations.split(os.pathsep)
-        ]
-        locations += _PROFILE_LOCATIONS_INTERNAL
-    else:
-        locations = list(_PROFILE_LOCATIONS_INTERNAL)
-
-    return locations
-
-
 def get_all_profile_file_paths(locations: Optional[List[Path]] = None) -> List[Path]:
     """
     Get all the environment-profile file paths as registred by the user.
@@ -88,7 +43,7 @@ def get_all_profile_file_paths(locations: Optional[List[Path]] = None) -> List[P
     Args:
         locations: list of filesystem path to directory that might exist
     """
-    locations = locations or get_profile_locations()
+    locations = locations or []
     return [
         path
         for location in locations

@@ -19,10 +19,6 @@ def main():
     LOGGER.debug(f"starting {kloch.__name__} v{kloch.__version__}")
     LOGGER.debug(f"retrieved cli with args={cli._args}")
 
-    if cli.profile_paths:
-        LOGGER.debug(f"adding {len(cli.profile_paths)} profile locations")
-        [kloch.add_profile_location(path) for path in cli.profile_paths]
-
     sys.exit(cli.execute())
 
 

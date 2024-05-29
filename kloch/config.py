@@ -22,6 +22,10 @@ def _cast_list(src_str: str) -> List[str]:
     return src_str.split(",")
 
 
+def _cast_path_list(src_str: str) -> List[Path]:
+    return [Path(path) for path in src_str.split(os.pathsep)]
+
+
 @dataclasses.dataclass
 class KlochConfig:
     """
@@ -62,6 +66,20 @@ class KlochConfig:
             ),
             "environ": Environ.KLOCH_CONFIG_CLI_LOGGING_DEFAULT_LEVEL,
             "environ_cast": str,
+        },
+    )
+
+    profile_paths: List[Path] = dataclasses.field(
+        default_factory=list,
+        metadata={
+            "documentation": (
+                "Filesystem path to one or multiple directory that might exists.\n"
+                "The directories contain profile valid to be discoverable.\n\n"
+                "If specified from the environment, it must a list of path separated "
+                "by the default system path separator (windows = ``;``, linux = ``:``)"
+            ),
+            "environ": Environ.KLOCH_CONFIG_PROFILE_PATHS,
+            "environ_cast": _cast_path_list,
         },
     )
 

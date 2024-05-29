@@ -24,7 +24,7 @@ def test__getCli__subcommands():
 
 
 def test__getCli__list(monkeypatch, data_dir, capsys):
-    monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+    monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS, str(data_dir))
 
     argv = ["list"]
     cli = kloch.get_cli(argv=argv)
@@ -39,7 +39,7 @@ def test__getCli__list(monkeypatch, data_dir, capsys):
 
 
 def test__getCli__list__filter(monkeypatch, data_dir, capsys):
-    monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+    monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS, str(data_dir))
 
     name_filter = ".*es:beta"
     argv = ["list", name_filter]
@@ -64,7 +64,7 @@ def test__getCli__run(monkeypatch, data_dir):
         Results.env = env
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+    monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS, str(data_dir))
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
     argv = ["run", "lxm"]
@@ -89,7 +89,7 @@ def test__getCli__run__command(monkeypatch, data_dir):
         Results.env = env
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setenv(kloch.KENV_PROFILE_PATH_ENV_VAR, str(data_dir))
+    monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS, str(data_dir))
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
     extra_command = ["echo", "a", "bunch", "of", "ÅÍÎÏ˝ÓÔÒÚÆ☃", "--debug"]
