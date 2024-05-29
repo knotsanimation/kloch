@@ -178,7 +178,42 @@ def read_profile_from_file(
     return profile
 
 
-def serialize_profile(profile: EnvironmentProfile) -> str:
+def read_profile_from_id(
+    profile_id: str,
+    profile_locations: Optional[List[Path]] = None,
+) -> EnvironmentProfile:
+    """
+    Generate a profile instance from a serialized file on disk retrieved using the given identifier.
+
+    Raises error if the profile file is not built properly.
+
+    This a convenient function wrapping :func:`read_profile_from_file` and
+    :func:`get_profile_file_path` and assuming that no profile with the same
+    identifier exist in the locations.
+
+    Args:
+        profile_id: identifier that must match the profile.
+        profile_locations:
+            list of filesystem path to potential existing directories containing profiles.
+
+    Returns:
+        a profile instance
+    """
+    profile_paths = get_profile_file_path(
+        profile_id=profile_id,
+        profile_locations=profile_locations,
+    )
+    profile = read_profile_from_file(
+        file_path=profile_paths[0],
+        profile_locations=profile_locations,
+    )
+    return profile
+
+
+def serialize_profile(
+    profile: EnvironmentProfile,
+    profile_locations: Optional[List[Path]] = None,
+) -> str:
     """
     Convert the instance to a serialized dictionnary intended to be written on disk.
     """
@@ -187,7 +222,10 @@ def serialize_profile(profile: EnvironmentProfile) -> str:
 
     base_profile: Optional[EnvironmentProfile] = asdict.get("base", None)
     if base_profile:
-        base_path = get_profile_file_path(base_profile.identifier)
+        base_path = get_profile_file_path(
+            profile_id=base_profile.identifier,
+            profile_locations=profile_locations,
+        )
         if not base_path:
             raise ValueError(
                 f"Base profile {base_profile.identifier} is not registred on disk."
@@ -203,8 +241,8 @@ def serialize_profile(profile: EnvironmentProfile) -> str:
 def write_profile_to_file(
     profile: EnvironmentProfile,
     file_path: Path,
-    # TODO rename param to check_valid_id
-    check_valid_name: bool = True,
+    profile_locations: Optional[List[Path]] = None,
+    check_valid_id: bool = True,
 ) -> Path:
     """
     Convert the instance to a serialized file on disk.
@@ -214,17 +252,22 @@ def write_profile_to_file(
         file_path:
             filesystem path to a file that might exist.
             parent location is expected to exist.
-        check_valid_name:
-            if True, ensure the identifier of the profile is unique
+        check_valid_id:
+            if True, ensure the identifier of the profile is unique among all ``profile_locations``
+        profile_locations:
+            list of filesystem path to potential existing directories containing profiles.
     """
-    if check_valid_name:
-        profile_paths = get_profile_file_path(profile.identifier)
+    if check_valid_id:
+        profile_paths = get_profile_file_path(
+            profile_id=profile.identifier,
+            profile_locations=profile_locations,
+        )
         if profile_paths and file_path not in profile_paths:
             raise ValueError(
                 f"Found multiple profile with identifier '{profile.identifier}'."
             )
 
-    serialized = serialize_profile(profile)
+    serialized = serialize_profile(profile, profile_locations=profile_locations)
 
     file_path.write_text(serialized)
     return file_path

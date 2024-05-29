@@ -15,6 +15,7 @@ __all__ = [
     "MergeableDict",
     "MergeRule",
     "read_profile_from_file",
+    "read_profile_from_id",
     "refacto_dict",
     "serialize_profile",
     "write_profile_to_file",
@@ -32,6 +33,7 @@ from .filesyntax import EnvironmentProfile
 from .filesyntax import KENV_PROFILE_PATH_ENV_VAR
 from .filesyntax import serialize_profile
 from .filesyntax import read_profile_from_file
+from .filesyntax import read_profile_from_id
 from .filesyntax import write_profile_to_file
 from .filesyntax import add_profile_location
 from .filesyntax import get_profile_locations

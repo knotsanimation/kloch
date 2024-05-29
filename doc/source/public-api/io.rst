@@ -18,3 +18,4 @@ Input/Output
 .. autofunction:: kloch.serialize_profile
 .. autofunction:: kloch.write_profile_to_file
 .. autofunction:: kloch.read_profile_from_file
+.. autofunction:: kloch.read_profile_from_id
