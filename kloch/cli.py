@@ -61,6 +61,10 @@ class BaseParser:
         """
         return self._config.profile_paths + self._profile_paths
 
+    @property
+    def session_root(self) -> Optional[Path]:
+        return self._config.cli_session_dir
+
     @abc.abstractmethod
     def execute(self):
         """
@@ -200,7 +204,7 @@ class RunParser(BaseParser):
         sys.exit(launcher.execute(tmpdir=session_dir.path, command=command))
 
     def execute(self):
-        session_root = self._config.cli_session_dir
+        session_root = self.session_root
         if session_root is None:
             with tempfile.TemporaryDirectory(prefix=f"{kloch.__name__}") as tmp_dir:
                 session_dir = SessionDirectory.initialize(Path(tmp_dir))
@@ -513,4 +517,14 @@ def get_cli(argv=None, config: kloch.KlochConfig = None) -> BaseParser:
 
     args = parser.parse_args(argv)
     setattr(args, _ARGS_USER_COMMAND_DEST, user_command)
-    return args.func(args, config)
+    instance: BaseParser = args.func(args, config)
+
+    # clean old sessions everytime the cli is launched
+    if instance.session_root and instance.session_root.exists():
+        cleaned = kloch.session.clean_outdated_session_dirs(
+            root=instance.session_root,
+            lifetime=config.cli_session_dir_lifetime,
+        )
+        LOGGER.debug(f"removed {len(cleaned)} outdated session dirs")
+
+    return instance

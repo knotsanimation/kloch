@@ -100,6 +100,19 @@ class KlochConfig:
         },
     )
 
+    cli_session_dir_lifetime: float = dataclasses.field(
+        default=240.0,
+        metadata={
+            "documentation": (
+                "Amount in hours before a session directory must be deleted.\n"
+                "Note the deleting is performed only the next time kloch is started so it "
+                "is possible a session directory exist longer if kloch is not launched for a while."
+            ),
+            "environ": Environ.KLOCH_CONFIG_CLI_SESSION_LIFETIME,
+            "environ_cast": float,
+        },
+    )
+
     profile_paths: List[Path] = dataclasses.field(
         default_factory=list,
         metadata={

@@ -31,6 +31,8 @@ class Environ:
 
     KLOCH_CONFIG_CLI_SESSION_PATH = f"{_KLOCH_CONFIG_PREFIX}_cli_session_path".upper()
 
+    KLOCH_CONFIG_CLI_SESSION_LIFETIME = f"{_KLOCH_CONFIG_PREFIX}_cli_lifetime".upper()
+
     KLOCH_CONFIG_PROFILE_PATHS = f"{_KLOCH_CONFIG_PREFIX}_profile_paths".upper()
 
     @classmethod

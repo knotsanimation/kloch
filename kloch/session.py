@@ -1,8 +1,10 @@
 import logging
+import shutil
 import socket
 import time
 import uuid
 from pathlib import Path
+from typing import List
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,8 +37,8 @@ class SessionDirectory:
         return self.path.name
 
     @property
-    def timestamp(self) -> int:
-        return int(self.timestamp_path.read_text())
+    def timestamp(self) -> float:
+        return float(self.timestamp_path.read_text())
 
     @classmethod
     def initialize(cls, root: Path) -> "SessionDirectory":
@@ -62,3 +64,45 @@ class SessionDirectory:
         LOGGER.debug(f"touch('{instance.timestamp_path}')")
         instance.timestamp_path.write_text(str(timestamp))
         return instance
+
+
+def clean_outdated_session_dirs(root: Path, lifetime: float) -> List[Path]:
+    """
+    Iterate through all existing session directories and delete the one which have been created longer than the given lifetime.
+
+    This function should handle file or dirs of the given root which are not sessions.
+
+    Args:
+        root: filesystem path to an existing directory.
+        lifetime: maximum lifetime in hours of a session directory
+
+    Returns:
+        list of directories filesystem path that have been removed
+    """
+    # convert hours to seconds
+    lifetime = lifetime * 3600
+    current_time = time.time()
+    minimal_lifetime = current_time - lifetime
+
+    removed = []
+
+    for path in root.glob("*"):
+        if not path.is_dir():
+            continue
+
+        session = SessionDirectory(path)
+        if not session.timestamp_path.exists():
+            continue
+
+        if session.timestamp > minimal_lifetime:
+            continue
+
+        try:
+            shutil.rmtree(path)
+        except Exception as error:
+            LOGGER.exception(f"failed to remove outdated session dir '{path}': {error}")
+            continue
+
+        removed.append(path)
+
+    return removed
