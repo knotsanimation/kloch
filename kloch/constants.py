@@ -2,6 +2,8 @@
 Variables whose values doesn't change during application runtime.
 """
 
+from typing import List
+
 _KLOCH_CONFIG_PREFIX = "KLOCH_CONFIG"
 
 
@@ -26,3 +28,16 @@ class Environ:
     )
 
     KLOCH_CONFIG_PROFILE_PATHS = f"{_KLOCH_CONFIG_PREFIX}_profile_paths".upper()
+
+    @classmethod
+    def list_all(cls) -> List[str]:
+        """
+        Return all environment variables supported by the application.
+        """
+        return [
+            obj
+            for obj_name, obj in vars(cls).items()
+            if not obj_name.startswith("__")
+            and isinstance(obj, str)
+            and obj.startswith("KLOCH")
+        ]
