@@ -61,4 +61,4 @@ def test__check_launcher_plugins(data_dir, monkeypatch):
 
     with pytest.raises(ImportError) as error:
         kloch.launchers._plugins.check_launcher_plugins(["kloch_rerr"])
-        assert BaseLauncher.__name__ in error
+    assert BaseLauncher.__name__ in str(error.value)

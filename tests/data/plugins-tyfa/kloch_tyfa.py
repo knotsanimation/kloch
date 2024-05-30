@@ -16,7 +16,11 @@ class TyfaLauncher(BaseLauncher):
 
     name = "tyfa"
 
-    def execute(self, tmpdir: Path, command: Optional[List[str]] = None):
+    def execute(
+        self,
+        tmpdir: Path,
+        command: Optional[List[str]] = None,
+    ):  # pragma: no cover
         pass
 
 
@@ -35,10 +39,10 @@ class TyfaLauncherSerialized(BaseLauncherSerialized):
     summary = "Whatever"
     description = "Follow me on GitHub ! https://github.com/MrLixm"
 
-    def validate(self):
+    def validate(self):  # pragma: no cover
         super().validate()
 
     # we override for type-hint
-    def unserialize(self) -> TyfaLauncher:
+    def unserialize(self) -> TyfaLauncher:  # pragma: no cover
         # noinspection PyTypeChecker
         return super().unserialize()
