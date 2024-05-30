@@ -12,3 +12,5 @@ Input/Output
 .. autofunction:: kloch.write_profile_to_file
 .. autofunction:: kloch.read_profile_from_file
 .. autofunction:: kloch.read_profile_from_id
+
+.. autofunction:: kloch.filesyntax.is_file_environment_profile

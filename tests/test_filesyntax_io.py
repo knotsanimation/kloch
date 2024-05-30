@@ -5,6 +5,20 @@ import pytest
 import kloch.filesyntax
 
 
+def test__is_file_environment_profile(data_dir):
+    src_path = data_dir / "not-a-profile.txt"
+    result = kloch.filesyntax.is_file_environment_profile(src_path)
+    assert result is False
+
+    src_path = data_dir / "fake-profile.yml"
+    result = kloch.filesyntax.is_file_environment_profile(src_path)
+    assert result is False
+
+    src_path = data_dir / "profile.echoes.yml"
+    result = kloch.filesyntax.is_file_environment_profile(src_path)
+    assert result is True
+
+
 def test__read_profile_from_file__envvar(data_dir):
     profile_echoes_beta_paths = kloch.filesyntax.get_profile_file_path(
         "knots:echoes:beta",
