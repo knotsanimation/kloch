@@ -1,4 +1,5 @@
 import logging
+import logging.handlers
 import sys
 from typing import List
 from typing import Optional
@@ -27,7 +28,13 @@ def main(argv: Optional[List[str]] = None):
     logging.root.addHandler(handler)
 
     for log_path in config.cli_logging_paths:
-        handler = logging.FileHandler(log_path, encoding="utf-8")
+        handler = logging.handlers.RotatingFileHandler(
+            log_path,
+            # keep in sync with config option
+            maxBytes=65536,
+            backupCount=1,
+            encoding="utf-8",
+        )
         handler.setLevel(logging.DEBUG)
         handler.setFormatter(formatter)
         logging.root.addHandler(handler)

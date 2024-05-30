@@ -53,7 +53,8 @@ class KlochConfig:
         metadata={
             "documentation": (
                 "Filesystem path to one or multiple log file that might exists.\n"
-                "If specified all the logging will be wrote to those files.\n\n"
+                "If specified all the logging will be wrote to those files."
+                "Logs are rotated bwteen 2 files of 65.536Kb max.\n\n"
                 "If specified from the environment, it must a list of path separated "
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
