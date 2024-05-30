@@ -22,9 +22,10 @@ class SessionDirectory:
         Filesystem path to an existing directory.
         """
 
-        self.timestamp_path = self.path / ".timestamp"
+        self.meta_session_path = self.path / "kloch.session"
         """
-        A file containing the timestamp at which the session was created.
+        A file indicating the directory is a session and which contains 
+        the timestamp at which the session was created.
         """
 
         self.profile_path = self.path / "profile.yml"
@@ -38,7 +39,7 @@ class SessionDirectory:
 
     @property
     def timestamp(self) -> float:
-        return float(self.timestamp_path.read_text())
+        return float(self.meta_session_path.read_text())
 
     @classmethod
     def initialize(cls, root: Path) -> "SessionDirectory":
@@ -61,9 +62,20 @@ class SessionDirectory:
 
         instance = cls(path)
 
-        LOGGER.debug(f"touch('{instance.timestamp_path}')")
-        instance.timestamp_path.write_text(str(timestamp))
+        LOGGER.debug(f"touch('{instance.meta_session_path}')")
+        instance.meta_session_path.write_text(str(timestamp))
         return instance
+
+
+def get_session_dirs(root: Path) -> List[SessionDirectory]:
+    """
+    Get all the session directories found in the given root directory.
+    """
+    return [
+        SessionDirectory(path)
+        for path in root.glob("*")
+        if path.is_dir() and SessionDirectory(path).meta_session_path.exists()
+    ]
 
 
 def clean_outdated_session_dirs(root: Path, lifetime: float) -> List[Path]:
@@ -86,23 +98,19 @@ def clean_outdated_session_dirs(root: Path, lifetime: float) -> List[Path]:
 
     removed = []
 
-    for path in root.glob("*"):
-        if not path.is_dir():
-            continue
-
-        session = SessionDirectory(path)
-        if not session.timestamp_path.exists():
-            continue
+    for session in get_session_dirs(root=root):
 
         if session.timestamp > minimal_lifetime:
             continue
 
         try:
-            shutil.rmtree(path)
+            shutil.rmtree(session.path)
         except Exception as error:
-            LOGGER.exception(f"failed to remove outdated session dir '{path}': {error}")
+            LOGGER.exception(
+                f"failed to remove outdated session dir '{session.path}': {error}"
+            )
             continue
 
-        removed.append(path)
+        removed.append(session.path)
 
     return removed
