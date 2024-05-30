@@ -29,6 +29,8 @@ class Environ:
         f"{_KLOCH_CONFIG_PREFIX}_cli_logging_default_level".upper()
     )
 
+    KLOCH_CONFIG_CLI_SESSION_PATH = f"{_KLOCH_CONFIG_PREFIX}_cli_session_path".upper()
+
     KLOCH_CONFIG_PROFILE_PATHS = f"{_KLOCH_CONFIG_PREFIX}_profile_paths".upper()
 
     @classmethod

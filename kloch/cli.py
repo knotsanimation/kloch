@@ -17,6 +17,7 @@ from typing import Optional
 import kloch
 from kloch.launchers import BaseLauncher
 from kloch.launchers import BaseLauncherSerialized
+from kloch.session import SessionDirectory
 
 LOGGER = logging.getLogger(__name__)
 
@@ -152,9 +153,19 @@ class RunParser(BaseParser):
         """
         return self._args.command
 
-    def execute(self):
+    def _execute(self, session_dir: SessionDirectory):
+        LOGGER.debug(f"session dir at '{session_dir.path}'")
         print(f"loading {len(self.profile_ids)} profiles ...")
         profile = self._get_merged_profile(self.profile_ids)
+
+        # keep a backup of the merged profile for debugging
+        LOGGER.debug(f"writing merged profile to '{session_dir.profile_path}'")
+        kloch.write_profile_to_file(
+            profile,
+            file_path=session_dir.profile_path,
+            profile_locations=self.profile_paths,
+            check_valid_id=False,
+        )
 
         launchers_dict = profile.launchers
         launchers_list = launchers_dict.to_serialized_list()
@@ -186,10 +197,17 @@ class RunParser(BaseParser):
         LOGGER.debug(f"executing launcher={launcher} with command={command}")
         LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
 
-        with tempfile.TemporaryDirectory(
-            prefix=f"{kloch.__name__}-{launcher.name}",
-        ) as tmpdir:
-            sys.exit(launcher.execute(tmpdir=Path(tmpdir), command=command))
+        sys.exit(launcher.execute(tmpdir=session_dir.path, command=command))
+
+    def execute(self):
+        session_root = self._config.cli_session_dir
+        if session_root is None:
+            with tempfile.TemporaryDirectory(prefix=f"{kloch.__name__}") as tmp_dir:
+                session_dir = SessionDirectory.initialize(Path(tmp_dir))
+                return self._execute(session_dir=session_dir)
+        else:
+            session_dir = SessionDirectory.initialize(session_root)
+            return self._execute(session_dir=session_dir)
 
     @classmethod
     def add_to_parser(cls, parser: argparse.ArgumentParser):

@@ -15,4 +15,5 @@ Public API
    io
    profile
    launchers
+   session
    utils

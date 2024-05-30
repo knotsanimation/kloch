@@ -22,6 +22,10 @@ def _cast_list(src_str: str) -> List[str]:
     return src_str.split(",")
 
 
+def _cast_path(src_str: str) -> Path:
+    return Path(src_str)
+
+
 def _cast_path_list(src_str: str) -> List[Path]:
     return [Path(path) for path in src_str.split(os.pathsep)]
 
@@ -80,6 +84,19 @@ class KlochConfig:
             ),
             "environ": Environ.KLOCH_CONFIG_CLI_LOGGING_DEFAULT_LEVEL,
             "environ_cast": str,
+        },
+    )
+
+    cli_session_dir: Optional[Path] = dataclasses.field(
+        default=None,
+        metadata={
+            "documentation": (
+                "Filesystem path to a directory that might exists.\n"
+                "The directory is used to store temporarly any file generated during the executing of a launcher.\n"
+                "If not specified, a system's default temporary location is used."
+            ),
+            "environ": Environ.KLOCH_CONFIG_CLI_SESSION_PATH,
+            "environ_cast": _cast_path,
         },
     )
 
