@@ -45,7 +45,7 @@ class KlochConfig:
     )
 
     cli_logging_paths: List[Path] = dataclasses.field(
-        default="{levelname: <7} | {asctime} [{name}] {message}",
+        default_factory=list,
         metadata={
             "documentation": (
                 "Filesystem path to one or multiple log file that might exists.\n"
