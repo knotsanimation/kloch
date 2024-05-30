@@ -23,6 +23,9 @@ Each config key can also be set using an individual environment variable:
    :hide_code:
    :filename: _injected/exec-config-envvar.py
 
+Be aware that specifying a config key in an environment variable will
+override any value specified in the config file.
+
 
 Content
 -------
