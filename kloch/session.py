@@ -54,7 +54,10 @@ class SessionDirectory:
             root.mkdir()
 
         timestamp = time.time()
-        identifier: str = f"{timestamp}-{socket.gethostname()}-{uuid.uuid4()}"
+        # XXX: we generate uuid to prevent collision but we shorten it as we
+        #   are already pretty safe with the timestamp.
+        uuid_ = uuid.uuid4().hex[:8]
+        identifier: str = f"{timestamp}-{socket.gethostname()}-{uuid_}"
 
         path = root / identifier
         LOGGER.debug(f"mkdir('{path}')")
