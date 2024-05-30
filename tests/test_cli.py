@@ -23,6 +23,16 @@ def test__getCli__subcommands():
     assert isinstance(cli, kloch.cli.ListParser)
 
 
+def test__getCli__list__default(capsys):
+
+    argv = ["list"]
+    cli = kloch.get_cli(argv=argv)
+    cli.execute()
+
+    captured = capsys.readouterr()
+    assert "Searching 0 locations" in captured.out
+
+
 def test__getCli__list(monkeypatch, data_dir, capsys):
     monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS, str(data_dir))
 
@@ -50,6 +60,20 @@ def test__getCli__list__filter(monkeypatch, data_dir, capsys):
     assert "Searching 1 locations" in captured.out
     assert f"Filter <{name_filter}> specified" in captured.out
     assert "Found 1 valid profiles" in captured.out
+
+
+def test__getCli__list__profile_paths(data_dir, capsys):
+
+    argv = ["list", "--profile_paths", str(data_dir)]
+    cli = kloch.get_cli(argv=argv)
+    cli.execute()
+
+    captured = capsys.readouterr()
+    assert "Searching 1 locations" in captured.out
+
+    profile_capture = re.search(r"Found (\d+) valid profiles", captured.out)
+    assert profile_capture
+    assert int(profile_capture.group(1)) >= 1
 
 
 def test__getCli__run(monkeypatch, data_dir):

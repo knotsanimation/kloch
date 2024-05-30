@@ -45,12 +45,20 @@ class BaseParser:
         return self._args.debug
 
     @property
-    def profile_paths(self) -> List[Path]:
+    def _profile_paths(self) -> List[Path]:
         """
         One or multiple filesystem path to existing directory containing profile file.
         The paths are append to the global profile path variable.
         """
         return [Path(path) for path in self._args.profile_paths]
+
+    @property
+    def profile_paths(self) -> List[Path]:
+        """
+        One or multiple filesystem path to existing directory containing profile file.
+        The paths are append to the global profile path variable.
+        """
+        return self._config.profile_paths + self._profile_paths
 
     @abc.abstractmethod
     def execute(self):
@@ -73,7 +81,7 @@ class BaseParser:
             "--profile_paths",
             nargs="*",
             default=[],
-            help=cls.profile_paths.__doc__,
+            help=cls._profile_paths.__doc__,
         )
         parser.set_defaults(func=cls)
 
@@ -81,7 +89,7 @@ class BaseParser:
         """
         Merge each profile with its base then merge all of them from left to right.
         """
-        profile_locations = self._config.profile_paths
+        profile_locations = self.profile_paths
 
         profiles = []
         for profile_id in profile_identifiers:
@@ -226,7 +234,7 @@ class ListParser(BaseParser):
         return self._args.id_filter
 
     def execute(self):
-        profile_locations = self._config.profile_paths
+        profile_locations = self.profile_paths
         profile_locations_txt = [str(path) for path in profile_locations]
         print(
             f"Searching {len(profile_locations)} locations: {profile_locations_txt} ..."
