@@ -14,17 +14,17 @@ def test__SessionDir(tmp_path: Path):
 
 def test__clean_outdated_session_dirs(tmp_path: Path):
     session1 = kloch.session.SessionDirectory.initialize(tmp_path)
-    time.sleep(0.005)
+    time.sleep(0.05)
     session2 = kloch.session.SessionDirectory.initialize(tmp_path)
-    time.sleep(0.005)
+    time.sleep(0.05)
     session3 = kloch.session.SessionDirectory.initialize(tmp_path)
-    time.sleep(0.005)
+    time.sleep(0.05)
     session4 = kloch.session.SessionDirectory.initialize(tmp_path)
-    time.sleep(0.005)
+    time.sleep(0.05)
 
     Path(tmp_path / "nothingtoseehere.randomfile").write_text("eat the rich")
 
-    lifetime = 0.015 / 3600  # to hours
+    lifetime = 0.15 / 3600  # to hours
     cleaned = kloch.session.clean_outdated_session_dirs(tmp_path, lifetime=lifetime)
     assert len(cleaned) == 2
     assert session4.path.exists()
