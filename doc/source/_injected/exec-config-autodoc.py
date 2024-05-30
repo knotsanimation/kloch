@@ -51,14 +51,15 @@ def create_field_table(field: dataclasses.Field) -> list[RowType]:
 
     env_var = field.metadata["environ"]
 
-    row1 = (f" ``{field_name}`` ", " **type** ", f" `{ftype}` ")
-    row2 = ("-", "-", "-")
-    row3 = ("", " **default** ", f" ``{default_value}`` ")
-    row4 = ("", "-", "-")
-    row3 = ("", " **environment variable** ", f" ``{env_var}`` ")
-    row4 = ("", "-", "-")
-    row5 = ("", " **description** ", f" {doc.pop(0)} ")
-    rows = [row1, row2, row3, row4, row5]
+    rows = [
+        (f" .. option:: {field_name} ", " **type** ", f" `{ftype}` "),
+        ("-", "-", "-"),
+        ("", " **default** ", f" ``{default_value}`` "),
+        ("", "-", "-"),
+        ("", " **environment variable** ", f" ``{env_var}`` "),
+        ("", "-", "-"),
+        ("", " **description** ", f" {doc.pop(0)} "),
+    ]
 
     for doc_line in doc:
         rows += [("", "", f" {doc_line} ")]

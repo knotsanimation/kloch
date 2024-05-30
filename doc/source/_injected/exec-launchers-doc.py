@@ -39,6 +39,7 @@ def unify_columns(table: list[RowType]) -> list[str]:
 def create_field_table(
     field: dataclasses.Field,
     required: bool,
+    launcher: Type[kloch.launchers.BaseLauncherSerialized],
 ) -> list[RowType]:
     field_name = field.default
     field_doc = field.metadata["description"]
@@ -54,12 +55,15 @@ def create_field_table(
 
     ftype = str(ftype).replace("typing.", "")
 
-    row1 = (f" ``{field_name}`` ", " **required** ", f" {required} ")
-    row2 = ("-", "-", "-")
-    row3 = ("", " **type** ", f" `{ftype}` ")
-    row4 = ("", "-", "-")
-    row5 = ("", " **description** ", f" {doc.pop(0)} ")
-    rows = [row1, row2, row3, row4, row5]
+    rows = [
+        (f" .. _format-{launcher.identifier}-{field_name}: ", "", ""),
+        (f"", "", ""),
+        (f" ``{field_name}`` ", " **required** ", f" {required} "),
+        ("-", "-", "-"),
+        ("", " **type** ", f" `{ftype}` "),
+        ("", "-", "-"),
+        ("", " **description** ", f" {doc.pop(0)} "),
+    ]
 
     for doc_line in doc:
         rows += [("", "", f" {doc_line} ")]
@@ -84,6 +88,7 @@ def document_launcher(launcher: Type[kloch.launchers.BaseLauncherSerialized]) ->
         fields_table += create_field_table(
             field=field,
             required=required,
+            launcher=launcher,
         )
 
     header_table = [

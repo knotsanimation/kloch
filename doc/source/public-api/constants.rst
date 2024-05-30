@@ -7,3 +7,4 @@ Constants
 
 .. automodule:: kloch.constants
    :members:
+   :undoc-members:

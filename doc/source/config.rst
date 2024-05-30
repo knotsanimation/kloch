@@ -1,6 +1,7 @@
 Configuration
 =============
 
+
 Tweak the behavior of the kloch runtime using a configuration system.
 
 Configuration are serialized on disk using yaml file with a simple flat key/value structure:
@@ -25,6 +26,8 @@ Each config key can also be set using an individual environment variable:
 
 Content
 -------
+
+.. program:: config
 
 .. exec-inject::
    :filename: _injected/exec-config-autodoc.py
