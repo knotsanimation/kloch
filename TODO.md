@@ -14,7 +14,7 @@ Collection of various ideas to improve kloch.
 - [x] ~~use `+-` to append command~~ (rejected)
 - [ ] allow to specify an absolute path to a profile instead of identifier
 - [ ] do something with the version attribute ? allow duplicate identifier in path, but with different version ?
-- [ ] log on disk ?
+- [x] ~~log on disk ?~~
 - [ ] private profiles ? with a dot prefix signifying they can only be inherited and not used directly ?
 - [ ] allow `python_file` to be an url to a python file to download
 

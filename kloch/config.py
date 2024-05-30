@@ -44,6 +44,20 @@ class KlochConfig:
         },
     )
 
+    cli_logging_paths: List[Path] = dataclasses.field(
+        default="{levelname: <7} | {asctime} [{name}] {message}",
+        metadata={
+            "documentation": (
+                "Filesystem path to one or multiple log file that might exists.\n"
+                "If specified all the logging will be wrote to those files.\n\n"
+                "If specified from the environment, it must a list of path separated "
+                "by the default system path separator (windows = ``;``, linux = ``:``)"
+            ),
+            "environ": Environ.KLOCH_CONFIG_CLI_LOGGING_PATHS,
+            "environ_cast": _cast_path_list,
+        },
+    )
+
     cli_logging_format: str = dataclasses.field(
         default="{levelname: <7} | {asctime} [{name}] {message}",
         metadata={

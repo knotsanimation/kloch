@@ -19,6 +19,8 @@ class Environ:
 
     KLOCH_CONFIG_LAUNCHER_PLUGINS = f"{_KLOCH_CONFIG_PREFIX}_launcher_plugins".upper()
 
+    KLOCH_CONFIG_CLI_LOGGING_PATHS = f"{_KLOCH_CONFIG_PREFIX}_cli_logging_paths".upper()
+
     KLOCH_CONFIG_CLI_LOGGING_FORMAT = (
         f"{_KLOCH_CONFIG_PREFIX}_cli_logging_format".upper()
     )
