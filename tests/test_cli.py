@@ -24,7 +24,6 @@ def test__getCli__subcommands():
 
 
 def test__getCli__list__default(capsys):
-
     argv = ["list"]
     cli = kloch.get_cli(argv=argv)
     cli.execute()
@@ -34,7 +33,7 @@ def test__getCli__list__default(capsys):
 
 
 def test__getCli__list(monkeypatch, data_dir, capsys):
-    monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS, str(data_dir))
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_PATHS, str(data_dir))
 
     argv = ["list"]
     cli = kloch.get_cli(argv=argv)
@@ -49,7 +48,7 @@ def test__getCli__list(monkeypatch, data_dir, capsys):
 
 
 def test__getCli__list__filter(monkeypatch, data_dir, capsys):
-    monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS, str(data_dir))
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_PATHS, str(data_dir))
 
     name_filter = ".*es:beta"
     argv = ["list", name_filter]
@@ -63,7 +62,6 @@ def test__getCli__list__filter(monkeypatch, data_dir, capsys):
 
 
 def test__getCli__list__profile_paths(data_dir, capsys):
-
     argv = ["list", "--profile_paths", str(data_dir)]
     cli = kloch.get_cli(argv=argv)
     cli.execute()
@@ -88,7 +86,7 @@ def test__getCli__run(monkeypatch, data_dir):
         Results.env = env
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS, str(data_dir))
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_PATHS, str(data_dir))
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
     argv = ["run", "lxm"]
@@ -113,7 +111,7 @@ def test__getCli__run__command(monkeypatch, data_dir):
         Results.env = env
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setenv(kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS, str(data_dir))
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_PATHS, str(data_dir))
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
     extra_command = ["echo", "a", "bunch", "of", "ÅÍÎÏ˝ÓÔÒÚÆ☃", "--debug"]
@@ -159,7 +157,6 @@ def test__getCli__plugins__undefined(data_dir, capsys):
 
 
 def test__getCli__plugins(monkeypatch, data_dir, capsys):
-
     plugin_path = data_dir / "plugins-behr"
     monkeypatch.syspath_prepend(plugin_path)
     plugin_path = data_dir / "plugins-tyfa"
@@ -180,7 +177,6 @@ def test__getCli__plugins(monkeypatch, data_dir, capsys):
 
 
 def test__getCli__plugins__arg__launcher_plugin(monkeypatch, data_dir, capsys):
-
     plugin_path = data_dir / "plugins-behr"
     monkeypatch.syspath_prepend(plugin_path)
     plugin_path = data_dir / "plugins-tyfa"

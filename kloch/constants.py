@@ -12,28 +12,26 @@ class Environ:
     Environment variables used across the application.
     """
 
-    KLOCH_CONFIG_ENV_VAR = f"{_KLOCH_CONFIG_PREFIX}_PATH"
+    CONFIG_ENV_VAR = f"{_KLOCH_CONFIG_PREFIX}_PATH"
     """
     Environment variable that must specify a file path to an existing configuration file.
     """
 
-    KLOCH_CONFIG_LAUNCHER_PLUGINS = f"{_KLOCH_CONFIG_PREFIX}_launcher_plugins".upper()
+    CONFIG_LAUNCHER_PLUGINS = f"{_KLOCH_CONFIG_PREFIX}_launcher_plugins".upper()
 
-    KLOCH_CONFIG_CLI_LOGGING_PATHS = f"{_KLOCH_CONFIG_PREFIX}_cli_logging_paths".upper()
+    CONFIG_CLI_LOGGING_PATHS = f"{_KLOCH_CONFIG_PREFIX}_cli_logging_paths".upper()
 
-    KLOCH_CONFIG_CLI_LOGGING_FORMAT = (
-        f"{_KLOCH_CONFIG_PREFIX}_cli_logging_format".upper()
-    )
+    CONFIG_CLI_LOGGING_FORMAT = f"{_KLOCH_CONFIG_PREFIX}_cli_logging_format".upper()
 
-    KLOCH_CONFIG_CLI_LOGGING_DEFAULT_LEVEL = (
+    CONFIG_CLI_LOGGING_DEFAULT_LEVEL = (
         f"{_KLOCH_CONFIG_PREFIX}_cli_logging_default_level".upper()
     )
 
-    KLOCH_CONFIG_CLI_SESSION_PATH = f"{_KLOCH_CONFIG_PREFIX}_cli_session_path".upper()
+    CONFIG_CLI_SESSION_PATH = f"{_KLOCH_CONFIG_PREFIX}_cli_session_path".upper()
 
-    KLOCH_CONFIG_CLI_SESSION_LIFETIME = f"{_KLOCH_CONFIG_PREFIX}_cli_lifetime".upper()
+    CONFIG_CLI_SESSION_LIFETIME = f"{_KLOCH_CONFIG_PREFIX}_cli_lifetime".upper()
 
-    KLOCH_CONFIG_PROFILE_PATHS = f"{_KLOCH_CONFIG_PREFIX}_profile_paths".upper()
+    CONFIG_PROFILE_PATHS = f"{_KLOCH_CONFIG_PREFIX}_profile_paths".upper()
 
     @classmethod
     def list_all(cls) -> List[str]:

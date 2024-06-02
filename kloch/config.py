@@ -43,7 +43,7 @@ class KlochConfig:
                 "A list of importable python module names containing new launchers to support.\n\n"
                 "If specified in environment variable, this must be a comma-separated list of str like ``module1,module2,module3``"
             ),
-            "environ": Environ.KLOCH_CONFIG_LAUNCHER_PLUGINS,
+            "environ": Environ.CONFIG_LAUNCHER_PLUGINS,
             "environ_cast": _cast_list,
         },
     )
@@ -58,7 +58,7 @@ class KlochConfig:
                 "If specified from the environment, it must a list of path separated "
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
-            "environ": Environ.KLOCH_CONFIG_CLI_LOGGING_PATHS,
+            "environ": Environ.CONFIG_CLI_LOGGING_PATHS,
             "environ_cast": _cast_path_list,
         },
     )
@@ -70,7 +70,7 @@ class KlochConfig:
                 "Formatting to use for all logged messages. See python logging module documentation.\n"
                 "The tokens must use the ``{`` style."
             ),
-            "environ": Environ.KLOCH_CONFIG_CLI_LOGGING_FORMAT,
+            "environ": Environ.CONFIG_CLI_LOGGING_FORMAT,
             "environ_cast": str,
         },
     )
@@ -83,7 +83,7 @@ class KlochConfig:
                 "Can be an int or a level name as string as long as it is understandable"
                 " by ``logging.getLevelName``."
             ),
-            "environ": Environ.KLOCH_CONFIG_CLI_LOGGING_DEFAULT_LEVEL,
+            "environ": Environ.CONFIG_CLI_LOGGING_DEFAULT_LEVEL,
             "environ_cast": str,
         },
     )
@@ -96,7 +96,7 @@ class KlochConfig:
                 "The directory is used to store temporarly any file generated during the executing of a launcher.\n"
                 "If not specified, a system's default temporary location is used."
             ),
-            "environ": Environ.KLOCH_CONFIG_CLI_SESSION_PATH,
+            "environ": Environ.CONFIG_CLI_SESSION_PATH,
             "environ_cast": _cast_path,
         },
     )
@@ -109,7 +109,7 @@ class KlochConfig:
                 "Note the deleting is performed only the next time kloch is started so it "
                 "is possible a session directory exist longer if kloch is not launched for a while."
             ),
-            "environ": Environ.KLOCH_CONFIG_CLI_SESSION_LIFETIME,
+            "environ": Environ.CONFIG_CLI_SESSION_LIFETIME,
             "environ_cast": float,
         },
     )
@@ -123,7 +123,7 @@ class KlochConfig:
                 "If specified from the environment, it must a list of path separated "
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
-            "environ": Environ.KLOCH_CONFIG_PROFILE_PATHS,
+            "environ": Environ.CONFIG_PROFILE_PATHS,
             "environ_cast": _cast_path_list,
         },
     )
@@ -142,7 +142,7 @@ class KlochConfig:
         """
         Generate an instance from a serialized file specified in an environment variable.
         """
-        environ = os.getenv(Environ.KLOCH_CONFIG_ENV_VAR)
+        environ = os.getenv(Environ.CONFIG_ENV_VAR)
 
         asdict = {}
         if environ:
