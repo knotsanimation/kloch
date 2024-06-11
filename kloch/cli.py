@@ -512,7 +512,7 @@ def get_cli(argv=None, config: kloch.KlochConfig = None) -> BaseParser:
         argv = argv[:split_index]
 
     # XXX: internal feature for the PythonLauncher. It's ok not having it documented in the CLI.
-    if argv[0] and Path(argv[0]).exists():
+    if argv and argv[0] and Path(argv[0]).exists():
         argv.insert(0, "python")
 
     args = parser.parse_args(argv)
