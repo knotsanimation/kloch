@@ -31,6 +31,7 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
       - name: Install Python ${{ matrix.python-version }}
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
