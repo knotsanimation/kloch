@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Poetry
-        run: pipx install poetry
+        run: pipx install poetry --python 3.11
       - name: Install Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
