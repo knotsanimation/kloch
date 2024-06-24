@@ -29,12 +29,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Poetry
-        run: pipx install poetry --python 3.11
+        run: pipx install poetry
       - name: Install Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          #cache: 'poetry'
-      - run: poetry env use ${{ matrix.python-version }}
+          cache: 'poetry'
       - run: poetry install --extras "tests"
       - run: poetry run pytest ./tests
