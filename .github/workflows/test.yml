@@ -37,5 +37,5 @@ jobs:
           python-version: ${{ matrix.python-version }}
           update-environment: false
       - run: poetry env use ${{ steps.setup-python.outputs.python-path }}
-      - run: poetry install --extras "tests"
+      - run: poetry install --extras "tests" --no-interaction --no-cache -vvv
       - run: poetry run pytest ./tests
