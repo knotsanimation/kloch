@@ -69,7 +69,7 @@ use the environment variable:
 
    import kloch
    print("# (shell syntax, to adapt for you context)")
-   print(f"export {kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS}=/d/pipeline/profiles/")
+   print(f"export {kloch.Environ.CONFIG_PROFILE_PATHS}=/d/pipeline/profiles/")
 
 .. tip::
 
