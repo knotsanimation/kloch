@@ -13,7 +13,11 @@ class BehrLauncher(BaseLauncher):
 
     name = "behr"
 
-    def execute(self, tmpdir: Path, command: Optional[List[str]] = None):
+    def execute(
+        self,
+        tmpdir: Path,
+        command: Optional[List[str]] = None,
+    ):  # pragma: no cover
         pass
 
 
@@ -32,10 +36,10 @@ class BehrLauncherSerialized(BaseLauncherSerialized):
     summary = "Whatever"
     description = "Follow me on Mastodon ! https://mastodon.gamedev.place/@liamcollod"
 
-    def validate(self):
+    def validate(self):  # pragma: no cover
         super().validate()
 
     # we override for type-hint
-    def unserialize(self) -> BehrLauncher:
+    def unserialize(self) -> BehrLauncher:  # pragma: no cover
         # noinspection PyTypeChecker
         return super().unserialize()

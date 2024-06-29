@@ -24,7 +24,7 @@ def test__KlochConfig__from_environment(monkeypatch, data_dir):
     assert config == kloch.config.KlochConfig()
 
     config_path = data_dir / "config-blaj.yml"
-    monkeypatch.setenv(kloch.config.KLOCH_CONFIG_ENV_VAR, str(config_path))
+    monkeypatch.setenv(kloch.Environ.CONFIG_ENV_VAR, str(config_path))
     config = kloch.config.KlochConfig.from_environment()
     assert config.cli_logging_default_level == "WARNING"
     assert config.cli_logging_format == "{levelname: <7}: {message}"
@@ -39,7 +39,7 @@ def test__KlochConfig__from_file(data_dir):
     config_path = data_dir / "config-molg.yml"
     with pytest.raises(TypeError) as error:
         config = kloch.config.KlochConfig.from_file(file_path=config_path)
-        assert "NON_VALID_KEY" in error
+    assert "NON_VALID_KEY" in str(error.value)
 
 
 def test__KlochConfig__documentation():

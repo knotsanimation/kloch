@@ -10,8 +10,10 @@ Public API
 .. toctree::
 
    config
+   constants
    cli
    io
    profile
    launchers
+   session
    utils

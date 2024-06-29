@@ -17,6 +17,7 @@ from typing import Optional
 import kloch
 from kloch.launchers import BaseLauncher
 from kloch.launchers import BaseLauncherSerialized
+from kloch.session import SessionDirectory
 
 LOGGER = logging.getLogger(__name__)
 
@@ -33,8 +34,9 @@ class BaseParser:
         args: user command line argument already parsed by argparse
     """
 
-    def __init__(self, args):
+    def __init__(self, args: argparse.Namespace, config: kloch.KlochConfig):
         self._args: argparse.Namespace = args
+        self._config = config
 
     @property
     def debug(self) -> bool:
@@ -44,12 +46,24 @@ class BaseParser:
         return self._args.debug
 
     @property
-    def profile_paths(self) -> List[Path]:
+    def _profile_paths(self) -> List[Path]:
         """
         One or multiple filesystem path to existing directory containing profile file.
         The paths are append to the global profile path variable.
         """
         return [Path(path) for path in self._args.profile_paths]
+
+    @property
+    def profile_paths(self) -> List[Path]:
+        """
+        One or multiple filesystem path to existing directory containing profile file.
+        The paths are append to the global profile path variable.
+        """
+        return self._config.profile_paths + self._profile_paths
+
+    @property
+    def session_root(self) -> Optional[Path]:
+        return self._config.cli_session_dir
 
     @abc.abstractmethod
     def execute(self):
@@ -72,39 +86,46 @@ class BaseParser:
             "--profile_paths",
             nargs="*",
             default=[],
-            help=cls.profile_paths.__doc__,
+            help=cls._profile_paths.__doc__,
         )
         parser.set_defaults(func=cls)
 
+    def _get_merged_profile(self, profile_identifiers: List[str]):
+        """
+        Merge each profile with its base then merge all of them from left to right.
+        """
+        profile_locations = self.profile_paths
 
-def _get_merged_profile(profile_identifiers: List[str]):
-    """
-    Merge each profile with its base then merge all of them from left to right.
-    """
-    profiles = []
-    for profile_id in profile_identifiers:
-        profile_paths = kloch.get_profile_file_path(profile_id)
-        if len(profile_paths) >= 2:
-            raise ValueError(
-                f"Found multiple profile with identifier '{profile_id}' "
-                f": {profile_paths}."
+        profiles = []
+        for profile_id in profile_identifiers:
+            profile_paths = kloch.get_profile_file_path(
+                profile_id,
+                profile_locations=profile_locations,
             )
+            if len(profile_paths) >= 2:
+                raise ValueError(
+                    f"Found multiple profile with identifier '{profile_id}' "
+                    f": {profile_paths}."
+                )
 
-        if not profile_paths:
-            raise ValueError(f"No profile found with identifier '{profile_id}'.")
+            if not profile_paths:
+                raise ValueError(f"No profile found with identifier '{profile_id}'.")
 
-        profile_path = profile_paths[0]
-        LOGGER.debug(f"reading profile {profile_path}")
-        profile = kloch.read_profile_from_file(profile_path)
-        profile = profile.get_merged_profile()
-        profiles.append(profile)
+            profile_path = profile_paths[0]
+            LOGGER.debug(f"reading profile {profile_path}")
+            profile = kloch.read_profile_from_file(
+                profile_path,
+                profile_locations=profile_locations,
+            )
+            profile = profile.get_merged_profile()
+            profiles.append(profile)
 
-    profile = profiles.pop(-1)
-    for base_profile in profiles:
-        profile.base = base_profile
-        profile = profile.get_merged_profile()
+        profile = profiles.pop(-1)
+        for base_profile in profiles:
+            profile.base = base_profile
+            profile = profile.get_merged_profile()
 
-    return profile
+        return profile
 
 
 class RunParser(BaseParser):
@@ -136,9 +157,19 @@ class RunParser(BaseParser):
         """
         return self._args.command
 
-    def execute(self):
+    def _execute(self, session_dir: SessionDirectory):
+        LOGGER.debug(f"session dir at '{session_dir.path}'")
         print(f"loading {len(self.profile_ids)} profiles ...")
-        profile = _get_merged_profile(self.profile_ids)
+        profile = self._get_merged_profile(self.profile_ids)
+
+        # keep a backup of the merged profile for debugging
+        LOGGER.debug(f"writing merged profile to '{session_dir.profile_path}'")
+        kloch.write_profile_to_file(
+            profile,
+            file_path=session_dir.profile_path,
+            profile_locations=self.profile_paths,
+            check_valid_id=False,
+        )
 
         launchers_dict = profile.launchers
         launchers_list = launchers_dict.to_serialized_list()
@@ -170,10 +201,17 @@ class RunParser(BaseParser):
         LOGGER.debug(f"executing launcher={launcher} with command={command}")
         LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
 
-        with tempfile.TemporaryDirectory(
-            prefix=f"{kloch.__name__}-{launcher.name}",
-        ) as tmpdir:
-            sys.exit(launcher.execute(tmpdir=Path(tmpdir), command=command))
+        sys.exit(launcher.execute(tmpdir=session_dir.path, command=command))
+
+    def execute(self):
+        session_root = self.session_root
+        if session_root is None:
+            with tempfile.TemporaryDirectory(prefix=f"{kloch.__name__}") as tmp_dir:
+                session_dir = SessionDirectory.initialize(Path(tmp_dir))
+                return self._execute(session_dir=session_dir)
+        else:
+            session_dir = SessionDirectory.initialize(session_root)
+            return self._execute(session_dir=session_dir)
 
     @classmethod
     def add_to_parser(cls, parser: argparse.ArgumentParser):
@@ -218,9 +256,7 @@ class ListParser(BaseParser):
         return self._args.id_filter
 
     def execute(self):
-        print(f"Parsing environment variable {kloch.KENV_PROFILE_PATH_ENV_VAR} ...")
-
-        profile_locations = kloch.get_profile_locations()
+        profile_locations = self.profile_paths
         profile_locations_txt = [str(path) for path in profile_locations]
         print(
             f"Searching {len(profile_locations)} locations: {profile_locations_txt} ..."
@@ -280,7 +316,7 @@ class ResolveParser(BaseParser):
         return self._args.profile_ids
 
     def execute(self):
-        profile = _get_merged_profile(self.profile_ids)
+        profile = self._get_merged_profile(self.profile_ids)
         serialized = kloch.serialize_profile(profile)
         print(serialized)
 
@@ -355,7 +391,6 @@ class PluginsParser(BaseParser):
         return self._args.launcher_plugins
 
     def execute(self):
-
         launcher_plugins = self.launcher_plugins or kloch.get_config().launcher_plugins
 
         print(f"Parsing {len(launcher_plugins)} launcher plugins: {launcher_plugins}")
@@ -407,13 +442,16 @@ class RawFormatter(argparse.HelpFormatter):
         return text
 
 
-def get_cli(argv=None) -> BaseParser:
+def get_cli(argv=None, config: kloch.KlochConfig = None) -> BaseParser:
     """
     Return the command line interface generated from user arguments provided.
 
     Args:
         argv: source command line argument to use instea dof the usual sys.argv
+        config: the kloch config instance to use for running the cli
     """
+    config = config or kloch.get_config()
+
     parser = argparse.ArgumentParser(
         kloch.__name__,
         description=(
@@ -474,9 +512,19 @@ def get_cli(argv=None) -> BaseParser:
         argv = argv[:split_index]
 
     # XXX: internal feature for the PythonLauncher. It's ok not having it documented in the CLI.
-    if argv[0] and Path(argv[0]).exists():
+    if argv and argv[0] and Path(argv[0]).exists():
         argv.insert(0, "python")
 
     args = parser.parse_args(argv)
     setattr(args, _ARGS_USER_COMMAND_DEST, user_command)
-    return args.func(args)
+    instance: BaseParser = args.func(args, config)
+
+    # clean old sessions everytime the cli is launched
+    if instance.session_root and instance.session_root.exists():
+        cleaned = kloch.session.clean_outdated_session_dirs(
+            root=instance.session_root,
+            lifetime=config.cli_session_dir_lifetime,
+        )
+        LOGGER.debug(f"removed {len(cleaned)} outdated session dirs")
+
+    return instance

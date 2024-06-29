@@ -29,11 +29,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Poetry
-        run: pipx install poetry
+        run: pipx install git+https://github.com/python-poetry/poetry.git@5bab98c9500f1050c6bb6adfb55580a23173f18d
       - name: Install Python ${{ matrix.python-version }}
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
-      - run: poetry install
+          update-environment: false
+      - run: poetry env use ${{ steps.setup-python.outputs.python-path }}
+      - run: poetry install --extras "tests" --no-interaction --no-cache -vvv
       - run: poetry run pytest ./tests

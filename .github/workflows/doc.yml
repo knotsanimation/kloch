@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'poetry'
-      - run: poetry install
+      - run: poetry install --extras "doc"
       - run: poetry run python ./doc/build-doc.py
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

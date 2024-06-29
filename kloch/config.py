@@ -13,18 +13,21 @@ from typing import Union
 
 import yaml
 
+from kloch.constants import Environ
+
 LOGGER = logging.getLogger(__name__)
-
-KLOCH_CONFIG_PREFIX = "KLOCH_CONFIG"
-
-KLOCH_CONFIG_ENV_VAR = f"{KLOCH_CONFIG_PREFIX}_PATH"
-"""
-Environment variable that must specify a file path to an existing configuration file.
-"""
 
 
 def _cast_list(src_str: str) -> List[str]:
     return src_str.split(",")
+
+
+def _cast_path(src_str: str) -> Path:
+    return Path(src_str)
+
+
+def _cast_path_list(src_str: str) -> List[Path]:
+    return [Path(path) for path in src_str.split(os.pathsep)]
 
 
 @dataclasses.dataclass
@@ -40,8 +43,23 @@ class KlochConfig:
                 "A list of importable python module names containing new launchers to support.\n\n"
                 "If specified in environment variable, this must be a comma-separated list of str like ``module1,module2,module3``"
             ),
-            "environ": f"{KLOCH_CONFIG_PREFIX}_launcher_plugins".upper(),
+            "environ": Environ.CONFIG_LAUNCHER_PLUGINS,
             "environ_cast": _cast_list,
+        },
+    )
+
+    cli_logging_paths: List[Path] = dataclasses.field(
+        default_factory=list,
+        metadata={
+            "documentation": (
+                "Filesystem path to one or multiple log file that might exists.\n"
+                "If specified all the logging will be wrote to those files."
+                "Logs are rotated bwteen 2 files of 65.536Kb max.\n\n"
+                "If specified from the environment, it must a list of path separated "
+                "by the default system path separator (windows = ``;``, linux = ``:``)"
+            ),
+            "environ": Environ.CONFIG_CLI_LOGGING_PATHS,
+            "environ_cast": _cast_path_list,
         },
     )
 
@@ -52,7 +70,7 @@ class KlochConfig:
                 "Formatting to use for all logged messages. See python logging module documentation.\n"
                 "The tokens must use the ``{`` style."
             ),
-            "environ": f"{KLOCH_CONFIG_PREFIX}_cli_logging_format".upper(),
+            "environ": Environ.CONFIG_CLI_LOGGING_FORMAT,
             "environ_cast": str,
         },
     )
@@ -65,8 +83,48 @@ class KlochConfig:
                 "Can be an int or a level name as string as long as it is understandable"
                 " by ``logging.getLevelName``."
             ),
-            "environ": f"{KLOCH_CONFIG_PREFIX}_cli_logging_default_level".upper(),
+            "environ": Environ.CONFIG_CLI_LOGGING_DEFAULT_LEVEL,
             "environ_cast": str,
+        },
+    )
+
+    cli_session_dir: Optional[Path] = dataclasses.field(
+        default=None,
+        metadata={
+            "documentation": (
+                "Filesystem path to a directory that might exists.\n"
+                "The directory is used to store temporarly any file generated during the executing of a launcher.\n"
+                "If not specified, a system's default temporary location is used."
+            ),
+            "environ": Environ.CONFIG_CLI_SESSION_PATH,
+            "environ_cast": _cast_path,
+        },
+    )
+
+    cli_session_dir_lifetime: float = dataclasses.field(
+        default=240.0,
+        metadata={
+            "documentation": (
+                "Amount in hours before a session directory must be deleted.\n"
+                "Note the deleting is performed only the next time kloch is started so it "
+                "is possible a session directory exist longer if kloch is not launched for a while."
+            ),
+            "environ": Environ.CONFIG_CLI_SESSION_LIFETIME,
+            "environ_cast": float,
+        },
+    )
+
+    profile_paths: List[Path] = dataclasses.field(
+        default_factory=list,
+        metadata={
+            "documentation": (
+                "Filesystem path to one or multiple directory that might exists.\n"
+                "The directories contain profile valid to be discoverable.\n\n"
+                "If specified from the environment, it must a list of path separated "
+                "by the default system path separator (windows = ``;``, linux = ``:``)"
+            ),
+            "environ": Environ.CONFIG_PROFILE_PATHS,
+            "environ_cast": _cast_path_list,
         },
     )
 
@@ -84,7 +142,7 @@ class KlochConfig:
         """
         Generate an instance from a serialized file specified in an environment variable.
         """
-        environ = os.getenv(KLOCH_CONFIG_ENV_VAR)
+        environ = os.getenv(Environ.CONFIG_ENV_VAR)
 
         asdict = {}
         if environ:

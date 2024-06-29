@@ -81,7 +81,7 @@ class BaseLauncher:
         Returns:
             The exit code of the execution. 0 if successfull, else imply failure.
         """
-        pass
+        pass  # pragma: no cover
 
     def to_dict(self) -> Dict[str, Any]:
         """

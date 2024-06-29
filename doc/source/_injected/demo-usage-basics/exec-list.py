@@ -4,7 +4,5 @@ import kloch
 
 THISDIR = Path(".", "source", "_injected", "demo-usage-basics").absolute()
 
-
-kloch.add_profile_location(THISDIR)
-cli = kloch.get_cli(["list"])
+cli = kloch.get_cli(["list", "--profile_paths", str(THISDIR)])
 cli.execute()

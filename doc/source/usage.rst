@@ -61,7 +61,7 @@ request of packages:
 Let say we store this profile in a shared location ``/d/pipeline/profiles/``.
 
 The first step is to make our profile discoverable. To do so you can
-use environment variable:
+use the environment variable:
 
 .. exec_code::
    :hide_code:
@@ -69,7 +69,7 @@ use environment variable:
 
    import kloch
    print("# (shell syntax, to adapt for you context)")
-   print(f"export {kloch.KENV_PROFILE_PATH_ENV_VAR}=/d/pipeline/profiles/")
+   print(f"export {kloch.Environ.KLOCH_CONFIG_PROFILE_PATHS}=/d/pipeline/profiles/")
 
 .. tip::
 

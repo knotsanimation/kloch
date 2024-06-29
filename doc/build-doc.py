@@ -26,3 +26,6 @@ PYTHONPATH = PYTHONPATH.lstrip(os.pathsep)
 ENVIRON["PYTHONPATH"] = PYTHONPATH
 
 subprocess.check_call(COMMAND, cwd=THISDIR, env=ENVIRON)
+print(f"documentation generated in '{BUILDIR}'")
+url = "file:///" + str(Path(BUILDIR / "html" / "index.html").as_posix())
+print(f"html at '{url}'")

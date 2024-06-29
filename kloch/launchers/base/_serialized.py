@@ -212,7 +212,9 @@ class BaseLauncherSerialized(MergeableDict):
         if command in self:
             assert isinstance(self[command], list), f"'{command}': must be a list."
             for value in self[command]:
-                assert isinstance(value, str), f"'{command}': item '{value}' be str."
+                assert isinstance(
+                    value, str
+                ), f"'{command}': item '{value}' must be str."
 
     def resolved(self) -> Dict:
         """

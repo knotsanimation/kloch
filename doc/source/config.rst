@@ -1,6 +1,7 @@
 Configuration
 =============
 
+
 Tweak the behavior of the kloch runtime using a configuration system.
 
 Configuration are serialized on disk using yaml file with a simple flat key/value structure:
@@ -13,8 +14,8 @@ You specify which configuration file to use with the environment variable:
 .. exec_code::
    :hide_code:
 
-   import kloch.config
-   print(kloch.config.KLOCH_CONFIG_ENV_VAR)
+   import kloch
+   print(kloch.Environ.KLOCH_CONFIG_ENV_VAR)
 
 Each config key can also be set using an individual environment variable:
 
@@ -22,9 +23,14 @@ Each config key can also be set using an individual environment variable:
    :hide_code:
    :filename: _injected/exec-config-envvar.py
 
+Be aware that specifying a config key in an environment variable will
+override any value specified in the config file.
+
 
 Content
 -------
+
+.. program:: config
 
 .. exec-inject::
    :filename: _injected/exec-config-autodoc.py

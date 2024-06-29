@@ -5,14 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.7.0] - 2024-05-25
+## [0.8.0] - 2024-06-29
+
+### added
+
+- io: `read_profile_from_id()`
+- constants module with environment variables
+- logging to disk with `cli_logging_paths` config key
+- control for the "session directory" using config
+
+### changed
+
+- !io: drop the global system to add profile locations, all profile location
+  are added on each function call.
+- io: made `is_file_environment_profile` public
+- cli: add KlochConfig propagated through cli
+
+### chores
+
+- fixing tests CI
+- pyproject use _extras_ instead of poetry groups
+- remove app packaging script: not used anymore
+
+
+## [0.7.0] - 2024-05-27
 
 ### added
 
 - plugin system for launchers
 - individual config values can now be retrieved from environment variable
 
-### refacto
+### changed
 
 - ! removed `rezenv` launcher to be extracted as plugin at https://github.com/knotsanimation/kloch-launcher-rezenv
 - logic change in the MergeableDict class when subclassing to return the 

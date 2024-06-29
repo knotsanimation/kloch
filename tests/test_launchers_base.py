@@ -40,12 +40,12 @@ def test__BaseLauncher__required_fields():
 
         required_fields = ["environ"]
 
-        def execute(self, tmpdir, command=None):
+        def execute(self, tmpdir, command=None):  # pragma: no cover
             pass
 
     with pytest.raises(ValueError) as error:
         TestLauncher(params=["--verbose"])
-        assert "required field" in error
+    assert "required field" in str(error.value)
 
     launcher = TestLauncher(params=["--verbose"], environ={"PATH": "ghghghgh"})
     assert launcher.environ["PATH"] == "ghghghgh"
@@ -91,7 +91,7 @@ def test__BaseLauncherSerialized(data_dir, monkeypatch):
     instance = BaseLauncherSerialized(src_dict)
     with pytest.raises(AssertionError) as error:
         instance.validate()
-        assert "must be str" in error
+    assert "must be str" in str(error.value)
 
     src_dict = {"command": ["arg1", "arg"]}
     instance = BaseLauncherSerialized(src_dict)

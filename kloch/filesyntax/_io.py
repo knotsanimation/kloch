@@ -1,5 +1,4 @@
 import logging
-import os
 from pathlib import Path
 from typing import Dict
 from typing import List
@@ -13,13 +12,6 @@ from ._profile import EnvironmentProfile
 
 LOGGER = logging.getLogger(__name__)
 
-
-KENV_PROFILE_PATH_ENV_VAR: str = "KENV_PROFILE_PATHS"
-"""
-Name of the user-editable environment variable to add profile locations.
-"""
-
-_PROFILE_LOCATIONS_INTERNAL: List[Path] = []
 
 KENV_PROFILE_MAGIC = "kloch_profile"
 KENV_PROFILE_VERSION = 2
@@ -44,43 +36,6 @@ def is_file_environment_profile(file_path: Path) -> bool:
     return content.get("__magic__", "").startswith(KENV_PROFILE_MAGIC)
 
 
-def add_profile_location(location: Path):
-    """
-    Add a location where profile can be found.
-
-    Locations added thorugh here are appended to the environment defined locations.
-
-    Args:
-        location: filesystem path to an existing directory.
-    """
-    global _PROFILE_LOCATIONS_INTERNAL
-    if location in _PROFILE_LOCATIONS_INTERNAL:
-        return
-    _PROFILE_LOCATIONS_INTERNAL.append(location)
-
-
-def get_profile_locations() -> List[Path]:
-    """
-    Get the user-defined directories where profile are stored.
-
-    Returns:
-         list of filesystem path to directory that might exist
-    """
-    locations = os.getenv(KENV_PROFILE_PATH_ENV_VAR)
-    if not locations and not _PROFILE_LOCATIONS_INTERNAL:
-        return []
-
-    if locations:
-        locations = [
-            Path(location).absolute() for location in locations.split(os.pathsep)
-        ]
-        locations += _PROFILE_LOCATIONS_INTERNAL
-    else:
-        locations = list(_PROFILE_LOCATIONS_INTERNAL)
-
-    return locations
-
-
 def get_all_profile_file_paths(locations: Optional[List[Path]] = None) -> List[Path]:
     """
     Get all the environment-profile file paths as registred by the user.
@@ -88,7 +43,7 @@ def get_all_profile_file_paths(locations: Optional[List[Path]] = None) -> List[P
     Args:
         locations: list of filesystem path to directory that might exist
     """
-    locations = locations or get_profile_locations()
+    locations = locations or []
     return [
         path
         for location in locations
@@ -178,7 +133,42 @@ def read_profile_from_file(
     return profile
 
 
-def serialize_profile(profile: EnvironmentProfile) -> str:
+def read_profile_from_id(
+    profile_id: str,
+    profile_locations: Optional[List[Path]] = None,
+) -> EnvironmentProfile:
+    """
+    Generate a profile instance from a serialized file on disk retrieved using the given identifier.
+
+    Raises error if the profile file is not built properly.
+
+    This a convenient function wrapping :func:`read_profile_from_file` and
+    :func:`get_profile_file_path` and assuming that no profile with the same
+    identifier exist in the locations.
+
+    Args:
+        profile_id: identifier that must match the profile.
+        profile_locations:
+            list of filesystem path to potential existing directories containing profiles.
+
+    Returns:
+        a profile instance
+    """
+    profile_paths = get_profile_file_path(
+        profile_id=profile_id,
+        profile_locations=profile_locations,
+    )
+    profile = read_profile_from_file(
+        file_path=profile_paths[0],
+        profile_locations=profile_locations,
+    )
+    return profile
+
+
+def serialize_profile(
+    profile: EnvironmentProfile,
+    profile_locations: Optional[List[Path]] = None,
+) -> str:
     """
     Convert the instance to a serialized dictionnary intended to be written on disk.
     """
@@ -187,7 +177,10 @@ def serialize_profile(profile: EnvironmentProfile) -> str:
 
     base_profile: Optional[EnvironmentProfile] = asdict.get("base", None)
     if base_profile:
-        base_path = get_profile_file_path(base_profile.identifier)
+        base_path = get_profile_file_path(
+            profile_id=base_profile.identifier,
+            profile_locations=profile_locations,
+        )
         if not base_path:
             raise ValueError(
                 f"Base profile {base_profile.identifier} is not registred on disk."
@@ -203,8 +196,8 @@ def serialize_profile(profile: EnvironmentProfile) -> str:
 def write_profile_to_file(
     profile: EnvironmentProfile,
     file_path: Path,
-    # TODO rename param to check_valid_id
-    check_valid_name: bool = True,
+    profile_locations: Optional[List[Path]] = None,
+    check_valid_id: bool = True,
 ) -> Path:
     """
     Convert the instance to a serialized file on disk.
@@ -214,17 +207,22 @@ def write_profile_to_file(
         file_path:
             filesystem path to a file that might exist.
             parent location is expected to exist.
-        check_valid_name:
-            if True, ensure the identifier of the profile is unique
+        check_valid_id:
+            if True, ensure the identifier of the profile is unique among all ``profile_locations``
+        profile_locations:
+            list of filesystem path to potential existing directories containing profiles.
     """
-    if check_valid_name:
-        profile_paths = get_profile_file_path(profile.identifier)
+    if check_valid_id:
+        profile_paths = get_profile_file_path(
+            profile_id=profile.identifier,
+            profile_locations=profile_locations,
+        )
         if profile_paths and file_path not in profile_paths:
             raise ValueError(
                 f"Found multiple profile with identifier '{profile.identifier}'."
             )
 
-    serialized = serialize_profile(profile)
+    serialized = serialize_profile(profile, profile_locations=profile_locations)
 
     file_path.write_text(serialized)
     return file_path

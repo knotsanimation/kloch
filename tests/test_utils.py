@@ -5,7 +5,7 @@ import kloch._utils
 LOGGER = logging.getLogger(__name__)
 
 
-def expand_envvars():
+def test__expand_envvars():
     src_str = "${PATH}/foobar"
     result = kloch._utils.expand_envvars(src_str)
     assert result != src_str
