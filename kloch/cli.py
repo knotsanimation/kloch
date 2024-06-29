@@ -391,7 +391,7 @@ class PluginsParser(BaseParser):
         return self._args.launcher_plugins
 
     def execute(self):
-        launcher_plugins = self.launcher_plugins or kloch.get_config().launcher_plugins
+        launcher_plugins = self.launcher_plugins or self._config.launcher_plugins
 
         print(f"Parsing {len(launcher_plugins)} launcher plugins: {launcher_plugins}")
         try:
