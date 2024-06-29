@@ -17,6 +17,8 @@ Collection of various ideas to improve kloch.
 - [x] ~~log on disk ?~~
 - [ ] private profiles ? with a dot prefix signifying they can only be inherited and not used directly ?
 - [ ] allow `python_file` to be an url to a python file to download
+- [ ] introduce operating system functions ? like maybe tokens or if conditions ?
+- [ ] new merge rule `!=` create if doesn't exist (for dict keys)
 
 ## refacto
 
