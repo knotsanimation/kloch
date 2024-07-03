@@ -2,6 +2,7 @@
 A simple configuration system for the Kloch runtime.
 """
 
+import collections
 import dataclasses
 import logging
 import os
@@ -38,14 +39,28 @@ def _cast_path_list_split(src_str: str) -> List[Path]:
     return [Path(path) for path in src_str.split(os.pathsep)]
 
 
-def _cast_path_list(src_list: List[str]) -> List[Path]:
-    return [Path(path) for path in src_list]
+# caster for yaml configs:
 
 
-# def _ensure_path_absolute(path: Path, absolute_root: Path) -> Path:
-#     if not path.is_absolute():
-#         path = Path(absolute_root, path).resolve()
-#     return path
+def _ensure_path_absolute(path: Path, absolute_root: Path) -> Path:
+    if path.is_absolute():
+        return path
+    return Path(absolute_root, path).resolve()
+
+
+def _make_config_caster(caster):
+    def _config_caster(v, *args, **kwargs):
+        return caster(v)
+
+    return _config_caster
+
+
+def _cast_config_path(src_str: str, config_dir: Path) -> Path:
+    return _ensure_path_absolute(Path(src_str), config_dir)
+
+
+def _cast_config_path_list(src_list: List[str], config_dir: Path) -> List[Path]:
+    return [_ensure_path_absolute(Path(path), config_dir) for path in src_list]
 
 
 @dataclasses.dataclass
@@ -61,7 +76,7 @@ class KlochConfig:
                 "A list of importable python module names containing new launchers to support.\n\n"
                 "If specified in environment variable, this must be a comma-separated list of str like ``module1,module2,module3``"
             ),
-            "config_cast": list,
+            "config_cast": _make_config_caster(list),
             "environ": Environ.CONFIG_LAUNCHER_PLUGINS,
             "environ_cast": _cast_list_split,
         },
@@ -77,7 +92,7 @@ class KlochConfig:
                 "If specified from the environment, it must a list of path separated "
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
-            "config_cast": _cast_path_list,
+            "config_cast": _cast_config_path_list,
             "environ": Environ.CONFIG_CLI_LOGGING_PATHS,
             "environ_cast": _cast_path_list_split,
         },
@@ -90,7 +105,7 @@ class KlochConfig:
                 "Formatting to use for all logged messages. See python logging module documentation.\n"
                 "The tokens must use the ``{`` style."
             ),
-            "config_cast": str,
+            "config_cast": _make_config_caster(str),
             "environ": Environ.CONFIG_CLI_LOGGING_FORMAT,
             "environ_cast": str,
         },
@@ -104,7 +119,7 @@ class KlochConfig:
                 "Can be an int or a level name as string as long as it is understandable"
                 " by ``logging.getLevelName``."
             ),
-            "config_cast": str,
+            "config_cast": _make_config_caster(str),
             "environ": Environ.CONFIG_CLI_LOGGING_DEFAULT_LEVEL,
             "environ_cast": str,
         },
@@ -118,7 +133,7 @@ class KlochConfig:
                 "The directory is used to store temporarly any file generated during the executing of a launcher.\n"
                 "If not specified, a system's default temporary location is used."
             ),
-            "config_cast": _cast_path,
+            "config_cast": _cast_config_path,
             "environ": Environ.CONFIG_CLI_SESSION_PATH,
             "environ_cast": _cast_path,
         },
@@ -132,7 +147,7 @@ class KlochConfig:
                 "Note the deleting is performed only the next time kloch is started so it "
                 "is possible a session directory exist longer if kloch is not launched for a while."
             ),
-            "config_cast": float,
+            "config_cast": _make_config_caster(float),
             "environ": Environ.CONFIG_CLI_SESSION_LIFETIME,
             "environ_cast": float,
         },
@@ -147,7 +162,7 @@ class KlochConfig:
                 "If specified from the environment, it must a list of path separated "
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
-            "config_cast": _cast_path_list,
+            "config_cast": _cast_config_path_list,
             "environ": Environ.CONFIG_PROFILE_PATHS,
             "environ_cast": _cast_path_list_split,
         },
@@ -166,7 +181,11 @@ class KlochConfig:
             for field in dataclasses.fields(cls)
         }
         # cast config value to expected type
-        asdict = {k: casters.get(k, _placeholder_caster)(v) for k, v in asdict.items()}
+        # all paths type are made absolute using the config parent dir
+        asdict = {
+            k: casters.get(k, _placeholder_caster)(v, file_path.parent)
+            for k, v in asdict.items()
+        }
         return cls(**asdict)
 
     @classmethod

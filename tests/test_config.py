@@ -32,6 +32,10 @@ def test__KlochConfig__from_environment(monkeypatch, data_dir):
     assert len(config.cli_logging_paths) == 2
     assert isinstance(config.cli_logging_paths[0], Path)
     assert isinstance(config.cli_session_dir, Path)
+    assert str(config.cli_session_dir) == str(config_path.parent / ".session")
+    assert str(config.cli_logging_paths[0]) == str(
+        config_path.parent / "tmp" / "kloch.log"
+    )
 
     monkeypatch.setenv("KLOCH_CONFIG_CLI_LOGGING_DEFAULT_LEVEL", "ERROR")
     config = kloch.config.KlochConfig.from_environment()
@@ -49,6 +53,12 @@ def test__KlochConfig__from_file(data_dir):
 def test__KlochConfig__documentation():
     for field in dataclasses.fields(kloch.config.KlochConfig):
         assert field.metadata.get("documentation")
-        assert field.metadata.get("config_cast")
+        config_cast = field.metadata.get("config_cast")
+        assert config_cast
+        # check the caster accept 2 arguments
+        try:
+            config_cast({}, Path())
+        except TypeError:
+            pass
         assert field.metadata.get("environ")
         assert field.metadata.get("environ_cast")
