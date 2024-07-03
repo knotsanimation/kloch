@@ -1,2 +1,6 @@
 cli_logging_default_level: "WARNING"
 cli_logging_format: "{levelname: <7}: {message}"
+cli_logging_paths:
+  - ./tmp/kloch.log
+  - ./tmp/kloch2.log
+cli_session_dir: ./.session/

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import TypeVar
 from typing import Union
 
 import yaml
@@ -18,7 +19,14 @@ from kloch.constants import Environ
 LOGGER = logging.getLogger(__name__)
 
 
-def _cast_list(src_str: str) -> List[str]:
+T = TypeVar("T")
+
+
+def _placeholder_caster(x: T, *args, **kwargs) -> T:
+    return x
+
+
+def _cast_list_split(src_str: str) -> List[str]:
     return src_str.split(",")
 
 
@@ -26,8 +34,18 @@ def _cast_path(src_str: str) -> Path:
     return Path(src_str)
 
 
-def _cast_path_list(src_str: str) -> List[Path]:
+def _cast_path_list_split(src_str: str) -> List[Path]:
     return [Path(path) for path in src_str.split(os.pathsep)]
+
+
+def _cast_path_list(src_list: List[str]) -> List[Path]:
+    return [Path(path) for path in src_list]
+
+
+# def _ensure_path_absolute(path: Path, absolute_root: Path) -> Path:
+#     if not path.is_absolute():
+#         path = Path(absolute_root, path).resolve()
+#     return path
 
 
 @dataclasses.dataclass
@@ -43,8 +61,9 @@ class KlochConfig:
                 "A list of importable python module names containing new launchers to support.\n\n"
                 "If specified in environment variable, this must be a comma-separated list of str like ``module1,module2,module3``"
             ),
+            "config_cast": list,
             "environ": Environ.CONFIG_LAUNCHER_PLUGINS,
-            "environ_cast": _cast_list,
+            "environ_cast": _cast_list_split,
         },
     )
 
@@ -58,8 +77,9 @@ class KlochConfig:
                 "If specified from the environment, it must a list of path separated "
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
+            "config_cast": _cast_path_list,
             "environ": Environ.CONFIG_CLI_LOGGING_PATHS,
-            "environ_cast": _cast_path_list,
+            "environ_cast": _cast_path_list_split,
         },
     )
 
@@ -70,6 +90,7 @@ class KlochConfig:
                 "Formatting to use for all logged messages. See python logging module documentation.\n"
                 "The tokens must use the ``{`` style."
             ),
+            "config_cast": str,
             "environ": Environ.CONFIG_CLI_LOGGING_FORMAT,
             "environ_cast": str,
         },
@@ -83,6 +104,7 @@ class KlochConfig:
                 "Can be an int or a level name as string as long as it is understandable"
                 " by ``logging.getLevelName``."
             ),
+            "config_cast": str,
             "environ": Environ.CONFIG_CLI_LOGGING_DEFAULT_LEVEL,
             "environ_cast": str,
         },
@@ -96,6 +118,7 @@ class KlochConfig:
                 "The directory is used to store temporarly any file generated during the executing of a launcher.\n"
                 "If not specified, a system's default temporary location is used."
             ),
+            "config_cast": _cast_path,
             "environ": Environ.CONFIG_CLI_SESSION_PATH,
             "environ_cast": _cast_path,
         },
@@ -109,6 +132,7 @@ class KlochConfig:
                 "Note the deleting is performed only the next time kloch is started so it "
                 "is possible a session directory exist longer if kloch is not launched for a while."
             ),
+            "config_cast": float,
             "environ": Environ.CONFIG_CLI_SESSION_LIFETIME,
             "environ_cast": float,
         },
@@ -123,8 +147,9 @@ class KlochConfig:
                 "If specified from the environment, it must a list of path separated "
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
+            "config_cast": _cast_path_list,
             "environ": Environ.CONFIG_PROFILE_PATHS,
-            "environ_cast": _cast_path_list,
+            "environ_cast": _cast_path_list_split,
         },
     )
 
@@ -135,6 +160,13 @@ class KlochConfig:
         """
         with file_path.open("r", encoding="utf-8") as file:
             asdict: Dict = yaml.safe_load(file)
+
+        casters = {
+            field.name: field.metadata["config_cast"]
+            for field in dataclasses.fields(cls)
+        }
+        # cast config value to expected type
+        asdict = {k: casters.get(k, _placeholder_caster)(v) for k, v in asdict.items()}
         return cls(**asdict)
 
     @classmethod

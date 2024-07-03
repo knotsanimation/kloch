@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+from pathlib import Path
 
 import pytest
 
@@ -28,6 +29,9 @@ def test__KlochConfig__from_environment(monkeypatch, data_dir):
     config = kloch.config.KlochConfig.from_environment()
     assert config.cli_logging_default_level == "WARNING"
     assert config.cli_logging_format == "{levelname: <7}: {message}"
+    assert len(config.cli_logging_paths) == 2
+    assert isinstance(config.cli_logging_paths[0], Path)
+    assert isinstance(config.cli_session_dir, Path)
 
     monkeypatch.setenv("KLOCH_CONFIG_CLI_LOGGING_DEFAULT_LEVEL", "ERROR")
     config = kloch.config.KlochConfig.from_environment()
@@ -45,5 +49,6 @@ def test__KlochConfig__from_file(data_dir):
 def test__KlochConfig__documentation():
     for field in dataclasses.fields(kloch.config.KlochConfig):
         assert field.metadata.get("documentation")
+        assert field.metadata.get("config_cast")
         assert field.metadata.get("environ")
         assert field.metadata.get("environ_cast")
