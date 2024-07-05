@@ -2,7 +2,6 @@
 A simple configuration system for the Kloch runtime.
 """
 
-import collections
 import dataclasses
 import logging
 import os
@@ -18,7 +17,6 @@ import yaml
 from kloch.constants import Environ
 
 LOGGER = logging.getLogger(__name__)
-
 
 T = TypeVar("T")
 
