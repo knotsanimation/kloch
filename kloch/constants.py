@@ -12,7 +12,7 @@ class Environ:
     Environment variables used across the application.
     """
 
-    CONFIG_ENV_VAR = f"{_KLOCH_CONFIG_PREFIX}_PATH"
+    CONFIG_PATH = f"{_KLOCH_CONFIG_PREFIX}_PATH"
     """
     Environment variable that must specify a file path to an existing configuration file.
     """

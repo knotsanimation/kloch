@@ -15,7 +15,7 @@ You specify which configuration file to use with the environment variable:
    :hide_code:
 
    import kloch
-   print(kloch.Environ.CONFIG_ENV_VAR)
+   print(kloch.Environ.CONFIG_PATH)
 
 Each config key can also be set using an individual environment variable:
 

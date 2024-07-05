@@ -193,7 +193,7 @@ class KlochConfig:
         """
         Generate an instance from a serialized file specified in an environment variable.
         """
-        environ = os.getenv(Environ.CONFIG_ENV_VAR)
+        environ = os.getenv(Environ.CONFIG_PATH)
 
         asdict = {}
         if environ:
