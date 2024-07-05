@@ -181,7 +181,7 @@ We execute the following command:
 
 .. code-block:: shell
 
-   kloch resolve knots:echoes --profile_paths ./profiles/
+   kloch resolve knots:echoes --profile_roots ./profiles/
 
 .. exec_code::
    :hide_code:

@@ -31,7 +31,7 @@ class Environ:
 
     CONFIG_CLI_SESSION_LIFETIME = f"{_KLOCH_CONFIG_PREFIX}_cli_lifetime".upper()
 
-    CONFIG_PROFILE_PATHS = f"{_KLOCH_CONFIG_PREFIX}_profile_paths".upper()
+    CONFIG_PROFILE_ROOTS = f"{_KLOCH_CONFIG_PREFIX}_profile_roots".upper()
 
     @classmethod
     def list_all(cls) -> List[str]:

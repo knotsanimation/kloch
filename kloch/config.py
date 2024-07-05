@@ -153,7 +153,7 @@ class KlochConfig:
         },
     )
 
-    profile_paths: List[Path] = dataclasses.field(
+    profile_roots: List[Path] = dataclasses.field(
         default_factory=list,
         metadata={
             "documentation": (
@@ -163,7 +163,7 @@ class KlochConfig:
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
             "config_cast": _cast_config_path_list,
-            "environ": Environ.CONFIG_PROFILE_PATHS,
+            "environ": Environ.CONFIG_PROFILE_ROOTS,
             "environ_cast": _cast_path_list_split,
         },
     )

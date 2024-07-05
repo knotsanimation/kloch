@@ -69,11 +69,11 @@ use the environment variable:
 
    import kloch
    print("# (shell syntax, to adapt for you context)")
-   print(f"export {kloch.Environ.CONFIG_PROFILE_PATHS}=/d/pipeline/profiles/")
+   print(f"export {kloch.Environ.CONFIG_PROFILE_ROOTS}=/d/pipeline/profiles/")
 
 .. tip::
 
-   You can also set locations on the fly by using the ``--profile_paths`` CLI argument.
+   You can also set locations on the fly by using the ``--profile_roots`` CLI argument.
 
 
 Then you can validate your manipulation by using the ``list`` command. This
