@@ -57,6 +57,8 @@ def test__MergeableDict__add():
                     "-=maya": "_",
                     "-=notAdded": "_",
                     "added": "1.2",
+                    "!=echoes": "3",
+                    "!=knots": "1",
                 },
                 "+=tests": {
                     "foo": [4, 5, 6],
@@ -73,6 +75,7 @@ def test__MergeableDict__add():
                 "requires": {
                     "echoes": "2",
                     "added": "1.2",
+                    "!=knots": "1",
                 },
                 "+=tests": {
                     "foo": [1, 2, 3, 4, 5, 6],
@@ -92,6 +95,7 @@ def test__MergeableDict__add():
             "requires": {
                 "echoes": "2",
                 "added": "1.2",
+                "knots": "1",
             },
             "tests": {
                 "foo": [1, 2, 3, 4, 5, 6],

@@ -15,7 +15,7 @@ top = MergeableDict(
     {
         "rezenv": {
             "+=config": {"quiet": False, "debug": True},
-            "requires": {"maya": "2023", "-=devUtils": ""},
+            "requires": {"maya": "2023", "-=devUtils": "", "!=houdini": "19"},
             "==environ": {"PROD": "test"},
             "roots": ["/d/prods"],
         }
