@@ -166,7 +166,7 @@ profile.
 We can notice a few points:
 
 - the ``myMovie`` profile now inherits from the ``myStudio`` profile
-  by specifying it in the ``base`` key.
+  by specifying it in the ``inherit`` key.
 - some keys are prefixed with a ``+=``: this is a token indicating how to merge
   the 2 hierarchies. Without it ``myMovie`` ``requires`` key would totally
   override the one in ``myStudio``.

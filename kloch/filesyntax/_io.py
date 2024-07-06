@@ -14,7 +14,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 KENV_PROFILE_MAGIC = "kloch_profile"
-KENV_PROFILE_VERSION = 2
+KENV_PROFILE_VERSION = 3
 
 
 def is_file_environment_profile(file_path: Path) -> bool:
@@ -106,25 +106,25 @@ def read_profile_from_file(
         )
     del asdict["__magic__"]
 
-    base_name: Optional[str] = asdict.get("base", None)
-    if base_name:
-        base_paths = get_profile_file_path(
-            base_name,
+    super_name: Optional[str] = asdict.get("inherit", None)
+    if super_name:
+        super_paths = get_profile_file_path(
+            super_name,
             profile_locations=profile_locations,
         )
-        if len(base_paths) >= 2:
+        if len(super_paths) >= 2:
             raise ValueError(
-                f"Found multiple profile with identifier '{base_name}' "
-                f"specified from profile '{file_path}': {base_paths}."
+                f"Found multiple profile with identifier '{super_name}' "
+                f"specified from profile '{file_path}': {super_paths}."
             )
-        if not base_paths:
+        if not super_paths:
             raise ValueError(
-                f"No profile found with identifier '{base_name}' "
+                f"No profile found with identifier '{super_name}' "
                 f"specified from profile '{file_path}'."
             )
 
-        base_profile = read_profile_from_file(file_path=base_paths[0])
-        asdict["base"] = base_profile
+        super_profile = read_profile_from_file(file_path=super_paths[0])
+        asdict["inherit"] = super_profile
 
     launchers = LauncherSerializedDict(asdict["launchers"])
     asdict["launchers"] = launchers
@@ -175,17 +175,17 @@ def serialize_profile(
     asdict = {"__magic__": f"{KENV_PROFILE_MAGIC}:{KENV_PROFILE_VERSION}"}
     asdict.update(profile.to_dict())
 
-    base_profile: Optional[EnvironmentProfile] = asdict.get("base", None)
-    if base_profile:
-        base_path = get_profile_file_path(
-            profile_id=base_profile.identifier,
+    super_profile: Optional[EnvironmentProfile] = asdict.get("inherit", None)
+    if super_profile:
+        super_path = get_profile_file_path(
+            profile_id=super_profile.identifier,
             profile_locations=profile_locations,
         )
-        if not base_path:
+        if not super_path:
             raise ValueError(
-                f"Base profile {base_profile.identifier} is not registred on disk."
+                f"Base profile {super_profile.identifier} is not registred on disk."
             )
-        asdict["base"] = base_profile.identifier
+        asdict["inherit"] = super_profile.identifier
 
     # remove custom class wrapper
     asdict["launchers"] = dict(asdict["launchers"])

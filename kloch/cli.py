@@ -122,7 +122,7 @@ class BaseParser:
 
         profile = profiles.pop(-1)
         for base_profile in profiles:
-            profile.base = base_profile
+            profile.inherit = base_profile
             profile = profile.get_merged_profile()
 
         return profile

@@ -35,7 +35,7 @@ The content of the file is then defined as:
 |                +-----------------+----------------------------------------------------------------------------+
 |                | **description** | arbitrary chain of characters indicating the version of this profile       |
 +----------------+-----------------+----------------------------------------------------------------------------+
-| ``base``       | **required**    | no                                                                         |
+| ``inherit``    | **required**    | no                                                                         |
 +----------------+-----------------+----------------------------------------------------------------------------+
 |                | **type**        | `str`                                                                      |
 |                +-----------------+----------------------------------------------------------------------------+
@@ -52,7 +52,7 @@ Inheritance
 -----------
 
 As explained in :doc:`usage` it's possible to merge profiles "on top
-of each other" using the ``base`` key, or from the CLI.
+of each other" using the ``inherit`` key, or from the CLI.
 
 .. important::
 
@@ -64,8 +64,12 @@ happen as follow:
 - keep all root keys of ``profile-B`` that are not the ``launchers`` key.
 - merge the ``launchers`` as ``profile-A + profile-B``
 
-By default a merge actually correspond to only keeping ``profile-B`` value (override).
-Check the below `tokens` section to see how you can use other merge rules.
+.. note::
+
+   We use the same term as Python to explain inheritance:
+   specifying ``inherit: profileA`` in ``profileB`` can be described as
+   ``profileA`` is the _super_ profile of the _sub_ profile ``profileB``
+
 
 Tokens
 ------

@@ -6,7 +6,7 @@ def test__EnvironmentProfile__merging():
     profile1 = EnvironmentProfile(
         identifier="knots",
         version="0.1.0",
-        base=None,
+        inherit=None,
         launchers=LauncherSerializedDict(
             {
                 "rezenv": {
@@ -27,7 +27,7 @@ def test__EnvironmentProfile__merging():
     profile2 = EnvironmentProfile(
         identifier="knots:echoes",
         version="0.1.0",
-        base=profile1,
+        inherit=profile1,
         launchers=LauncherSerializedDict(
             {
                 "+=rezenv": {
