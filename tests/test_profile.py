@@ -10,8 +10,8 @@ def test__EnvironmentProfile__merging():
         launchers=LauncherSerializedDict(
             {
                 "rezenv": {
-                    "+=config": {"exclude": "whatever"},
-                    "requires": {
+                    "config": {"exclude": "whatever"},
+                    "==requires": {
                         "echoes": "2",
                         "maya": "2023",
                     },
@@ -31,16 +31,16 @@ def test__EnvironmentProfile__merging():
         launchers=LauncherSerializedDict(
             {
                 "+=rezenv": {
-                    "config": {"include": "yes"},
-                    "+=requires": {
+                    "==config": {"include": "yes"},
+                    "requires": {
                         "-=maya": "_",
                         "-=notAdded": "_",
                         "added": "1.2",
                     },
                     "+=tests": {
-                        "+=foo": [4, 5, 6],
+                        "foo": [4, 5, 6],
                         "+=new-echoes-key": {"working": True},
-                        "deeper!": {"+=as deep": [0, 0]},
+                        "==deeper!": {"+=as deep": [0, 0]},
                     },
                 }
             }
@@ -49,15 +49,15 @@ def test__EnvironmentProfile__merging():
     result = profile2.get_merged_profile().launchers
     expected = {
         "+=rezenv": {
-            "config": {"include": "yes"},
-            "+=requires": {
+            "==config": {"include": "yes"},
+            "requires": {
                 "echoes": "2",
                 "added": "1.2",
             },
             "+=tests": {
-                "+=foo": [1, 2, 3, 4, 5, 6],
+                "foo": [1, 2, 3, 4, 5, 6],
                 "+=new-echoes-key": {"working": True},
-                "deeper!": {"+=as deep": [0, 0]},
+                "==deeper!": {"+=as deep": [0, 0]},
             },
         },
         "testenv": {"command": "echo $cwd"},

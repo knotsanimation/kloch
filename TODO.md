@@ -36,7 +36,7 @@ Collection of various ideas to improve kloch.
     (code at Serialized level) then use that file to launch.
 - [ ] abstract `subprocess.run` in BaseLauncher and offer a `prepare_execution`
   abstractmethod instead.
-- [ ] change default merge rule to be append and add token to specify explicit override
+- [x] change default merge rule to be append and add token to specify explicit override
   - `-=` remove
   - `==` override
   - `+=` append (default)

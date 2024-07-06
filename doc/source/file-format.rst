@@ -100,29 +100,16 @@ The following merge tokens are available:
 +--------------------+-----------------------------------------------------------------+
 | ``-=``             | indicate the base's key should be removed if it exist           |
 +--------------------+-----------------------------------------------------------------+
-| `unset`            | no token indicate the key's value replace the base's value      |
+| ``==``             | indicate the base's value should be overriden                   |
++--------------------+-----------------------------------------------------------------+
+| `unset`            | no token is similar to += (append)                              |
 +--------------------+-----------------------------------------------------------------+
 
-.. tip::
+Here is an example making use of all of the tokens and the python API used to merge:
 
-   The logic imply that if you have a "A key"  with a ``+=`` token, but
-   it's parent "B key" has not, then the "A key" token is useless.
-
-   .. code-block:: yaml
-
-      config:
-         +=packages_paths:
-            - /foobar
-
-      # ^ is the same as ∨
-      config:
-         packages_paths:
-            - /foobar
-
-      # this is probably what is intended
-      +=config:
-         +=packages_paths:
-            - /foobar
+.. exec_code::
+   :filename: _injected/exec-fileformat-token-append.py
+   :language_output: python
 
 
 Launchers

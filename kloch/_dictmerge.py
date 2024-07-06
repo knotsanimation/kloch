@@ -156,6 +156,7 @@ class MergeableDict(dict):
     class tokens:
         append = "+="
         remove = "-="
+        override = "=="
 
     def __add__(self: T, other: T) -> T:
         """
@@ -184,8 +185,10 @@ class MergeableDict(dict):
         """
         Ensure the given key has all potential tokens removed.
         """
-        resolved = _remove_prefix(key, cls.tokens.append)
-        return _remove_prefix(resolved, cls.tokens.remove)
+        resolved = key
+        for token in [cls.tokens.append, cls.tokens.remove, cls.tokens.override]:
+            resolved = _remove_prefix(resolved, token)
+        return resolved
 
     @classmethod
     def get_merge_rule(cls, key: str) -> MergeRule:
@@ -196,7 +199,9 @@ class MergeableDict(dict):
             return MergeRule.append
         if key.startswith(cls.tokens.remove):
             return MergeRule.remove
-        return MergeRule.override
+        if key.startswith(cls.tokens.override):
+            return MergeRule.override
+        return MergeRule.append
 
     def get(self, key, default=None, ignore_tokens: bool = False):
         """
