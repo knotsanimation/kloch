@@ -68,7 +68,7 @@ happen as follow:
 
    We use the same term as Python to explain inheritance:
    specifying ``inherit: profileA`` in ``profileB`` can be described as
-   ``profileA`` is the _super_ profile of the _sub_ profile ``profileB``
+   ``profileA`` is the *super* profile of the *sub* profile ``profileB``
 
 
 Tokens
@@ -87,7 +87,7 @@ Those tokens indicate how the value of the key must be merged with a "base"
 value of similar type.
 
 In the context of environment profile it indicate how to merge the key/value pair
-of the current profile with the value of the profile specified in ``base``.
+of the current profile with the value of the profile specified in ``inherit``.
 
 A merge token:
 
