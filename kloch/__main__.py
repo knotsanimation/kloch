@@ -28,6 +28,7 @@ def main(argv: Optional[List[str]] = None):
     logging.root.addHandler(handler)
 
     for log_path in config.cli_logging_paths:
+        log_path.parent.mkdir(exist_ok=True)
         handler = logging.handlers.RotatingFileHandler(
             log_path,
             # keep in sync with config option
