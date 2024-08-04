@@ -43,7 +43,21 @@ def test__KlochConfig__from_environment(monkeypatch, data_dir):
     assert config.cli_logging_format == "{levelname: <7}: {message}"
 
 
-def test__KlochConfig__from_file(data_dir):
+def test__KlochConfig__from_file__expandvar(monkeypatch, data_dir, tmp_path: Path):
+    monkeypatch.setenv("FOOBAR", str(tmp_path))
+    monkeypatch.setenv("THIRDIR", str(tmp_path / "third"))
+
+    config_path = data_dir / "config-fuel.yml"
+    config = kloch.config.KlochConfig.from_file(file_path=config_path)
+    assert len(config.cli_logging_paths) == 2
+    assert config.cli_logging_paths[0] == tmp_path / "kloch.log"
+    assert config.cli_logging_paths[1] == config_path.parent / Path(
+        "$FOOBAR/tmp/kloch2.log"
+    )
+    assert config.cli_session_dir == Path(tmp_path / "third" / ".session")
+
+
+def test__KlochConfig__from_file__error(data_dir):
     config_path = data_dir / "config-molg.yml"
     with pytest.raises(TypeError) as error:
         config = kloch.config.KlochConfig.from_file(file_path=config_path)

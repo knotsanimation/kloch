@@ -15,6 +15,7 @@ from typing import Union
 import yaml
 
 from kloch.constants import Environ
+from kloch._utils import expand_envvars
 
 LOGGER = logging.getLogger(__name__)
 
@@ -46,6 +47,11 @@ def _ensure_path_absolute(path: Path, absolute_root: Path) -> Path:
     return Path(absolute_root, path).resolve()
 
 
+def _resolve_path_env_vars(path: Path) -> Path:
+    resolved = expand_envvars(str(path))
+    return Path(resolved)
+
+
 def _make_config_caster(caster):
     def _config_caster(v, *args, **kwargs):
         return caster(v)
@@ -54,11 +60,13 @@ def _make_config_caster(caster):
 
 
 def _cast_config_path(src_str: str, config_dir: Path) -> Path:
-    return _ensure_path_absolute(Path(src_str), config_dir)
+    casted = _resolve_path_env_vars(Path(src_str))
+    casted = _ensure_path_absolute(casted, config_dir)
+    return casted
 
 
 def _cast_config_path_list(src_list: List[str], config_dir: Path) -> List[Path]:
-    return [_ensure_path_absolute(Path(path), config_dir) for path in src_list]
+    return [_cast_config_path(path, config_dir) for path in src_list]
 
 
 @dataclasses.dataclass
