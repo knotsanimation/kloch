@@ -32,7 +32,7 @@ def main(argv: Optional[List[str]] = None):
         handler = logging.handlers.RotatingFileHandler(
             log_path,
             # keep in sync with config option
-            maxBytes=65536,
+            maxBytes=262144,
             backupCount=1,
             encoding="utf-8",
         )
