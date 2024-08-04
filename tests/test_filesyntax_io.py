@@ -30,7 +30,7 @@ def test__read_profile_from_file__envvar(data_dir):
         profile_locations=[data_dir],
     )
     assert profile_echoes_beta.identifier == "knots:echoes:beta"
-    assert profile_echoes_beta.base is None
+    assert profile_echoes_beta.inherit is None
 
     profile_echoes_path = kloch.filesyntax.get_profile_file_path(
         "knots:echoes",
@@ -41,11 +41,11 @@ def test__read_profile_from_file__envvar(data_dir):
         profile_locations=[data_dir],
     )
     assert profile_echoes.identifier == "knots:echoes"
-    assert profile_echoes.base == profile_echoes_beta
+    assert profile_echoes.inherit == profile_echoes_beta
 
     m_profile = profile_echoes.get_merged_profile()
     assert m_profile.identifier == "knots:echoes"
-    assert m_profile.base is None
+    assert m_profile.inherit is None
 
 
 def test__read_profile_from_id(data_dir):
@@ -54,7 +54,7 @@ def test__read_profile_from_id(data_dir):
         profile_locations=[data_dir],
     )
     assert profile_echoes_beta.identifier == "knots:echoes:beta"
-    assert profile_echoes_beta.base is None
+    assert profile_echoes_beta.inherit is None
 
 
 def test__read_profile_from_file__old(monkeypatch, data_dir):

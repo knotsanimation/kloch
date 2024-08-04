@@ -19,13 +19,13 @@ class EnvironmentProfile:
     """
     An environment is a collection of parameters required to start a pre-defined launcher.
 
-    Environment can inherit each other by specifying a `base` attribute. The inheritance
+    Environment can inherit each other by specifying a `inherit` attribute. The inheritance
     only merge the ``launchers`` attribute of the 2.
     """
 
     identifier: str
     version: str
-    base: Optional["EnvironmentProfile"]
+    inherit: Optional["EnvironmentProfile"]
     launchers: LauncherSerializedDict
 
     @classmethod
@@ -38,13 +38,13 @@ class EnvironmentProfile:
         """
         identifier: str = serialized["identifier"]
         version: str = serialized["version"]
-        base: Optional["EnvironmentProfile"] = serialized.get("base", None)
+        inherit: Optional["EnvironmentProfile"] = serialized.get("inherit", None)
         launchers: LauncherSerializedDict = serialized["launchers"]
 
         return EnvironmentProfile(
             identifier=identifier,
             version=version,
-            base=base,
+            inherit=inherit,
             launchers=launchers,
         )
 
@@ -56,8 +56,8 @@ class EnvironmentProfile:
             "identifier": self.identifier,
             "version": self.version,
         }
-        if self.base:
-            serialized["base"] = self.base
+        if self.inherit:
+            serialized["inherit"] = self.inherit
 
         serialized["launchers"] = copy.deepcopy(self.launchers)
         return serialized
@@ -70,12 +70,12 @@ class EnvironmentProfile:
             a new instance.
         """
         launchers = self.launchers
-        if self.base:
-            launchers = self.base.get_merged_profile().launchers + launchers
+        if self.inherit:
+            launchers = self.inherit.get_merged_profile().launchers + launchers
 
         return EnvironmentProfile(
             identifier=self.identifier,
             version=self.version,
-            base=None,
+            inherit=None,
             launchers=launchers,
         )

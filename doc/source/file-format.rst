@@ -35,7 +35,7 @@ The content of the file is then defined as:
 |                +-----------------+----------------------------------------------------------------------------+
 |                | **description** | arbitrary chain of characters indicating the version of this profile       |
 +----------------+-----------------+----------------------------------------------------------------------------+
-| ``base``       | **required**    | no                                                                         |
+| ``inherit``    | **required**    | no                                                                         |
 +----------------+-----------------+----------------------------------------------------------------------------+
 |                | **type**        | `str`                                                                      |
 |                +-----------------+----------------------------------------------------------------------------+
@@ -52,7 +52,7 @@ Inheritance
 -----------
 
 As explained in :doc:`usage` it's possible to merge profiles "on top
-of each other" using the ``base`` key, or from the CLI.
+of each other" using the ``inherit`` key, or from the CLI.
 
 .. important::
 
@@ -64,8 +64,12 @@ happen as follow:
 - keep all root keys of ``profile-B`` that are not the ``launchers`` key.
 - merge the ``launchers`` as ``profile-A + profile-B``
 
-By default a merge actually correspond to only keeping ``profile-B`` value (override).
-Check the below `tokens` section to see how you can use other merge rules.
+.. note::
+
+   We use the same term as Python to explain inheritance:
+   specifying ``inherit: profileA`` in ``profileB`` can be described as
+   ``profileA`` is the *super* profile of the *sub* profile ``profileB``
+
 
 Tokens
 ------
@@ -83,7 +87,7 @@ Those tokens indicate how the value of the key must be merged with a "base"
 value of similar type.
 
 In the context of environment profile it indicate how to merge the key/value pair
-of the current profile with the value of the profile specified in ``base``.
+of the current profile with the value of the profile specified in ``inherit``.
 
 A merge token:
 
@@ -100,29 +104,18 @@ The following merge tokens are available:
 +--------------------+-----------------------------------------------------------------+
 | ``-=``             | indicate the base's key should be removed if it exist           |
 +--------------------+-----------------------------------------------------------------+
-| `unset`            | no token indicate the key's value replace the base's value      |
+| ``==``             | indicate the base's value should be overriden                   |
++--------------------+-----------------------------------------------------------------+
+| ``!=``             | add the key and value only if the key doesn't exist in base     |
++--------------------+-----------------------------------------------------------------+
+| `unset`            | no token is similar to += (append)                              |
 +--------------------+-----------------------------------------------------------------+
 
-.. tip::
+Here is an example making use of all of the tokens and the python API used to merge:
 
-   The logic imply that if you have a "A key"  with a ``+=`` token, but
-   it's parent "B key" has not, then the "A key" token is useless.
-
-   .. code-block:: yaml
-
-      config:
-         +=packages_paths:
-            - /foobar
-
-      # ^ is the same as ∨
-      config:
-         packages_paths:
-            - /foobar
-
-      # this is probably what is intended
-      +=config:
-         +=packages_paths:
-            - /foobar
+.. exec_code::
+   :filename: _injected/exec-fileformat-token-append.py
+   :language_output: python
 
 
 Launchers
@@ -181,7 +174,7 @@ We execute the following command:
 
 .. code-block:: shell
 
-   kloch resolve knots:echoes --profile_paths ./profiles/
+   kloch resolve knots:echoes --profile_roots ./profiles/
 
 .. exec_code::
    :hide_code:

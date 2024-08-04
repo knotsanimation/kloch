@@ -19,6 +19,7 @@ class MergeRule(enum.IntEnum):
     override = enum.auto()
     append = enum.auto()
     remove = enum.auto()
+    ifnotexists = enum.auto()
 
 
 def refacto_dict(
@@ -95,6 +96,13 @@ def deepmerge_dicts(
             new_content[over_key] = over_value
             continue
 
+        if merge_rule == merge_rule.ifnotexists:
+            if base_key:
+                new_content[base_key] = base_value
+            else:
+                new_content[over_key] = over_value
+            continue
+
         # reaching here implies `merge_rule.append`
 
         if isinstance(over_value, dict) and isinstance(base_value, dict):
@@ -156,6 +164,8 @@ class MergeableDict(dict):
     class tokens:
         append = "+="
         remove = "-="
+        override = "=="
+        ifnotexists = "!="
 
     def __add__(self: T, other: T) -> T:
         """
@@ -184,8 +194,15 @@ class MergeableDict(dict):
         """
         Ensure the given key has all potential tokens removed.
         """
-        resolved = _remove_prefix(key, cls.tokens.append)
-        return _remove_prefix(resolved, cls.tokens.remove)
+        resolved = key
+        for token in [
+            cls.tokens.append,
+            cls.tokens.remove,
+            cls.tokens.override,
+            cls.tokens.ifnotexists,
+        ]:
+            resolved = _remove_prefix(resolved, token)
+        return resolved
 
     @classmethod
     def get_merge_rule(cls, key: str) -> MergeRule:
@@ -196,7 +213,11 @@ class MergeableDict(dict):
             return MergeRule.append
         if key.startswith(cls.tokens.remove):
             return MergeRule.remove
-        return MergeRule.override
+        if key.startswith(cls.tokens.override):
+            return MergeRule.override
+        if key.startswith(cls.tokens.ifnotexists):
+            return MergeRule.ifnotexists
+        return MergeRule.append
 
     def get(self, key, default=None, ignore_tokens: bool = False):
         """

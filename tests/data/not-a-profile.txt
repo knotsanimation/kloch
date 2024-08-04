@@ -1,4 +1,4 @@
-__magic__: kloch_profile:2
+__magic__: kloch_profile:3
 identifier: notaprofile
 version: 0.2.0
 launchers: {}

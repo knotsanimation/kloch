@@ -64,12 +64,29 @@ In a very abstract way, `kloch` is a system that:
          launcher = get_launcher(launcher_name)
          launcher(**launcher_config)
 
-The profile system includes:
 
-- profile inheritance (a profile specify it merges on top of another profile)
-- token system to determine merging rules during inheritance
-- arbitrary profile locations definition through API and environment variable.
-- launcher plugin system to accomodate for any use-case.
+Features
+--------
+
+- offer a CLI and a public python API
+- custom config format for environment profiles:
+   - inheritance
+   - inheritance merging rules with token system
+- arbitrary profile locations with flexible configuration
+- plugin system for launchers
+
+
+Programming distinctions
+------------------------
+
+- robust logging.
+- good amount of unittesting
+- good documentation with a lot of doc created at code level
+- python 3.7+ support (EOL was in June 2023).
+- PyYAML as only mandatory external python dependency.
+- flexible "meta" configuration from environment variable or config file.
+- clear public and private API
+
 
 
 Contents

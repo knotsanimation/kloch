@@ -15,7 +15,7 @@ You specify which configuration file to use with the environment variable:
    :hide_code:
 
    import kloch
-   print(kloch.Environ.CONFIG_ENV_VAR)
+   print(kloch.Environ.CONFIG_PATH)
 
 Each config key can also be set using an individual environment variable:
 
@@ -30,13 +30,21 @@ override any value specified in the config file.
 Content
 -------
 
-.. tip::
+.. admonition:: Relative Paths
+   :class: tip
 
-   All config key that expect a ``Path`` and whose value is a relative path
+   All config **file** key that expect a ``Path`` and whose value is a relative path
    are turned absolute to the config parent directory.
 
    Example: config is read from ``C:/configs/kloch.yml``,
    then ``cli_session_dir: ../sessions/`` will produce ``C:/sessions/``
+
+.. admonition:: Environment Variables in Paths
+   :class: tip
+
+   All config **file** key that expect a ``Path`` can have environment variable that
+   will be resolved. Environment variable are specified like ``$MYVAR/mydir``.
+   You can escape the resolving by doubling the ``$`` like ``$$myvar/mydir``.
 
 .. program:: config
 

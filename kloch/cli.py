@@ -46,20 +46,20 @@ class BaseParser:
         return self._args.debug
 
     @property
-    def _profile_paths(self) -> List[Path]:
+    def _profile_roots(self) -> List[Path]:
         """
         One or multiple filesystem path to existing directory containing profile file.
-        The paths are append to the global profile path variable.
+        The paths are append to the global profile roots variable.
         """
-        return [Path(path) for path in self._args.profile_paths]
+        return [Path(path) for path in self._args.profile_roots]
 
     @property
-    def profile_paths(self) -> List[Path]:
+    def profile_roots(self) -> List[Path]:
         """
         One or multiple filesystem path to existing directory containing profile file.
-        The paths are append to the global profile path variable.
+        The paths are append to the global profile roots variable.
         """
-        return self._config.profile_paths + self._profile_paths
+        return self._config.profile_roots + self._profile_roots
 
     @property
     def session_root(self) -> Optional[Path]:
@@ -83,10 +83,10 @@ class BaseParser:
             help=cls.debug.__doc__,
         )
         parser.add_argument(
-            "--profile_paths",
+            "--profile_roots",
             nargs="*",
             default=[],
-            help=cls._profile_paths.__doc__,
+            help=cls._profile_roots.__doc__,
         )
         parser.set_defaults(func=cls)
 
@@ -94,7 +94,7 @@ class BaseParser:
         """
         Merge each profile with its base then merge all of them from left to right.
         """
-        profile_locations = self.profile_paths
+        profile_locations = self.profile_roots
 
         profiles = []
         for profile_id in profile_identifiers:
@@ -122,7 +122,7 @@ class BaseParser:
 
         profile = profiles.pop(-1)
         for base_profile in profiles:
-            profile.base = base_profile
+            profile.inherit = base_profile
             profile = profile.get_merged_profile()
 
         return profile
@@ -167,7 +167,7 @@ class RunParser(BaseParser):
         kloch.write_profile_to_file(
             profile,
             file_path=session_dir.profile_path,
-            profile_locations=self.profile_paths,
+            profile_locations=self.profile_roots,
             check_valid_id=False,
         )
 
@@ -256,7 +256,7 @@ class ListParser(BaseParser):
         return self._args.id_filter
 
     def execute(self):
-        profile_locations = self.profile_paths
+        profile_locations = self.profile_roots
         profile_locations_txt = [str(path) for path in profile_locations]
         print(
             f"Searching {len(profile_locations)} locations: {profile_locations_txt} ..."
@@ -442,16 +442,10 @@ class RawFormatter(argparse.HelpFormatter):
         return text
 
 
-def get_cli(argv=None, config: kloch.KlochConfig = None) -> BaseParser:
+def _get_parser() -> argparse.ArgumentParser:
     """
-    Return the command line interface generated from user arguments provided.
-
-    Args:
-        argv: source command line argument to use instea dof the usual sys.argv
-        config: the kloch config instance to use for running the cli
+    The argparse ArgumentParser that build the CLI
     """
-    config = config or kloch.get_config()
-
     parser = argparse.ArgumentParser(
         kloch.__name__,
         description=(
@@ -501,6 +495,20 @@ def get_cli(argv=None, config: kloch.KlochConfig = None) -> BaseParser:
         description="List information about the currently registred plugins.",
     )
     PluginsParser.add_to_parser(subparser)
+    return parser
+
+
+def get_cli(argv=None, config: kloch.KlochConfig = None) -> BaseParser:
+    """
+    Return the command line interface generated from user arguments provided.
+
+    Args:
+        argv: source command line argument to use instea dof the usual sys.argv
+        config: the kloch config instance to use for running the cli
+    """
+    config = config or kloch.get_config()
+
+    parser = _get_parser()
 
     argv: List[str] = copy.copy(argv) or sys.argv[1:]
 

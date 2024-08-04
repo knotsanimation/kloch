@@ -36,8 +36,8 @@ def test__MergeableDict__add():
     dict_root = MergeableDict(
         {
             "rezenv": {
-                "+=config": {"exclude": "whatever"},
-                "requires": {
+                "config": {"exclude": "whatever"},
+                "==requires": {
                     "echoes": "2",
                     "maya": "2023",
                 },
@@ -52,16 +52,18 @@ def test__MergeableDict__add():
     dict_leaf = MergeableDict(
         {
             "+=rezenv": {
-                "config": {"include": "yes"},
-                "+=requires": {
+                "==config": {"include": "yes"},
+                "requires": {
                     "-=maya": "_",
                     "-=notAdded": "_",
                     "added": "1.2",
+                    "!=echoes": "3",
+                    "!=knots": "1",
                 },
                 "+=tests": {
-                    "+=foo": [4, 5, 6],
+                    "foo": [4, 5, 6],
                     "+=new-echoes-key": {"working": True},
-                    "deeper!": {"+=as deep": [0, 0]},
+                    "==deeper!": {"+=as deep": [0, 0]},
                 },
             }
         }
@@ -69,15 +71,16 @@ def test__MergeableDict__add():
     dict_expected = MergeableDict(
         {
             "+=rezenv": {
-                "config": {"include": "yes"},
-                "+=requires": {
+                "==config": {"include": "yes"},
+                "requires": {
                     "echoes": "2",
                     "added": "1.2",
+                    "!=knots": "1",
                 },
                 "+=tests": {
-                    "+=foo": [1, 2, 3, 4, 5, 6],
+                    "foo": [1, 2, 3, 4, 5, 6],
                     "+=new-echoes-key": {"working": True},
-                    "deeper!": {"+=as deep": [0, 0]},
+                    "==deeper!": {"+=as deep": [0, 0]},
                 },
             },
             "testenv": {"command": "echo $cwd"},
@@ -92,6 +95,7 @@ def test__MergeableDict__add():
             "requires": {
                 "echoes": "2",
                 "added": "1.2",
+                "knots": "1",
             },
             "tests": {
                 "foo": [1, 2, 3, 4, 5, 6],

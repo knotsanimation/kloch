@@ -69,11 +69,11 @@ use the environment variable:
 
    import kloch
    print("# (shell syntax, to adapt for you context)")
-   print(f"export {kloch.Environ.CONFIG_PROFILE_PATHS}=/d/pipeline/profiles/")
+   print(f"export {kloch.Environ.CONFIG_PROFILE_ROOTS}=/d/pipeline/profiles/")
 
 .. tip::
 
-   You can also set locations on the fly by using the ``--profile_paths`` CLI argument.
+   You can also set locations on the fly by using the ``--profile_roots`` CLI argument.
 
 
 Then you can validate your manipulation by using the ``list`` command. This
@@ -166,7 +166,7 @@ profile.
 We can notice a few points:
 
 - the ``myMovie`` profile now inherits from the ``myStudio`` profile
-  by specifying it in the ``base`` key.
+  by specifying it in the ``inherit`` key.
 - some keys are prefixed with a ``+=``: this is a token indicating how to merge
   the 2 hierarchies. Without it ``myMovie`` ``requires`` key would totally
   override the one in ``myStudio``.

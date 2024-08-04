@@ -1,7 +1,7 @@
-__magic__: kloch_profile:2
+__magic__: kloch_profile:3
 identifier: knots:echoes
 version: 0.2.0
-base: knots:echoes:beta
+inherit: knots:echoes:beta
 launchers:
   +=rezenv:
     +=config:

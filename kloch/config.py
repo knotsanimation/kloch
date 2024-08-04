@@ -2,7 +2,6 @@
 A simple configuration system for the Kloch runtime.
 """
 
-import collections
 import dataclasses
 import logging
 import os
@@ -16,9 +15,9 @@ from typing import Union
 import yaml
 
 from kloch.constants import Environ
+from kloch._utils import expand_envvars
 
 LOGGER = logging.getLogger(__name__)
-
 
 T = TypeVar("T")
 
@@ -48,6 +47,11 @@ def _ensure_path_absolute(path: Path, absolute_root: Path) -> Path:
     return Path(absolute_root, path).resolve()
 
 
+def _resolve_path_env_vars(path: Path) -> Path:
+    resolved = expand_envvars(str(path))
+    return Path(resolved)
+
+
 def _make_config_caster(caster):
     def _config_caster(v, *args, **kwargs):
         return caster(v)
@@ -56,11 +60,13 @@ def _make_config_caster(caster):
 
 
 def _cast_config_path(src_str: str, config_dir: Path) -> Path:
-    return _ensure_path_absolute(Path(src_str), config_dir)
+    casted = _resolve_path_env_vars(Path(src_str))
+    casted = _ensure_path_absolute(casted, config_dir)
+    return casted
 
 
 def _cast_config_path_list(src_list: List[str], config_dir: Path) -> List[Path]:
-    return [_ensure_path_absolute(Path(path), config_dir) for path in src_list]
+    return [_cast_config_path(path, config_dir) for path in src_list]
 
 
 @dataclasses.dataclass
@@ -87,8 +93,9 @@ class KlochConfig:
         metadata={
             "documentation": (
                 "Filesystem path to one or multiple log file that might exists.\n"
-                "If specified all the logging will be wrote to those files."
-                "Logs are rotated bwteen 2 files of 65.536Kb max.\n\n"
+                "If specified all the logging will also be wrote to those files.\n"
+                "The log path parent directory is created if it doesn't exists.\n\n"
+                "Logs are rotated between 2 files of 262.14Kb max.\n\n"
                 "If specified from the environment, it must a list of path separated "
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
@@ -153,7 +160,7 @@ class KlochConfig:
         },
     )
 
-    profile_paths: List[Path] = dataclasses.field(
+    profile_roots: List[Path] = dataclasses.field(
         default_factory=list,
         metadata={
             "documentation": (
@@ -163,7 +170,7 @@ class KlochConfig:
                 "by the default system path separator (windows = ``;``, linux = ``:``)"
             ),
             "config_cast": _cast_config_path_list,
-            "environ": Environ.CONFIG_PROFILE_PATHS,
+            "environ": Environ.CONFIG_PROFILE_ROOTS,
             "environ_cast": _cast_path_list_split,
         },
     )
@@ -193,7 +200,7 @@ class KlochConfig:
         """
         Generate an instance from a serialized file specified in an environment variable.
         """
-        environ = os.getenv(Environ.CONFIG_ENV_VAR)
+        environ = os.getenv(Environ.CONFIG_PATH)
 
         asdict = {}
         if environ:
