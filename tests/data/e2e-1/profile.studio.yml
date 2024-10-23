@@ -1,0 +1,15 @@
+__magic__: kloch_profile:3
+identifier: studio
+version: 0.1.0
+launchers:
+  +=.base:
+    +=environ:
+      STUD_SKYNET_PATH: "N:"
+      STUD_LOCAL_INSTALL_PATH: $LOCALAPPDATA\studio
+      STUD_LOCAL_REZ_INSTALL_PATH: $STUD_LOCAL_INSTALL_PATH\rez
+      STUD_LOCAL_REZ_SCRIPTS_PATH: $STUD_LOCAL_REZ_INSTALL_PATH\Scripts\rez
+  +=behr:
+    +=environ:
+      PATH:
+        - $PATH
+        - $STUD_LOCAL_REZ_SCRIPTS_PATH
