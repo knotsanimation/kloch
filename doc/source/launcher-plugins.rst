@@ -27,6 +27,14 @@ As example you can check the content of:
 - ``{root}/tests/data/plugins-behr``
 - ``{root}/tests/data/plugins-tyfa``
 
+
+.. tip::
+
+   As kloch plugins need to be in the PYTHONPATH, every python code will be
+   able to import them so make sure to pick a name that will not conflict
+   with other modules. Prefixing them with ``kloch_`` is recommended.
+
+
 Creating the subclasses
 -----------------------
 
