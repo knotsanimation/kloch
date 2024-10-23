@@ -38,4 +38,4 @@ from .filesyntax import get_all_profile_file_paths
 from .cli import get_cli
 
 # keep in sync with pyproject.toml
-__version__ = "0.10.0"
+__version__ = "0.11.0"
