@@ -17,6 +17,30 @@ KENV_PROFILE_MAGIC = "kloch_profile"
 KENV_PROFILE_VERSION = 3
 
 
+class ProfileAPIVersionError(Exception):
+    """
+    Issue with the '__magic__' attribute of a profile.
+    """
+
+    pass
+
+
+class ProfileInheritanceError(Exception):
+    """
+    Issue with the 'inherit' attribute of a profile.
+    """
+
+    pass
+
+
+class ProfileIdentifierError(Exception):
+    """
+    Issue with the 'identifier' attribute of a profile.
+    """
+
+    pass
+
+
 def is_file_environment_profile(file_path: Path) -> bool:
     """
     Return True if the given file is an Environment Profile.
@@ -87,7 +111,9 @@ def read_profile_from_file(
     """
     Generate an instance from a serialized file on disk.
 
-    Raises error if the file is not built properly.
+    Raises:
+        ProfileAPIVersionError:
+        ProfileInheritanceError:
 
     Args:
         file_path:
@@ -100,7 +126,7 @@ def read_profile_from_file(
 
     profile_version = int(asdict["__magic__"].split(":")[-1])
     if not profile_version == KENV_PROFILE_VERSION:
-        raise SyntaxError(
+        raise ProfileAPIVersionError(
             f"Cannot read profile with version <{profile_version}> while current "
             f"API version is <{KENV_PROFILE_VERSION}>."
         )
@@ -113,12 +139,12 @@ def read_profile_from_file(
             profile_locations=profile_locations,
         )
         if len(super_paths) >= 2:
-            raise ValueError(
+            raise ProfileInheritanceError(
                 f"Found multiple profile with identifier '{super_name}' "
                 f"specified from profile '{file_path}': {super_paths}."
             )
         if not super_paths:
-            raise ValueError(
+            raise ProfileInheritanceError(
                 f"No profile found with identifier '{super_name}' "
                 f"specified from profile '{file_path}'."
             )
@@ -171,6 +197,9 @@ def serialize_profile(
 ) -> str:
     """
     Convert the instance to a serialized dictionnary intended to be written on disk.
+
+    Raises:
+        ProfileInheritanceError: if the inherited profile specified is not found on disk
     """
     asdict = {"__magic__": f"{KENV_PROFILE_MAGIC}:{KENV_PROFILE_VERSION}"}
     asdict.update(profile.to_dict())
@@ -182,8 +211,9 @@ def serialize_profile(
             profile_locations=profile_locations,
         )
         if not super_path:
-            raise ValueError(
-                f"Base profile {super_profile.identifier} is not registred on disk."
+            raise ProfileInheritanceError(
+                f"Profile '{super_profile.identifier}' specified for inheritance on "
+                f"profile '{profile.identifier}' cannot be found on disk."
             )
         asdict["inherit"] = super_profile.identifier
 
@@ -202,6 +232,9 @@ def write_profile_to_file(
     """
     Convert the instance to a serialized file on disk.
 
+    Raises:
+        ProfileIdentifierError: if check_valid_id=True and the profile identifier is not unique
+
     Args:
         profile: profile instance to write to disk
         file_path:
@@ -218,7 +251,7 @@ def write_profile_to_file(
             profile_locations=profile_locations,
         )
         if profile_paths and file_path not in profile_paths:
-            raise ValueError(
+            raise ProfileIdentifierError(
                 f"Found multiple profile with identifier '{profile.identifier}'."
             )
 

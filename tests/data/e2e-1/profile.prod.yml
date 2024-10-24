@@ -1,0 +1,8 @@
+__magic__: kloch_profile:3
+identifier: prod
+version: 0.1.0
+inherit: studio
+launchers:
+  .base:
+    environ:
+      PROD_NAME: "myprod"

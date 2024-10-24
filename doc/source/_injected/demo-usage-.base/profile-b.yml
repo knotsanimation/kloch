@@ -3,12 +3,12 @@ identifier: diagnose
 inherit: myStudio
 version: 0.1.0
 launchers:
-  +=.base:
-    +=environ:
+  .base:
+    environ:
       LOG_LEVEL: DEBUG
-  +=system:
+  system:
     command:
       - diagnose
-  +=@python:
+  '@python':
     cwd: $STUDIO_COMMON_TOOLS_PATH
     python_file: ./diagnose.py

@@ -2,8 +2,9 @@ import dataclasses
 import importlib
 import inspect
 import logging
+from typing import Dict
+from typing import Generic
 from typing import List
-from typing import Tuple
 from typing import Type
 from typing import TypeVar
 
@@ -15,44 +16,75 @@ LOGGER = logging.getLogger(__name__)
 T = TypeVar("T")
 
 
+@dataclasses.dataclass
+class LoadedPluginsLaunchers(Generic[T]):
+    launchers: List[T]
+    """
+    List of external plugins that have been loaded
+    """
+
+    missed: Dict[str, str]
+    """
+    Given plugins that couldn't be loaded as mapping of {"module name": "error message"}
+    """
+
+    given: List[str]
+    """
+    Original list of modules name the plugins were extracted from.
+    """
+
+
 def load_plugin_launchers(
     module_names: List[str],
     subclass_type: Type[T],
-) -> Tuple[List[Type[T]], List[str]]:
+) -> LoadedPluginsLaunchers[Type[T]]:
     """
     Retrieve the launcher subclasses from the given module names.
 
-    Will raise if the module names are not existing modules.
-
-    The output of this function is NOT cached.
+    Import error are silenced and stored in the returned object.
 
     Args:
         module_names: list of importable python module names
         subclass_type: base class of the launchers to return
 
     Returns:
-        a tuple of ["list of launchers subclass", "list of empty module name"]
+        An instance of plugins loaded
     """
-    launchers = []
-    missed = []
+    plugins = []
+    missed = {}
 
     for module_name in module_names:
-        LOGGER.debug(f"loading launcher plugin '{module_name}' ...")
-        module = importlib.import_module(module_name)
+        try:
+            module = importlib.import_module(module_name)
+        except (ModuleNotFoundError, ImportError) as error:
+            missed[module_name] = str(error)
+            continue
+
         module_content = inspect.getmembers(module, inspect.isclass)
         module_launchers = [
             obj[1]
             for obj in module_content
             if issubclass(obj[1], subclass_type) and not obj[1] is subclass_type
         ]
-        LOGGER.debug(f"found '{len(module_launchers)}' launchers: {module_launchers}")
         if not module_launchers:
-            missed.append(module_name)
+            missed[module_name] = (
+                f"Module doesn't have any subclass of '{subclass_type}'"
+            )
             continue
 
-        launchers += module_launchers
+        for launcher in module_launchers:
+            if launcher in plugins:
+                LOGGER.warning(
+                    f"Got duplicated plugin '{launcher}' from module '{module_name}': skipping"
+                )
+                continue
+            plugins.append(launcher)
 
-    return launchers, missed
+    return LoadedPluginsLaunchers(
+        launchers=plugins,
+        missed=missed,
+        given=module_names.copy(),
+    )
 
 
 def _assert(condition: bool, message: str):
@@ -60,7 +92,7 @@ def _assert(condition: bool, message: str):
         raise AssertionError(message)
 
 
-def check_launcher_implementation(launcher: Type[BaseLauncher]):
+def _check_launcher_implementation(launcher: Type[BaseLauncher]):
     """
     Raise an AssertionError if the given launcher subclass is not properly implemented.
 
@@ -79,7 +111,7 @@ def check_launcher_implementation(launcher: Type[BaseLauncher]):
     )
 
 
-def check_launcher_serialized_implementation(launcher: Type[BaseLauncherSerialized]):
+def _check_launcher_serialized_implementation(launcher: Type[BaseLauncherSerialized]):
     """
     Raise an AssertionError if the given serialized launcher subclass is not properly implemented.
 
@@ -146,35 +178,48 @@ def check_launcher_serialized_implementation(launcher: Type[BaseLauncherSerializ
         )
 
 
-def check_launcher_plugins(launcher_plugins: List[str]):
+class PluginModuleError(Exception):
+    pass
+
+
+class PluginImplementationError(Exception):
+    pass
+
+
+def check_launcher_plugins(
+    plugins: LoadedPluginsLaunchers[Type[BaseLauncherSerialized]],
+) -> List[Exception]:
     """
-    Raise an exception if any of the launchers extracted from plugin system are invalid.
+    Return any issue/error the given launcher may have.
+
+    This function is not supposed to raise if a launcher is invalid.
 
     Args:
-        launcher_plugins: list of modules name to extract launcher from.
+        plugins: collection of plugin launcher loaded from external modules.
+
+    Returns:
+        list of errors found in given loaded plugins, empty if no errors.
     """
-    launchers, missed = load_plugin_launchers(
-        launcher_plugins,
-        BaseLauncher,
-    )
-    if missed:
-        raise ImportError(
-            f"The following modules did not define a '{BaseLauncher.__name__}' subclass object: {missed}"
-        )
+    errors: List[Exception] = []
+    if plugins.missed:
+        for module, error in plugins.missed.items():
+            error = PluginModuleError(f"Module '{module}' was not loaded: {error}")
+            errors.append(error)
 
-    for launcher in launchers:
-        check_launcher_implementation(launcher)
+    for launcher in plugins.launchers:
+        try:
+            _check_launcher_serialized_implementation(launcher)
+        except AssertionError as error:
+            error = PluginImplementationError(str(error))
+            errors.append(error)
 
-    # serialized classes:
+    launchers = [launcher.source for launcher in plugins.launchers]
 
-    launchers, missed = load_plugin_launchers(
-        launcher_plugins,
-        BaseLauncherSerialized,
-    )
-    if missed:
-        raise ImportError(
-            f"The following modules did not define a '{BaseLauncherSerialized.__name__}' subclass object: {missed}"
-        )
+    try:
+        for launcher in launchers:
+            _check_launcher_implementation(launcher)
+    except AssertionError as error:
+        error = PluginImplementationError(str(error))
+        errors.append(error)
 
-    for launcher in launchers:
-        check_launcher_serialized_implementation(launcher)
+    return errors

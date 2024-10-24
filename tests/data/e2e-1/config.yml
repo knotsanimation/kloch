@@ -1,0 +1,7 @@
+cli_logging_paths: [ "$KLOCHTEST_LOG_PATH" ]
+cli_session_dir: "$KLOCHTEST_SESSION_PATH"
+cli_session_dir_lifetime: 240.0
+launcher_plugins:
+  - "kloch_behr"
+profile_roots:
+  - .

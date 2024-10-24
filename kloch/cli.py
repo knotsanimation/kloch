@@ -15,6 +15,7 @@ from typing import List
 from typing import Optional
 
 import kloch
+from kloch.launchers import get_available_launchers_serialized_classes
 from kloch.launchers import BaseLauncher
 from kloch.launchers import BaseLauncherSerialized
 from kloch.session import SessionDirectory
@@ -103,20 +104,37 @@ class BaseParser:
                 profile_locations=profile_locations,
             )
             if len(profile_paths) >= 2:
-                raise ValueError(
-                    f"Found multiple profile with identifier '{profile_id}' "
-                    f": {profile_paths}."
+                print(
+                    f"ERROR | Found multiple profile with identifier '{profile_id}' "
+                    f": {profile_paths}.",
+                    file=sys.stderr,
                 )
+                sys.exit(1)
 
             if not profile_paths:
-                raise ValueError(f"No profile found with identifier '{profile_id}'.")
+                print(
+                    f"ERROR | No profile found with identifier '{profile_id}'.",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
 
             profile_path = profile_paths[0]
-            LOGGER.debug(f"reading profile {profile_path}")
-            profile = kloch.read_profile_from_file(
-                profile_path,
-                profile_locations=profile_locations,
-            )
+            LOGGER.debug(f"reading profile '{profile_path}'")
+            try:
+                profile = kloch.read_profile_from_file(
+                    profile_path,
+                    profile_locations=profile_locations,
+                )
+            except (
+                kloch.filesyntax.ProfileAPIVersionError,
+                kloch.filesyntax.ProfileInheritanceError,
+            ) as error:
+                print(
+                    f"ERROR | '{error}'.",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+
             profile = profile.get_merged_profile()
             profiles.append(profile)
 
@@ -159,6 +177,16 @@ class RunParser(BaseParser):
 
     def _execute(self, session_dir: SessionDirectory):
         LOGGER.debug(f"session dir at '{session_dir.path}'")
+
+        plugins_names = self._config.launcher_plugins
+        plugins_names_str = (": " + ",".join(plugins_names)) if plugins_names else ""
+        LOGGER.debug(f"loading {len(plugins_names)} plugin modules{plugins_names_str}")
+        launcher_plugins = kloch.launchers.load_plugin_launchers(
+            module_names=plugins_names,
+            subclass_type=BaseLauncherSerialized,
+        )
+        launchers_classes = get_available_launchers_serialized_classes(launcher_plugins)
+
         print(f"loading {len(self.profile_ids)} profiles ...")
         profile = self._get_merged_profile(self.profile_ids)
 
@@ -172,14 +200,16 @@ class RunParser(BaseParser):
         )
 
         launchers_dict = profile.launchers
-        launchers_list = launchers_dict.to_serialized_list()
+        launchers_list = launchers_dict.to_serialized_list(launchers_classes)
         launchers_list = launchers_list.with_base_merged()
         if len(launchers_list) > 1 or self.launcher:
             if not self.launcher:
-                raise ValueError(
-                    f"More than one launcher defined in profile "
-                    f"<{self.profile_ids}>: you need to specify a launcher name with --launcher"
+                print(
+                    f"ERROR | More than one launcher defined in profile "
+                    f"<{self.profile_ids}>: you need to specify a launcher name with --launcher",
+                    file=sys.stderr,
                 )
+                sys.exit(1)
 
             launchers_dict = [
                 _launcher
@@ -187,10 +217,12 @@ class RunParser(BaseParser):
                 if _launcher.name == self.launcher
             ]
             if not launchers_dict:
-                raise ValueError(
-                    f"No launcher with name <{self.launcher}> "
-                    f"found in profile <{self.profile_ids}>"
+                print(
+                    f"ERROR | No launcher with name <{self.launcher}> "
+                    f"found in profile <{self.profile_ids}>",
+                    file=sys.stderr,
                 )
+                sys.exit(1)
 
         launcher_serial: BaseLauncherSerialized = launchers_list[0]
         launcher_serial.validate()
@@ -269,7 +301,7 @@ class ListParser(BaseParser):
             try:
                 profile = kloch.read_profile_from_file(path)
             except Exception as error:
-                print(f"WARNING: {path}: {error}", file=sys.stderr)
+                print(f"WARNING | {path}: {error}", file=sys.stderr)
                 continue
             profiles.append(profile)
 
@@ -317,7 +349,13 @@ class ResolveParser(BaseParser):
 
     def execute(self):
         profile = self._get_merged_profile(self.profile_ids)
-        serialized = kloch.serialize_profile(profile)
+
+        try:
+            serialized = kloch.filesyntax.serialize_profile(profile)
+        except kloch.filesyntax.ProfileInheritanceError as error:
+            print(f"ERROR | {error}", file=sys.stderr)
+            sys.exit(1)
+
         print(serialized)
 
     @classmethod
@@ -391,27 +429,25 @@ class PluginsParser(BaseParser):
         return self._args.launcher_plugins
 
     def execute(self):
-        launcher_plugins = self.launcher_plugins or self._config.launcher_plugins
+        plugins_names = self.launcher_plugins or self._config.launcher_plugins
+        plugins_names_str = (": " + ",".join(plugins_names)) if plugins_names else ""
+        print(f"about to load {len(plugins_names)} plugin modules{plugins_names_str}")
+        launcher_plugins = kloch.launchers.load_plugin_launchers(
+            module_names=plugins_names,
+            subclass_type=BaseLauncherSerialized,
+        )
 
-        print(f"Parsing {len(launcher_plugins)} launcher plugins: {launcher_plugins}")
-        try:
-            kloch.launchers.check_launcher_plugins(launcher_plugins)
-        except Exception as error:
-            print(f"WARNING | invalid plugin implementation: {error}", file=sys.stderr)
+        issues = kloch.launchers.check_launcher_plugins(launcher_plugins)
+        for issue in issues:
+            print(f"WARNING | {issue.__class__.__name__}: {issue}", file=sys.stderr)
 
-        serialized_launchers = [
-            launcher
-            for launcher in kloch.launchers.get_available_launchers_serialized_classes(
-                launcher_plugins=launcher_plugins
-            )
-            if kloch.launchers.is_launcher_plugin(launcher)
-        ]
-        if serialized_launchers:
-            print(f"found {len(serialized_launchers)} launchers:")
-            for launcher in serialized_launchers:
+        launcher_classes = launcher_plugins.launchers
+        if launcher_classes:
+            print(f"found {len(launcher_classes)} launchers:")
+            for launcher in launcher_classes:
                 module_path = inspect.getfile(launcher)
                 print(
-                    f"- {launcher.source.__name__}: {launcher.__name__} ({module_path})"
+                    f"- {launcher.source.__name__}: {launcher.__name__} (from '{module_path}')"
                 )
 
         sys.exit()

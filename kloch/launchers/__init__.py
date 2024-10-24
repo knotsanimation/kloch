@@ -13,11 +13,11 @@ from .python import PythonLauncher
 from .python import PythonLauncherSerialized
 
 from ._plugins import check_launcher_plugins
+from ._plugins import LoadedPluginsLaunchers
+from ._plugins import load_plugin_launchers
 
 from ._get import get_available_launchers_classes
-from ._get import get_launcher_class
 from ._get import get_available_launchers_serialized_classes
-from ._get import get_launcher_serialized_class
 from ._get import is_launcher_plugin
 
 from ._serialized import LauncherSerializedDict

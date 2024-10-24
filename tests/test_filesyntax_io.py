@@ -57,12 +57,12 @@ def test__read_profile_from_id(data_dir):
     assert profile_echoes_beta.inherit is None
 
 
-def test__read_profile_from_file__old(monkeypatch, data_dir):
+def test__read_profile_from_file__old(data_dir):
     profile_paths = kloch.filesyntax.get_profile_file_path(
         "version1", profile_locations=[data_dir]
     )
     assert len(profile_paths) == 1
-    with pytest.raises(SyntaxError):
+    with pytest.raises(kloch.filesyntax.ProfileAPIVersionError):
         kloch.filesyntax.read_profile_from_file(profile_paths[0])
 
 
@@ -106,7 +106,7 @@ def test__write_profile_to_file(data_dir, tmp_path: Path):
     )
     assert profile_src == profile_new
 
-    with pytest.raises(ValueError):
+    with pytest.raises(kloch.filesyntax.ProfileIdentifierError):
         kloch.filesyntax.write_profile_to_file(
             profile_src,
             file_path=profile_new_path,

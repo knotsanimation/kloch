@@ -163,14 +163,9 @@ profile.
          :language: yaml
          :caption: /d/pipeline/profiles/myMovie.yml
 
-We can notice a few points:
-
-- the ``myMovie`` profile now inherits from the ``myStudio`` profile
-  by specifying it in the ``inherit`` key.
-- some keys are prefixed with a ``+=``: this is a token indicating how to merge
-  the 2 hierarchies. Without it ``myMovie`` ``requires`` key would totally
-  override the one in ``myStudio``.
-- we can only inherit one profile at once
+In the above example the ``myMovie`` profile now inherits from the ``myStudio``
+profile by specifying it in the ``inherit`` key (note that we can only inherit
+one profile at once).
 
 If we ``resolve`` the ``myMovie`` profile we can see exactly what the final request
 to rez will be :
@@ -185,12 +180,56 @@ to rez will be :
    :language_output: yaml
 
 As you can see the ``requires`` key contain the ``studio_util`` package defined
-in ``myStudio`` profile.
+in ``myStudio`` profile, same for the ``environ.TOOLS_path`` key that have been
+extended.
+By default when merging two profiles, dict and list are deep merged.
+
+
+merging rules with tokens
+_________________________
+
+It might be possible that when you merge 2 profile you want a bit more control
+over how each content section are merged together. This done via the usage of
+merge-rule tokens.
+
+Tokens are predefined characters that are prefixed to the key of the key/value
+mapping and specify how to merge the *base* profile value with the "over"
+profile value. The following are available:
+
+.. include:: _injected/tokens.rst
 
 .. important::
 
    The token logic can be tricky to understand at first. Make sure to read
    the full documentation in :doc:`file-format` page.
+
+A good use-case to change over the default behavior would be to have some
+debugging content in a "beta" profile, that you may want removed in the
+"production-ready" profile:
+
+.. container:: columns
+
+   .. container:: _column
+
+      .. literalinclude:: _injected/demo-usage-tokens/profile-a.yml
+         :language: yaml
+         :caption: /d/pipeline/profiles/myMovie-beta.yml
+
+   .. container:: _column
+
+      .. literalinclude:: _injected/demo-usage-tokens/profile-b.yml
+         :language: yaml
+         :caption: /d/pipeline/profiles/myMovie.yml
+
+
+.. exec_code::
+   :hide_code:
+   :filename: _injected/demo-usage-tokens/exec-merge.py
+   :language_output: yaml
+
+You will notice that most of the time you won't need any other token than the default
+one. The other tokens are provided for special occasion where you need a
+different behavior.
 
 .base inheritance
 _________________
@@ -245,6 +284,10 @@ to profile during the lifetime of your production/studio.
 
 This is especially important if change made to a profile actually break the
 environment and you need to quickly rollback to its previous state.
+
+Note that the ``version`` key specified at the root of the profile content help
+tracking and communicating changes but despite being enforced by the API to exists,
+is actually not used by the API anywhere (yet).
 
 Advices
 -------

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2024-10-23
+
+### changed
+
+- ! full refacto of the plugin system;
+  - `load_plugin_launchers` is now public
+  - `load_plugin_launchers` return a new `LoadedPluginsLaunchers` object instance
+  - remove `get_launcher_class` and `get_launcher_serialized_class`; not useful anymore
+- improve error handling (less verbose tracebacks)
+
+### chores
+
+- doc: update the Usage page to reflect the change made in previous version
+- doc: fix missing public-api for ``kloch.filesyntax``
+
 ## [0.10.0] - 2024-08-04
 
 ### added

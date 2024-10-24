@@ -1,84 +1,69 @@
 from typing import List
 from typing import Optional
 from typing import Type
+from typing import TypeVar
 from typing import Union
 
 import kloch.launchers
 from kloch.launchers import BaseLauncher
 from kloch.launchers import BaseLauncherSerialized
-from ._plugins import load_plugin_launchers
+from ._plugins import LoadedPluginsLaunchers
+
+
+T = TypeVar("T")
+
+
+def _collect_launchers(
+    natives: List[Type[T]],
+    plugins: Optional[LoadedPluginsLaunchers[Type[T]]] = None,
+) -> List[Type[T]]:
+    """
+    Combine given launchers to flat list of unique objects.
+    """
+    plugins = plugins.launchers if plugins else []
+    launchers = natives + plugins
+    # remove duplicates but preserve order
+    return [
+        launcher
+        for index, launcher in enumerate(launchers)
+        if launcher not in launchers[:index]
+    ]
 
 
 def get_available_launchers_classes(
-    launcher_plugins: List[str] = None,
+    plugins: Optional[LoadedPluginsLaunchers[Type[BaseLauncher]]] = None,
 ) -> List[Type[BaseLauncher]]:
     """
-    Get all list of available launcher classes that are registred.
+    Collect all the launchers classes available.
+
+    This is simply the given plugin launchers + builtin launchers.
 
     Args:
-        launcher_plugins: list of python module names to load plugin launcher from.
+        plugins: collection of launcher loaded from plugins.
     """
-    launcher_plugins = (
-        kloch.get_config().launcher_plugins
-        if launcher_plugins is None
-        else launcher_plugins
-    )
-    plugins, _ = load_plugin_launchers(launcher_plugins, BaseLauncher)
     # noinspection PyProtectedMember
-    launchers = kloch.launchers._BUILTINS_LAUNCHERS.copy() + plugins
-    # remove duplicates
-    return [
-        launcher
-        for index, launcher in enumerate(launchers)
-        if launcher not in launchers[:index]
-    ]
-
-
-def get_launcher_class(name: str) -> Optional[Type[BaseLauncher]]:
-    """
-    Get the launcher class which match the given unique name.
-    """
-    for sub_class in get_available_launchers_classes():
-        if sub_class.name == name:
-            return sub_class
-    return None
+    return _collect_launchers(
+        natives=kloch.launchers._BUILTINS_LAUNCHERS.copy(),
+        plugins=plugins,
+    )
 
 
 def get_available_launchers_serialized_classes(
-    launcher_plugins: List[str] = None,
+    plugins: Optional[LoadedPluginsLaunchers[Type[BaseLauncherSerialized]]] = None,
 ) -> List[Type[BaseLauncherSerialized]]:
     """
-    Get all list of available serialized launcher classes that are registred.
+    Collect all the serialized launchers classes available.
+
+    This is simply the given plugin launchers + builtin launchers.
 
     Args:
-        launcher_plugins: list of python module names to load plugin launcher from.
+        plugins: collection of launcher loaded from plugins
     """
-    launcher_plugins = (
-        kloch.get_config().launcher_plugins
-        if launcher_plugins is None
-        else launcher_plugins
-    )
-    plugins, _ = load_plugin_launchers(launcher_plugins, BaseLauncherSerialized)
     # noinspection PyProtectedMember
-    launchers = kloch.launchers._BUILTINS_LAUNCHERS_SERIALIZED.copy() + plugins
-    # remove duplicates
-    return [
-        launcher
-        for index, launcher in enumerate(launchers)
-        if launcher not in launchers[:index]
-    ]
-
-
-def get_launcher_serialized_class(
-    identifier: str,
-) -> Optional[Type[BaseLauncherSerialized]]:
-    """
-    Get the serialized launcher class which match the given identifier.
-    """
-    for sub_class in get_available_launchers_serialized_classes():
-        if sub_class.identifier == identifier:
-            return sub_class
-    return None
+    return _collect_launchers(
+        natives=kloch.launchers._BUILTINS_LAUNCHERS_SERIALIZED.copy(),
+        plugins=plugins,
+    )
 
 
 # noinspection PyProtectedMember

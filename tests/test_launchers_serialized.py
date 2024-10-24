@@ -21,7 +21,8 @@ def test__LauncherSerializedDict():
             },
         },
     )
-    launchers = launcher_serial.to_serialized_list()
+    launcher_classes = kloch.launchers.get_available_launchers_serialized_classes()
+    launchers = launcher_serial.to_serialized_list(launcher_classes)
     assert len(launchers) == 2
     assert isinstance(launchers[0], kloch.launchers.PythonLauncherSerialized)
     assert launchers[0]["python_file"] == "/foo"

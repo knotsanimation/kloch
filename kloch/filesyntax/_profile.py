@@ -17,10 +17,13 @@ from kloch.launchers import LauncherSerializedDict
 @dataclasses.dataclass
 class EnvironmentProfile:
     """
-    An environment is a collection of parameters required to start a pre-defined launcher.
+    A profile is a collection of parameters required to start a pre-defined launcher.
 
-    Environment can inherit each other by specifying a `inherit` attribute. The inheritance
-    only merge the ``launchers`` attribute of the 2.
+    This can be seen as the context/environment necessary to run a launcher thus its
+    full name 'Environment Profile' that we abbreviate to profile for convenience.
+
+    Profiles can inherit each other by specifying a `inherit` attribute. The inheritance
+    only merge the content of the ``launchers`` attribute between 2 profiles.
     """
 
     identifier: str

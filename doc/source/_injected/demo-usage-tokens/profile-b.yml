@@ -1,0 +1,12 @@
+__magic__: kloch_profile:3
+identifier: myMovie
+inherit: myMovie:beta
+version: 0.1.0
+launchers:
+  config:
+    package_filter:
+      - excludes:
+          - after(1714574770)
+  rezenv:
+    requires:
+      -=debugTools: x
