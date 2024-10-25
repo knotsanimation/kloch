@@ -27,6 +27,11 @@ jobs:
       - name: Install Poetry
         # poetry 1.8.4
         run: pipx install git+https://github.com/python-poetry/poetry.git@6a071c181ad82ec3a5d4ecd54d50d08a75470e78
+      # XXX: TestPyPI expect an unique version for each deploy
+      # so we must create an unique version for each action run.
+      # Note that this doesn't change the version in 'kloch/__init__.py'
+      - name: Update version to be unique per run
+        run: poetry version $(poetry version --short).dev${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
       - name: Configure poetry for TestPyPI
         run: poetry config repositories.test-pypi https://test.pypi.org/legacy/
       - name: Poetry build and publish to TestPyPI
