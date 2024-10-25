@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.11.0] - 2024-10-23
+## [0.11.0] - 2024-10-25
 
 ### added
 
 - `cli.run_cli`, extracted from `__main__`
+- publish to PyPI and TestPyPI
 
 ### changed
 
@@ -24,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - doc: update the Usage page to reflect the change made in previous version
 - doc: fix missing public-api for ``kloch.filesyntax``
+- ci: add ci to publish to TestPyPI and PyPI.
+  - TestPyPI is only triggered on main branch pushes and ready-to-review PRs
+  - PyPI is only triggered on GitHub release
 
 ## [0.10.0] - 2024-08-04
 
