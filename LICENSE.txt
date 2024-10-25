@@ -1,0 +1,7 @@
+This software intentionally doesn't define a License.
+
+Additional information can be acquired through
+https://en.wikipedia.org/wiki/License-free_software
+but whose content doesn't constitute licensing terms in any way.
+
+Please contact <monsieurlixm+kloch@gmail.com> for licensing inquiries.

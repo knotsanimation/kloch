@@ -5,6 +5,7 @@ version = "0.11.0"
 description = "Environment Manager CLI wrapping package managers calls as serialized config file"
 authors = ["Liam Collod <monsieurlixm@gmail.com>"]
 readme = "README.md"
+license = "LICENSE.txt"
 documentation = "https://knotsanimation.github.io/kloch/"
 keywords = ["environment", "kloch", "packaging", "managing"]
 classifiers = [
