@@ -3,6 +3,8 @@ name: Publish Python distribution to TestPyPI
 
 on:
   pull_request:
+    types:
+      - ready_for_review
     paths-ignore:
       - 'doc/**'
       - 'tests/**'
