@@ -37,7 +37,7 @@ jobs:
       - name: Configure poetry for TestPyPI
         run: poetry config repositories.test-pypi https://test.pypi.org/legacy/
       - name: Poetry build and publish to TestPyPI
-        run: poetry publish --build -u __token__ -p ${{ secrets.PYPI_TOKEN }} --repository test-pypi
+        run: poetry publish --build -u __token__ -p ${{ secrets.TESTPYPI_TOKEN }} --repository test-pypi
       # this is only stored for debugging purposes
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
