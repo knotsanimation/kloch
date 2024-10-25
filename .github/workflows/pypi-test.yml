@@ -31,7 +31,7 @@ jobs:
       # so we must create an unique version for each action run.
       # Note that this doesn't change the version in 'kloch/__init__.py'
       - name: Update version to be unique per run
-        run: poetry version $(poetry version --short).dev${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+        run: poetry version $(poetry version --short).dev${{ github.run_id }}${{ github.run_number }}${{ github.run_attempt }}
       - name: Configure poetry for TestPyPI
         run: poetry config repositories.test-pypi https://test.pypi.org/legacy/
       - name: Poetry build and publish to TestPyPI
