@@ -10,6 +10,8 @@ on:
       - 'TODO.md'
   push:
     branches:
+      # this allows to test if everything looks okay before doing a
+      #   git release (which will trigger the definitive pypi publish).
       - main
 
 jobs:
