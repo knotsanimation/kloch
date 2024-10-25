@@ -1,0 +1,37 @@
+name: Publish Python distribution to TestPyPI
+# based on https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'doc/**'
+      - 'tests/**'
+      - 'CHANGELOG.md'
+      - 'TODO.md'
+  push:
+    branches:
+      - main
+
+jobs:
+  publish-to-testpypi:
+    name: Build and publish distribution to TestPyPI
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Poetry
+        # poetry 1.8.4
+        run: pipx install git+https://github.com/python-poetry/poetry.git@6a071c181ad82ec3a5d4ecd54d50d08a75470e78
+      - name: Configure poetry for TestPyPI
+        run: poetry config repositories.test-pypi https://test.pypi.org/legacy/
+      - name: Poetry build and publish to TestPyPI
+        run: poetry publish --build -u __token__ -p ${{ secrets.PYPI_TOKEN }} --repository test-pypi
+      # this is only stored for debugging purposes
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
