@@ -4,6 +4,7 @@ import copy
 import inspect
 import json
 import logging
+import logging.handlers
 import os
 import re
 import runpy
@@ -534,12 +535,12 @@ def _get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def get_cli(argv=None, config: kloch.KlochConfig = None) -> BaseParser:
+def get_cli(argv: Optional[List[str]] = None, config: kloch.KlochConfig = None) -> BaseParser:
     """
     Return the command line interface generated from user arguments provided.
 
     Args:
-        argv: source command line argument to use instea dof the usual sys.argv
+        argv: command line arguments; from sys.argv if not provided
         config: the kloch config instance to use for running the cli
     """
     config = config or kloch.get_config()
@@ -572,3 +573,42 @@ def get_cli(argv=None, config: kloch.KlochConfig = None) -> BaseParser:
         LOGGER.debug(f"removed {len(cleaned)} outdated session dirs")
 
     return instance
+
+
+def run_cli(argv: Optional[List[str]] = None):
+    """
+    Execute the CLI based on the provided user arguments.
+
+    Args:
+        argv: command line arguments; from sys.argv if not provided
+    """
+    config = kloch.get_config()
+    cli = kloch.get_cli(argv, config=config)
+    log_level = logging.DEBUG if cli.debug else config.cli_logging_default_level
+
+    formatter = logging.Formatter(config.cli_logging_format, style="{")
+
+    logging.root.setLevel(logging.DEBUG)
+
+    handler = logging.StreamHandler(stream=sys.stdout)
+    handler.setLevel(log_level)
+    handler.setFormatter(formatter)
+    logging.root.addHandler(handler)
+
+    for log_path in config.cli_logging_paths:
+        log_path.parent.mkdir(exist_ok=True)
+        handler = logging.handlers.RotatingFileHandler(
+            log_path,
+            # keep in sync with config option
+            maxBytes=262144,
+            backupCount=1,
+            encoding="utf-8",
+        )
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(formatter)
+        logging.root.addHandler(handler)
+
+    LOGGER.debug(f"starting {kloch.__name__} v{kloch.__version__}")
+    LOGGER.debug(f"retrieved cli with args={cli._args}")
+
+    sys.exit(cli.execute())

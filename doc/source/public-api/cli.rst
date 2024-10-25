@@ -8,5 +8,7 @@ Command Line Interface
 
 .. autofunction:: kloch.get_cli
 
+.. autofunction:: kloch.run_cli
+
 .. autoclass:: kloch.cli.BaseParser
    :members:

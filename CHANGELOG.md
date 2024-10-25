@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.11.0] - 2024-10-23
 
+### added
+
+- `cli.run_cli`, extracted from `__main__`
+
 ### changed
 
 - ! full refacto of the plugin system;
@@ -14,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `load_plugin_launchers` return a new `LoadedPluginsLaunchers` object instance
   - remove `get_launcher_class` and `get_launcher_serialized_class`; not useful anymore
 - improve error handling (less verbose tracebacks)
+- moved all code in `__main__` to `cli`
 
 ### chores
 

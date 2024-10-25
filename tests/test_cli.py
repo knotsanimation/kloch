@@ -190,3 +190,16 @@ def test__getCli__plugins__arg__launcher_plugin(monkeypatch, data_dir, capsys):
     result = capsys.readouterr()
     assert "found 2" in result.out
     assert str(plugin_path) in result.out
+
+
+def test__run_cli__logging(monkeypatch, tmp_path):
+    log_path = tmp_path / "logs" / "kloch.log"
+    monkeypatch.setenv(kloch.Environ.CONFIG_CLI_LOGGING_PATHS, str(log_path))
+    assert not log_path.exists()
+    with pytest.raises(SystemExit):
+        kloch.cli.run_cli(argv=["list"])
+    assert log_path.exists()
+
+    assert f"starting {kloch.__name__} v{kloch.__version__}" in log_path.read_text(
+        encoding="utf-8"
+    )

@@ -15,6 +15,7 @@ __all__ = [
     "read_profile_from_file",
     "read_profile_from_id",
     "refacto_dict",
+    "run_cli",
     "serialize_profile",
     "write_profile_to_file",
 ]
@@ -36,6 +37,7 @@ from .filesyntax import write_profile_to_file
 from .filesyntax import get_profile_file_path
 from .filesyntax import get_all_profile_file_paths
 from .cli import get_cli
+from .cli import run_cli
 
 # keep in sync with pyproject.toml
 __version__ = "0.11.0"

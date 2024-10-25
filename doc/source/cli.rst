@@ -17,7 +17,12 @@ The CLI can also be started from a python script:
 .. code-block:: python
 
    import kloch
-   kloch.get_cli(["--help"])
+   kloch.run_cli(["--help"])
+
+   # you can also use get_cli to have more control
+   # main difference is logging not being configuring
+   cli = kloch.get_cli(["..."])
+   cli.execute()
 
 Commands
 --------
