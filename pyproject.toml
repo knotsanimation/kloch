@@ -52,6 +52,8 @@ doc = [
     "furo",
 ]
 
+[tool.poetry.scripts]
+kloch = 'kloch.cli:run_cli'
 
 [build-system]
 requires = ["poetry-core"]
