@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ci: add ci to publish to TestPyPI and PyPI.
   - TestPyPI is only triggered on main branch pushes and ready-to-review PRs
   - PyPI is only triggered on GitHub release
+- added CONTRIBUTING.md
 
 ## [0.10.0] - 2024-08-04
 
