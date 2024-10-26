@@ -18,6 +18,12 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
+[tool.poetry.urls]
+# https://peps.python.org/pep-0753/
+"homepage" = "https://github.com/knotsanimation/kloch"
+"issues" = "https://github.com/knotsanimation/kloch/issues"
+"github" = "https://github.com/knotsanimation/kloch"
+"releasenotes" = "https://knotsanimation.github.io/kloch/changelog.html"
 
 [tool.poetry.dependencies]
 python = ">=3.7"
