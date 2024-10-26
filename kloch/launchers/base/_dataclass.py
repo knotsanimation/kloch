@@ -60,6 +60,23 @@ class BaseLauncher:
     A unique name among all subclasses.
     """
 
+    def __str__(self) -> str:
+        fields: List[str] = []
+        for field in dataclasses.fields(self):
+            name = field.name
+            value = getattr(self, name)
+            if name == "environ":
+                asstr = "{...}" if value else "{}"
+            elif name == "command":
+                asstr = "[...]" if value else "[]"
+            else:
+                asstr = str(value)
+
+            fields += [f"{name}={asstr}"]
+
+        fieldsstr = ", ".join(fields)
+        return f"<{self.__class__.__name__} {fieldsstr}>"
+
     def __post_init__(self):
         for field in dataclasses.fields(self):
             if field.name in self.required_fields and getattr(self, field.name) is None:
