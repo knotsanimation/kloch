@@ -19,5 +19,11 @@ jobs:
       - name: Install Poetry
         # poetry 1.8.4
         run: pipx install git+https://github.com/python-poetry/poetry.git@6a071c181ad82ec3a5d4ecd54d50d08a75470e78
-      - name: Poetry build and publish to PyPI
-        run: poetry publish --build
+      - name: Build with Poetry
+        run: poetry build
+      # Poetry publish doesn't work with trusted publisher, use official action
+      # https://github.com/python-poetry/poetry/issues/7940
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1.10
+        with:
+          packages-dir: dist/
