@@ -43,6 +43,15 @@ the [rez](https://rez.readthedocs.io) package manager.
 - flexible "meta" configuration from environment variable or config file.
 - clear public and private API
 
+## quick-start
+
+```shell
+pip install kloch
+kloch --help
+# or:
+python -m kloch --help 
+```
+
 
 ## documentation
 

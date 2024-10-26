@@ -1,21 +1,17 @@
 Install
 =======
 
-`kloch` is a python-based tool with external dependencies.
+`kloch` is a python-based tool with ``PyYaml`` as only dependency.
 
-It uses `poetry <https://python-poetry.org/>`_ to manage its dependencies.
-Those are defined in the ``pyproject.toml`` that can be found
-at the repository's root :
-
-.. literalinclude:: .pyproject.toml
-      :language: toml
-      :caption: pyproject.toml
-
-A quick install could look like:
+It's available on `PyPI <https://pypi.org/project/kloch>`_ and can be installed
+with:
 
 .. code-block:: shell
 
-   git clone https://github.com/knotsanimation/kloch.git
-   cd kloch
-   poetry install
-   poetry run python -m kloch --help
+   pip install kloch
+
+If you use poetry you can also include it in your project as a git dependency
+
+.. code-block:: shell
+
+   poetry add "git+https://github.com/knotsanimation/kloch.git"
