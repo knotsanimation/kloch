@@ -241,8 +241,6 @@ class RunParser(BaseParser):
 
         print(f"starting launcher {launcher.name}")
         LOGGER.debug(f"executing launcher={launcher} with command={command}")
-        LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
-
         sys.exit(launcher.execute(tmpdir=session_dir.path, command=command))
 
     def execute(self):
@@ -544,7 +542,10 @@ def _get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def get_cli(argv: Optional[List[str]] = None, config: kloch.KlochConfig = None) -> BaseParser:
+def get_cli(
+    argv: Optional[List[str]] = None,
+    config: kloch.KlochConfig = None,
+) -> BaseParser:
     """
     Return the command line interface generated from user arguments provided.
 
