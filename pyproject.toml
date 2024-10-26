@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "kloch"
 # keep in sync with __init__.py
-version = "0.11.1"
+version = "0.11.2"
 description = "Environment Manager CLI wrapping package managers calls as serialized config file"
 authors = ["Liam Collod <monsieurlixm@gmail.com>"]
 readme = "README.md"
