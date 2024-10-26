@@ -97,19 +97,7 @@ A merge token:
 
 The following merge tokens are available:
 
-+--------------------+-----------------------------------------------------------------+
-| token              | description                                                     |
-+====================+=================================================================+
-| ``+=``             | indicate the key's value should be appended to the base's value |
-+--------------------+-----------------------------------------------------------------+
-| ``-=``             | indicate the base's key should be removed if it exist           |
-+--------------------+-----------------------------------------------------------------+
-| ``==``             | indicate the base's value should be overriden                   |
-+--------------------+-----------------------------------------------------------------+
-| ``!=``             | add the key and value only if the key doesn't exist in base     |
-+--------------------+-----------------------------------------------------------------+
-| `unset`            | no token is similar to += (append)                              |
-+--------------------+-----------------------------------------------------------------+
+.. include:: _injected/tokens.rst
 
 Here is an example making use of all of the tokens and the python API used to merge:
 

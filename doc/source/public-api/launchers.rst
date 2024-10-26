@@ -10,15 +10,13 @@ Getters
 
 .. autofunction:: kloch.launchers.get_available_launchers_classes
 
-.. autofunction:: kloch.launchers.get_launcher_class
-
 .. autofunction:: kloch.launchers.get_available_launchers_serialized_classes
-
-.. autofunction:: kloch.launchers.get_launcher_serialized_class
 
 
 Plugins
 -------
+
+.. autoclass:: kloch.launchers.LoadedPluginsLaunchers
 
 .. autofunction:: kloch.launchers.check_launcher_plugins
 

@@ -1,0 +1,10 @@
+__magic__: kloch_profile:3
+identifier: myMovie:beta
+version: 0.1.0
+launchers:
+  rezenv:
+    requires:
+      maya: 2023
+      houdini: 20.2
+      debugTools: 2.1+
+

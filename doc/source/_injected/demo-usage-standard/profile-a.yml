@@ -7,3 +7,6 @@ launchers:
       default_shell: powershell
     requires:
       studio_util: 1+
+    environ:
+      TOOLS_PATH:
+        - /d/pipeline/studio/tools

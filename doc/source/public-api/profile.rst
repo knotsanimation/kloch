@@ -6,5 +6,6 @@ Profile
    import kloch
    import kloch.filesyntax
 
-.. autoclass:: kloch.EnvironmentProfile
-    :members:
+.. automodule:: kloch.filesyntax
+   :members:
+   :undoc-members:

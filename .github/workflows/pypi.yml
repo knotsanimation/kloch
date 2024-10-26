@@ -1,0 +1,23 @@
+name: Publish Python distribution to PyPI
+# based on https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  publish-to-pypi:
+    name: Build and publish distribution to PyPI
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Poetry
+        # poetry 1.8.4
+        run: pipx install git+https://github.com/python-poetry/poetry.git@6a071c181ad82ec3a5d4ecd54d50d08a75470e78
+      - name: Poetry build and publish to PyPI
+        run: poetry publish --build

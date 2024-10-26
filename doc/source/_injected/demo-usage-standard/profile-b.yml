@@ -3,9 +3,11 @@ identifier: myMovie
 inherit: myStudio
 version: 0.1.0
 launchers:
-  +=rezenv:
-    +=requires:
+  rezenv:
+    requires:
       maya: 2023
       houdini: 20.2
     environ:
       PROD_NAME: myMovie
+      TOOLS_PATH:
+        - /d/pipeline/myMovie/tools

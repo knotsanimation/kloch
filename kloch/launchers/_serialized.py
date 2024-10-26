@@ -1,9 +1,9 @@
 import copy
 from typing import Dict
 from typing import List
+from typing import Type
 
 from kloch import MergeableDict
-from kloch.launchers import get_launcher_serialized_class
 from kloch.launchers import BaseLauncherSerialized
 
 
@@ -55,20 +55,34 @@ class LauncherSerializedDict(MergeableDict):
     See :any:`MergeableDict` for the full documentation on tokens.
     """
 
-    def to_serialized_list(self) -> LauncherSerializedList:
+    def to_serialized_list(
+        self,
+        launcher_classes: List[Type[BaseLauncherSerialized]],
+    ) -> LauncherSerializedList:
         """
         Convert the dict structure to a list of :any:`BaseLauncherSerialized` instances.
+
+        Args:
+            launcher_classes:
+                list of launchers classes that can be possibly stored in this serialized dict.
+
+        Raises:
+            ValueError: If a launcher is serialized in this instance but is unknown.
 
         Returns:
             deepcopied dict structure as list of instances.
         """
+        _launcher_classes = {
+            launcher.identifier: launcher for launcher in launcher_classes
+        }
         launchers = []
         for identifier, launcher_config in self.items():
             _identifier = self.resolve_key_tokens(identifier)
-            launcher_class = get_launcher_serialized_class(_identifier)
+            launcher_class = _launcher_classes.get(_identifier)
             if not launcher_class:
                 raise ValueError(
-                    f"No Serialized Launcher with identifier '{_identifier}' found."
+                    f"No serialized-launcher with identifier '{_identifier}' found."
+                    f"Available launchers are '{', '.join(_launcher_classes.keys())}'"
                 )
             launcher = launcher_class(copy.deepcopy(launcher_config))
             launchers.append(launcher)
