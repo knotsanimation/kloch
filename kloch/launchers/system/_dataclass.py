@@ -26,7 +26,7 @@ class SystemLauncher(BaseLauncher):
         _command = self.command + (command or [])
 
         LOGGER.debug(
-            f"executing system command={_command}; environ={self.environ}; cwd={self.cwd}"
+            f"subprocess.run({_command}, shell=True, env={self.environ}, cwd={self.cwd})"
         )
         result = subprocess.run(_command, shell=True, env=self.environ, cwd=self.cwd)
 
