@@ -4,6 +4,9 @@ name: testpypi publish
 on:
   pull_request:
     types:
+      - opened
+      - reopened
+      - synchronize  # (when you commit/push to)
       - ready_for_review
     paths-ignore:
       - 'doc/**'
@@ -20,6 +23,9 @@ jobs:
   publish-to-testpypi:
     name: Build and publish distribution to TestPyPI
     runs-on: ubuntu-latest
+
+    # only runs on PR that are ready-for-review
+    if: ${{ !github.event.pull_request.draft }}
 
     outputs:
       published_version: ${{steps.getversion.outputs.version}}
