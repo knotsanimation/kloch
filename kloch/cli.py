@@ -210,20 +210,20 @@ class RunParser(BaseParser):
                     f"<{self.profile_ids}>: you need to specify a launcher name with --launcher",
                     file=sys.stderr,
                 )
-                sys.exit(1)
+                sys.exit(111)
 
-            launchers_dict = [
+            launchers_list = [
                 _launcher
                 for _launcher in launchers_list
-                if _launcher.name == self.launcher
+                if _launcher.identifier == self.launcher
             ]
-            if not launchers_dict:
+            if not launchers_list:
                 print(
                     f"ERROR | No launcher with name <{self.launcher}> "
                     f"found in profile <{self.profile_ids}>",
                     file=sys.stderr,
                 )
-                sys.exit(1)
+                sys.exit(112)
 
         launcher_serial: BaseLauncherSerialized = launchers_list[0]
         launcher_serial.validate()

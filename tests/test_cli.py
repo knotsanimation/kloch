@@ -124,6 +124,33 @@ def test__getCli__run__command(monkeypatch, data_dir):
     assert Results.env["HEH"] == "(╯°□°）╯︵ ┻━┻)"
 
 
+def test__getCli__run__mult_launcher__error(monkeypatch, data_dir, capsys):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+
+    argv = ["run", "mult-launchers"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="111"):
+        cli.execute()
+
+    argv = ["run", "mult-launchers", "--launcher", "BABABOEI!!"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="112"):
+        cli.execute()
+
+
+def test__getCli__run__mult_launcher(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "mult-launchers", "--launcher", "@python"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="0"):
+        cli.execute()
+
+    result = capfd.readouterr()
+    assert f"test script working" in result.out
+
+
 def test__getCli__python(data_dir, capsys):
     argv = ["python", str(data_dir / "test-script-a.py"), "some args ?", "test !"]
     cli = kloch.get_cli(argv=argv)
