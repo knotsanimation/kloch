@@ -226,7 +226,16 @@ class RunParser(BaseParser):
                 sys.exit(112)
 
         launcher_serial: BaseLauncherSerialized = launchers_list[0]
-        launcher_serial.validate()
+        try:
+            launcher_serial.validate()
+        except AssertionError as error:
+            print(
+                f"ERROR | Cannot validate launcher '{launcher_serial.identifier}' from profile '{profile.identifier}': "
+                f"{error}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
         launcher: BaseLauncher = launcher_serial.unserialize()
         command = self.command or None
 
