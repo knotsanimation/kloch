@@ -4,6 +4,7 @@ Collection of various ideas to improve kloch.
 
 ## features
 
+- [ ] allow to create "on-the-fly" profile directly from the command line
 - [ ] allow to specify an absolute path to a profile instead of identifier
 - [ ] allow multiples arg in `inherit`
 - [ ] do something with the version attribute ? allow duplicate identifier in path, but with different version ?
