@@ -116,3 +116,41 @@ def test_e2e_case2(data_dir, monkeypatch, tmp_path):
     result = subprocess.run(command, cwd=cwd_dir, env=environ)
     assert not result.returncode
     assert not list(cwd_dir.glob("*"))
+
+
+def test_e2e_case3(data_dir, monkeypatch, tmp_path, capfd):
+    """
+    Use environ to define kloch config and test profile prodml
+    """
+    test_data_dir = data_dir / "e2e-1"
+    plugin_path = data_dir / "plugins-behr"
+    cwd_dir = tmp_path / "cwd"
+    cwd_dir.mkdir()
+    session_dir = tmp_path / "session"
+
+    environ = os.environ.copy()
+    pythonpath = os.environ.get("PYTHONPATH")
+    if pythonpath:
+        environ["PYTHONPATH"] = f"{pythonpath}{os.pathsep}{plugin_path}"
+    else:
+        environ["PYTHONPATH"] = f"{plugin_path}"
+    environ[kloch.Environ.CONFIG_PROFILE_ROOTS] = str(test_data_dir)
+    environ[kloch.Environ.CONFIG_LAUNCHER_PLUGINS] = "kloch_behr"
+    environ[kloch.Environ.CONFIG_CLI_SESSION_PATH] = str(session_dir)
+
+    command = [
+        sys.executable,
+        "-m",
+        "kloch",
+        "run",
+        "prodml",
+        "--debug",
+        "--launcher",
+        "system",
+        "--",
+        "test_e2e_case3",
+    ]
+    result = subprocess.run(command, cwd=cwd_dir, env=environ)
+    assert not result.returncode
+    captured = capfd.readouterr()
+    assert '"hello from" test_e2e_case3' in captured.out
