@@ -9,3 +9,6 @@ launchers:
     command:
       - paint.exe
       - new
+    subprocess_kwargs:
+      shell: True
+      timeout: 2

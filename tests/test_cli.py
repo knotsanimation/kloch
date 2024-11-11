@@ -131,7 +131,7 @@ def test__getCli__run__system_test__command(monkeypatch, data_dir):
         command: List[str] = None
         env: Dict[str, str] = None
 
-    def patched_subprocess(command, shell, env, *args, **kwargs):
+    def patched_subprocess(command, env, *args, **kwargs):
         Results.command = command
         Results.env = env
         return subprocess.CompletedProcess(command, 0)

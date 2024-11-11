@@ -10,7 +10,15 @@ LOGGER = logging.getLogger(__name__)
 
 @dataclasses.dataclass(frozen=True)
 class SystemLauncherFields(BaseLauncherFields):
-    pass
+    subprocess_kwargs: dict = dataclasses.field(
+        default="subprocess_kwargs",
+        metadata={
+            "description": (
+                "Mapping of kwargs to pass to the internal ``subprocess.run`` call."
+            ),
+            "required": False,
+        },
+    )
 
 
 class SystemLauncherSerialized(BaseLauncherSerialized):
@@ -29,6 +37,11 @@ class SystemLauncherSerialized(BaseLauncherSerialized):
     )
 
     def validate(self):
+        subprocesskw = self.fields.subprocess_kwargs
+        if subprocesskw in self:
+            assert isinstance(
+                self[subprocesskw], dict
+            ), f"'{subprocesskw}': must be a dict."
         super().validate()
 
     # we override for type-hint
