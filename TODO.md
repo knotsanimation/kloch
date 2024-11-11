@@ -13,7 +13,6 @@ Collection of various ideas to improve kloch.
 ## features
 
 - [ ] 🔴 allow to create "on-the-fly" profile directly from the command line
-- [ ] 🔴 allow to specify an absolute path to a profile instead of identifier
 - [ ] 🟠 allow multiples arg in `inherit`
 - [ ] 🟠 do something with the version attribute ? allow duplicate identifier in path, but with different version ?
 - [ ] 🟡 private profiles ? with a dot prefix signifying they can only be inherited and not used directly ?
@@ -23,6 +22,7 @@ Collection of various ideas to improve kloch.
   - [ ] environment variable resolving ?
 - [ ] 🟡 allow `python_file` to be an url to a python file to download
 - [ ] 🟠 introduce operating system functions ? like maybe tokens or if conditions ?
+- [x] ~~🔴 allow to specify an absolute path to a profile instead of identifier~~
 - [x] ~~log on disk ?~~
 - [x] ~~validation of keys/value on profile read~~
 - [x] ~~add a "python/pip/poetry" package manager ?~~ (implemented as launcher with kiche)

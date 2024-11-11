@@ -100,10 +100,15 @@ class BaseParser:
 
         profiles = []
         for profile_id in profile_identifiers:
-            profile_paths = kloch.get_profile_file_path(
-                profile_id,
-                profile_locations=profile_locations,
-            )
+
+            aspath = Path(profile_id)
+            if aspath.exists():
+                profile_paths = [aspath]
+            else:
+                profile_paths = kloch.get_profile_file_path(
+                    profile_id,
+                    profile_locations=profile_locations,
+                )
             if len(profile_paths) >= 2:
                 print(
                     f"ERROR | Found multiple profile with identifier '{profile_id}' "
@@ -164,7 +169,8 @@ class RunParser(BaseParser):
     @property
     def profile_ids(self) -> List[str]:
         """
-        One or more identifier of existing environment profile(s).
+        One or more identifier or file paths of existing environment profile(s).
+
         The profiles are concatenated together from left to right.
         """
         return self._args.profile_ids
@@ -239,8 +245,8 @@ class RunParser(BaseParser):
         launcher: BaseLauncher = launcher_serial.unserialize()
         command = self.command or None
 
-        print(f"starting launcher {launcher.name}")
         LOGGER.debug(f"executing launcher={launcher} with command={command}")
+        print(f"starting launcher {launcher.name}")
         sys.exit(launcher.execute(tmpdir=session_dir.path, command=command))
 
     def execute(self):
@@ -350,7 +356,8 @@ class ResolveParser(BaseParser):
     @property
     def profile_ids(self) -> List[str]:
         """
-        One or more identifier of existing environment profile(s).
+        One or more identifier or file paths of existing environment profile(s).
+
         The profiles are concatenated together from left to right.
         """
         return self._args.profile_ids

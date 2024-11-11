@@ -93,7 +93,8 @@ imply we will be using ``kloch`` as a `Command Line Interface` tool [2]_.
    :hide_code:
    :filename: _injected/demo-usage-basics/exec-list.py
 
-All good, which mean we can use our profile using the ``run`` command:
+All good, which mean we can use our profile using the ``run`` command and
+by giving it the **identifier** of the desire profile to launch:
 
 .. tip::
 
@@ -102,6 +103,15 @@ All good, which mean we can use our profile using the ``run`` command:
 .. code-block:: shell
 
    python -m kloch run myMovie
+
+Instead of providing the profile identifier, you can also provide a path
+to an existing profile file, that may not even be registred in a profile
+root !
+
+.. code-block:: shell
+
+   python -m kloch run /d/pipeline/profiles/basic-profile.yml
+
 
 Which in our case should start a rez interactive shell.
 

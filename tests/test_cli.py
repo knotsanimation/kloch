@@ -74,7 +74,7 @@ def test__getCli__list__profile_paths(data_dir, capsys):
     assert int(profile_capture.group(1)) >= 1
 
 
-def test__getCli__run(monkeypatch, data_dir):
+def test__getCli__run__lxm(monkeypatch, data_dir):
     import subprocess
 
     class Results:
@@ -99,7 +99,32 @@ def test__getCli__run(monkeypatch, data_dir):
     assert Results.env.get("LXMCUSTOM") == "1"
 
 
-def test__getCli__run__command(monkeypatch, data_dir):
+def test__getCli__run__lxm__aspath(monkeypatch, data_dir):
+    import subprocess
+
+    def patched_subprocess(command, env, *args, **kwargs):
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(subprocess, "run", patched_subprocess)
+
+    profile_path = data_dir / "profile.lxm.yml"
+
+    argv = ["run", str(profile_path)]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit) as error:
+        cli.execute()
+    assert not error.value.code
+
+    profile_path = data_dir / "profile.YEEEEEEHAWWW.yml"
+
+    argv = ["run", str(profile_path)]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit) as error:
+        cli.execute()
+    assert error.value.code == 1
+
+
+def test__getCli__run__system_test__command(monkeypatch, data_dir):
     import subprocess
 
     class Results:

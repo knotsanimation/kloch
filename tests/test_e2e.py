@@ -22,7 +22,7 @@ def test_e2e_case1(data_dir, monkeypatch, tmp_path):
     session_dir = tmp_path / "session"
 
     environ = os.environ.copy()
-    pythonpath = os.environ.get('PYTHONPATH')
+    pythonpath = os.environ.get("PYTHONPATH")
     if pythonpath:
         environ["PYTHONPATH"] = f"{pythonpath}{os.pathsep}{plugin_path}"
     else:
@@ -56,6 +56,21 @@ def test_e2e_case1(data_dir, monkeypatch, tmp_path):
     assert not result.returncode
     assert not list(cwd_dir.glob("*"))
 
+    profile_path = test_data_dir / "profile.prod.yml"
+
+    command = [
+        sys.executable,
+        "-m",
+        "kloch",
+        "run",
+        str(profile_path),
+        "--debug",
+        "--",
+        "testcommand",
+    ]
+    result = subprocess.run(command, cwd=cwd_dir, env=environ)
+    assert not result.returncode
+
 
 def test_e2e_case2(data_dir, monkeypatch, tmp_path):
     """
@@ -68,7 +83,7 @@ def test_e2e_case2(data_dir, monkeypatch, tmp_path):
     session_dir = tmp_path / "session"
 
     environ = os.environ.copy()
-    pythonpath = os.environ.get('PYTHONPATH')
+    pythonpath = os.environ.get("PYTHONPATH")
     if pythonpath:
         environ["PYTHONPATH"] = f"{pythonpath}{os.pathsep}{plugin_path}"
     else:
