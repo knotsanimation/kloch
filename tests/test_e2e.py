@@ -118,7 +118,7 @@ def test_e2e_case2(data_dir, monkeypatch, tmp_path):
     assert not list(cwd_dir.glob("*"))
 
 
-def test_e2e_case3(data_dir, monkeypatch, tmp_path, capfd):
+def test_e2e_case3(data_dir, monkeypatch, tmp_path):
     """
     Use environ to define kloch config and test profile prodml
     """
@@ -150,7 +150,13 @@ def test_e2e_case3(data_dir, monkeypatch, tmp_path, capfd):
         "--",
         "test_e2e_case3",
     ]
-    result = subprocess.run(command, cwd=cwd_dir, env=environ)
+    result = subprocess.run(
+        command,
+        cwd=cwd_dir,
+        env=environ,
+        capture_output=True,
+        text=True,
+    )
+    print(result.stdout)
     assert not result.returncode
-    captured = capfd.readouterr()
-    assert '"hello from" test_e2e_case3' in captured.out
+    assert '"hello from" test_e2e_case3' in result.stdout
