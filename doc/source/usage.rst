@@ -274,7 +274,7 @@ Which once merged internally by kloch will produce a ``launchers`` structure lik
    :language_output: yaml
 
 As you can view, we inherit the ``environ`` keys that were defined in the
-``.base`` launcher (that is deleted) for both ``system`` and ``@python`` launchers.
+``.base`` launcher (that is deleted) for both ``system`` and ``#python`` launchers.
 
 It is also good to notice that we define environment variable that re-use previously
 defined environment variable, at profile level or system level (``$PATH``).

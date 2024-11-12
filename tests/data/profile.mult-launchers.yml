@@ -5,7 +5,7 @@ launchers:
   .base:
     environ:
       AYYYYY: "⭐"
-  '@python':
+  '#python':
     python_file: test-script-a.py
     environ:
       LXMCUSTOM: 1
