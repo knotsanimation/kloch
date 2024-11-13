@@ -280,6 +280,22 @@ It is also good to notice that we define environment variable that re-use previo
 defined environment variable, at profile level or system level (``$PATH``).
 
 
+supporting different os
+_______________________
+
+You can create conditional behavior in your profile by using `Context tokens`
+(explained in :doc:`file-format`).
+
+This token allow you to restrict the "visibility" of a launcher only when
+the system reading the profile reach some conditions. The most common one
+being which operating system it is currently running on.
+
+.. literalinclude:: _injected/demo-usage-tokens/profile-c.yml
+  :language: YAML
+
+In the above example we use the builtin system launcher to run a different
+command depending on the operating system.
+
 Storing profiles
 ________________
 

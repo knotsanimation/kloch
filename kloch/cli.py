@@ -16,6 +16,7 @@ from typing import List
 from typing import Optional
 
 import kloch
+from kloch.launchers import LauncherContext
 from kloch.launchers import get_available_launchers_serialized_classes
 from kloch.launchers import BaseLauncher
 from kloch.launchers import BaseLauncherSerialized
@@ -92,7 +93,11 @@ class BaseParser:
         )
         parser.set_defaults(func=cls)
 
-    def _get_merged_profile(self, profile_identifiers: List[str]):
+    def _get_merged_profile(
+        self,
+        profile_identifiers: List[str],
+        context: LauncherContext,
+    ):
         """
         Merge each profile with its base then merge all of them from left to right.
         """
@@ -149,6 +154,10 @@ class BaseParser:
             profile.inherit = base_profile
             profile = profile.get_merged_profile()
 
+        LOGGER.debug(f"filtering profile using context {context}")
+        profile.launchers = profile.launchers.get_filtered_context(context)
+        profile.launchers = profile.launchers.with_context_resolved()
+
         return profile
 
 
@@ -194,8 +203,9 @@ class RunParser(BaseParser):
         )
         launchers_classes = get_available_launchers_serialized_classes(launcher_plugins)
 
+        context = LauncherContext.create_from_system()
         print(f"loading {len(self.profile_ids)} profiles ...")
-        profile = self._get_merged_profile(self.profile_ids)
+        profile = self._get_merged_profile(self.profile_ids, context)
 
         # keep a backup of the merged profile for debugging
         LOGGER.debug(f"writing merged profile to '{session_dir.profile_path}'")
