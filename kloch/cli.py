@@ -40,7 +40,7 @@ class BaseParser:
         self,
         args: argparse.Namespace,
         config: kloch.KlochConfig,
-        original_argv: list[str],
+        original_argv: List[str],
     ):
         self._args: argparse.Namespace = args
         self._config = config

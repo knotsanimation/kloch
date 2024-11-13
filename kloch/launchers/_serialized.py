@@ -79,7 +79,7 @@ class LauncherSerializedDict(MergeableDict):
         """
         Merge all the same launchers with different contexts to a single launcher.
         """
-        toconcatenate: list[LauncherSerializedDict] = []
+        toconcatenate: List[LauncherSerializedDict] = []
         for launcher_identifier in self.keys():
             resolved = resolve_context_expression(launcher_identifier)
             newdict = LauncherSerializedDict(
