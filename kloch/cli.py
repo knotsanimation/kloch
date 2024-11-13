@@ -2,10 +2,8 @@ import abc
 import argparse
 import copy
 import inspect
-import json
 import logging
 import logging.handlers
-import os
 import re
 import runpy
 import sys
@@ -14,6 +12,7 @@ import textwrap
 from pathlib import Path
 from typing import List
 from typing import Optional
+from typing import Type
 
 import kloch
 from kloch.launchers import LauncherContext
@@ -37,9 +36,15 @@ class BaseParser:
         args: user command line argument already parsed by argparse
     """
 
-    def __init__(self, args: argparse.Namespace, config: kloch.KlochConfig):
+    def __init__(
+        self,
+        args: argparse.Namespace,
+        config: kloch.KlochConfig,
+        original_argv: list[str],
+    ):
         self._args: argparse.Namespace = args
         self._config = config
+        self._argv = original_argv
 
     @property
     def debug(self) -> bool:
@@ -214,6 +219,10 @@ class RunParser(BaseParser):
             file_path=session_dir.profile_path,
             profile_locations=self.profile_roots,
             check_valid_id=False,
+            extra_comments=[
+                f"auto-generated profile from argv '{' '.join(self._argv)}'",
+                f"context was '{context}'",
+            ],
         )
 
         launchers_dict = profile.launchers
@@ -373,7 +382,8 @@ class ResolveParser(BaseParser):
         return self._args.profile_ids
 
     def execute(self):
-        profile = self._get_merged_profile(self.profile_ids)
+        context = LauncherContext.create_from_system()
+        profile = self._get_merged_profile(self.profile_ids, context)
 
         try:
             serialized = kloch.filesyntax.serialize_profile(profile)
@@ -589,7 +599,8 @@ def get_cli(
 
     args = parser.parse_args(argv)
     setattr(args, _ARGS_USER_COMMAND_DEST, user_command)
-    instance: BaseParser = args.func(args, config)
+    parser_class: Type[BaseParser] = args.func
+    instance: BaseParser = parser_class(args, config, argv)
 
     # clean old sessions everytime the cli is launched
     if instance.session_root and instance.session_root.exists():

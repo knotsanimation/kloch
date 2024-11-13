@@ -228,6 +228,7 @@ def write_profile_to_file(
     file_path: Path,
     profile_locations: Optional[List[Path]] = None,
     check_valid_id: bool = True,
+    extra_comments: List[str] = None,
 ) -> Path:
     """
     Convert the instance to a serialized file on disk.
@@ -244,6 +245,7 @@ def write_profile_to_file(
             if True, ensure the identifier of the profile is unique among all ``profile_locations``
         profile_locations:
             list of filesystem path to potential existing directories containing profiles.
+        extra_comments: optional lines of comments to put in the yaml header
     """
     if check_valid_id:
         profile_paths = get_profile_file_path(
@@ -256,6 +258,10 @@ def write_profile_to_file(
             )
 
     serialized = serialize_profile(profile, profile_locations=profile_locations)
+
+    extra_comments = extra_comments or []
+    extra_comments = "# " + "\n# ".join(extra_comments)
+    serialized = extra_comments + "\n" + serialized
 
     file_path.write_text(serialized)
     return file_path
