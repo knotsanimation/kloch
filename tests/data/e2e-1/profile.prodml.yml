@@ -9,7 +9,8 @@ launchers:
   system:
     command:
       - echo
-      - hello from
+      - hello
+      - from
   system@os=windows:
     subprocess_kwargs:
       shell: True

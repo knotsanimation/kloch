@@ -160,4 +160,4 @@ def test_e2e_case3(data_dir, monkeypatch, tmp_path):
     print(result.stdout)
     print(result.stderr, file=sys.stderr)
     assert not result.returncode
-    assert '"hello from" test_e2e_case3' in result.stdout
+    assert result.stdout.strip("\n").endswith("hello from test_e2e_case3")
