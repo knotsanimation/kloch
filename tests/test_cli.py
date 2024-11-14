@@ -167,7 +167,7 @@ def test__getCli__run__mult_launcher(monkeypatch, data_dir, capfd):
     monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
     # needed to resolve 'python_file: test-script-a.py' in profile
     monkeypatch.chdir(data_dir)
-    argv = ["run", "mult-launchers", "--launcher", "#python"]
+    argv = ["run", "mult-launchers", "--launcher", ".python"]
     cli = kloch.get_cli(argv=argv)
     with pytest.raises(SystemExit, match="0"):
         cli.execute()

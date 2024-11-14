@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 def test__LauncherSerializedDict():
     launcher_serial = LauncherSerializedDict(
         {
-            "+=#python": {
+            "+=.python": {
                 "python_file": "/foo",
             },
             ".base": {

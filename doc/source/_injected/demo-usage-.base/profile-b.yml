@@ -9,6 +9,6 @@ launchers:
   system:
     command:
       - diagnose
-  '#python':
+  .python:
     cwd: $STUDIO_COMMON_TOOLS_PATH
     python_file: ./diagnose.py

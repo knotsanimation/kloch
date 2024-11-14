@@ -25,7 +25,7 @@ class PythonLauncher(BaseLauncher):
 
     required_fields = ["python_file"]
 
-    name = "#python"
+    name = ".python"
 
     def execute(self, tmpdir: Path, command: Optional[List[str]] = None):
         """
