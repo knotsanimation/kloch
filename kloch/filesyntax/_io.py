@@ -14,7 +14,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 KENV_PROFILE_MAGIC = "kloch_profile"
-KENV_PROFILE_VERSION = 3
+KENV_PROFILE_VERSION = 4
 
 
 class ProfileAPIVersionError(Exception):
