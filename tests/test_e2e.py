@@ -146,7 +146,7 @@ def test_e2e_case3(data_dir, monkeypatch, tmp_path):
         "prodml",
         "--debug",
         "--launcher",
-        "system",
+        ".system",
         "--",
         "test_e2e_case3",
     ]

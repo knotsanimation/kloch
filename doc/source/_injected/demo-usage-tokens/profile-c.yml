@@ -5,7 +5,7 @@ launchers:
   .base:
     environ:
       BASE_GREETING: "hello"
-  system@os=windows:
+  .system@os=windows:
     command: powershell -c "echo $Env:BASE_GREETING there 👋"
-  system@os=linux:
+  .system@os=linux:
     command: sh -c "echo $BASE_GREETING there 👋"

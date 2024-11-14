@@ -142,7 +142,7 @@ Context tokens are then used with the following logic:
 
 - when reading a profile, a context is created from the current system.
 - this context is used to **filter out** launcher which doesn't match it.
-   - example: ``system@os=linux: ...`` will be deleted if the current os = windows.
+   - example: ``.system@os=linux: ...`` will be deleted if the current os = windows.
 - the remaining launchers which points to the same launcher are then merged
   from top to bottom using the same Merge Tokens logic, thus leaving only
   a launcher name with no context token at the end.
@@ -154,7 +154,7 @@ Example:
 
 In the above example we use the builtin system launcher to run a different
 command depending on the operating system. Make note that if the os is ``mac``
-then this mean the ``system`` launcher will just not exist at all in the profile !
+then this mean the ``.system`` launcher will just not exist at all in the profile !
 
 Launchers
 ---------

@@ -6,11 +6,11 @@ launchers:
   .base:
     environ:
       PROD_NAME: "myprod"
-  system:
+  .system:
     command:
       - echo
       - hello
       - from
-  system@os=windows:
+  .system@os=windows:
     subprocess_kwargs:
       shell: True

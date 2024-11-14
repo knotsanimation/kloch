@@ -6,7 +6,7 @@ launchers:
   .base:
     environ:
       LOG_LEVEL: DEBUG
-  system:
+  .system:
     command:
       - diagnose
   .python:

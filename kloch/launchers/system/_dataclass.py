@@ -17,7 +17,7 @@ class SystemLauncher(BaseLauncher):
     A minimal launcher that just start a subprocess with the given command.
     """
 
-    name = "system"
+    name = ".system"
 
     subprocess_kwargs: dict = dataclasses.field(default_factory=dict)
     """

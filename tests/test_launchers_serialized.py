@@ -35,10 +35,10 @@ def test__LauncherSerializedDict():
 def test__LauncherSerializedDict__filter():
     launcher_serial = LauncherSerializedDict(
         {
-            "system@os=windows": {
+            ".system@os=windows": {
                 "command": "powershell script.ps1",
             },
-            "system@os=linux": {
+            ".system@os=linux": {
                 "command": "bash script.sh",
             },
             ".base": {
@@ -52,9 +52,9 @@ def test__LauncherSerializedDict__filter():
     context = LauncherContext(platform=LauncherPlatform.windows)
     result = launcher_serial.get_filtered_context(context)
     assert result is not launcher_serial
-    assert "system@os=linux" in launcher_serial
-    assert "system@os=linux" not in result
-    assert "system@os=windows" in result
+    assert ".system@os=linux" in launcher_serial
+    assert ".system@os=linux" not in result
+    assert ".system@os=windows" in result
     assert ".base" in result
 
     launcher_serial = LauncherSerializedDict(
@@ -79,10 +79,10 @@ def test__LauncherSerializedDict__filter():
 def test__LauncherSerializedDict__with_context_resolved():
     launcher_serial = LauncherSerializedDict(
         {
-            "system@os=windows": {
+            ".system@os=windows": {
                 "command": "powershell script.ps1",
             },
-            "system@os=linux": {
+            ".system@os=linux": {
                 "!=command": "bash script.sh",
             },
             ".base@user=tester": {
@@ -98,7 +98,7 @@ def test__LauncherSerializedDict__with_context_resolved():
     )
     expected = LauncherSerializedDict(
         {
-            "system": {
+            ".system": {
                 "command": "powershell script.ps1",
             },
             ".base": {

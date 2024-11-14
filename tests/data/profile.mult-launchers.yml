@@ -9,7 +9,7 @@ launchers:
     python_file: test-script-a.py
     environ:
       LXMCUSTOM: 1
-  system:
+  .system:
     environ:
       LXMCUSTOM: "表ポあA鷗ŒéＢ逍Üßªąñ丂㐀𠀀"
       HEH: "(╯°□°）╯︵ ┻━┻)"
