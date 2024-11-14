@@ -14,7 +14,7 @@ multiple pre-defined launchers.
 
 .. literalinclude:: _injected/demo-fileformat/profile.yml
    :language: yaml
-   :caption: a profile with the configuration for a `rezenv` launcher
+   :caption: a profile with the configuration for a `rezenv` launcher which inherit another profile
 
 `Launchers` are internally-defined python objects that specify how to execute
 a combinations of options and (optional) command.

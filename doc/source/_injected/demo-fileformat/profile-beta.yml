@@ -2,16 +2,15 @@ __magic__: kloch_profile:4
 identifier: knots:echoes:beta
 version: 0.3.2
 launchers:
-  +=rezenv:
-    +=config:
-      quiet: false
-      package_filter:
-        - excludes:
-            - glob(*.dev)
-    +=requires:
-      houdini: 20.1
-      maya: 2023
-      devUtils: 1+
+  .base:
     environ:
       PROD_STATUS: beta
       PROD_NAME: echoes
+  rezenv:
+    requires:
+      houdini: 20.1
+      maya: 2023
+      devUtils: 1+
+  rezenv@os=windows:
+    config:
+      default_shell: "powershell"

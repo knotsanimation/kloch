@@ -212,7 +212,7 @@ We execute the following command:
 
 .. code-block:: shell
 
-   kloch resolve knots:echoes --profile_roots ./profiles/
+   kloch resolve knots:echoes --profile_roots ./profiles/ --skip-context-filtering
 
 .. exec_code::
    :hide_code:

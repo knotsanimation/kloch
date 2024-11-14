@@ -3,15 +3,10 @@ identifier: knots:echoes
 version: 0.2.0
 inherit: knots:echoes:beta
 launchers:
-  +=rezenv:
-    +=config:
-      +=package_filter:
-        - excludes:
-            - after(1714574770)
-    +=params:
-      - --verbose
-    +=requires:
+  .base:
+    environ:
+      PROD_STATUS: prod
+  rezenv:
+    requires:
       houdini: 20.2
       -=devUtils: _
-    +=environ:
-      PROD_STATUS: prod
