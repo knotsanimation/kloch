@@ -21,7 +21,7 @@ Collection of various ideas to improve kloch.
   - [ ] PROFILE_DIR token
   - [ ] environment variable resolving ?
 - [ ] 🟡 allow `python_file` to be an url to a python file to download
-- [ ] 🟠 introduce operating system functions ? like maybe tokens or if conditions ?
+- [x] ~~🟠 introduce operating system functions ? like maybe tokens or if conditions ?~~
 - [x] ~~🔴 allow to specify an absolute path to a profile instead of identifier~~
 - [x] ~~log on disk ?~~
 - [x] ~~validation of keys/value on profile read~~

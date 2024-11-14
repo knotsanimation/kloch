@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2024-11-??
+
+### added
+
+- context system: allow to specify suffix tokens on launchers name to filter
+  their visiblity based on the system context on runtime.
+- cli: allow to specify profile to run/resolve as file paths
+
+### changed
+
+- ! `@python` launcher renamed to `.python` because of the new context system
+- ! `system` launcher renamed to `.system` for cohesion
+  - updated profile version to 4
+- ! system launcher: add subprocess_kwargs field, shell=True is not default anymore.
+- improve error reporting when a launcher is invalid
+- minor logging improvements
+
+### fixed
+
+- issues when picking a launcher through multiple in a profile
+
 ## [0.11.2] - 2024-10-26
 
 Add PyPI install instructions in documentation.
