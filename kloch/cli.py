@@ -101,7 +101,7 @@ class BaseParser:
     def _get_merged_profile(
         self,
         profile_identifiers: List[str],
-        context: LauncherContext,
+        context: Optional[LauncherContext],
     ):
         """
         Merge each profile with its base then merge all of them from left to right.
@@ -159,9 +159,10 @@ class BaseParser:
             profile.inherit = base_profile
             profile = profile.get_merged_profile()
 
-        LOGGER.debug(f"filtering profile using context {context}")
-        profile.launchers = profile.launchers.get_filtered_context(context)
-        profile.launchers = profile.launchers.with_context_resolved()
+        if context:
+            LOGGER.debug(f"filtering profile using context {context}")
+            profile.launchers = profile.launchers.get_filtered_context(context)
+            profile.launchers = profile.launchers.with_context_resolved()
 
         return profile
 
@@ -381,8 +382,19 @@ class ResolveParser(BaseParser):
         """
         return self._args.profile_ids
 
+    @property
+    def skip_context_filtering(self) -> bool:
+        """
+        Do not remove launcher that does not match the current system context.
+
+        (disable context token resolving)
+        """
+        return self._args.skip_context_filtering
+
     def execute(self):
         context = LauncherContext.create_from_system()
+        if self.skip_context_filtering:
+            context = None
         profile = self._get_merged_profile(self.profile_ids, context)
 
         try:
@@ -401,6 +413,11 @@ class ResolveParser(BaseParser):
             type=str,
             nargs="+",
             help=cls.profile_ids.__doc__,
+        )
+        parser.add_argument(
+            "--skip-context-filtering",
+            action="store_true",
+            help=cls.skip_context_filtering.__doc__,
         )
 
 
