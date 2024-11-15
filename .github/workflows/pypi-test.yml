@@ -57,10 +57,14 @@ jobs:
     name: Pip install the package from TestPyPI
     runs-on: ubuntu-latest
     needs: publish-to-testpypi
+
+    # only run on main because it's slow due to the 'sleep' we have to use
+    if: ${{ github.ref == 'refs/heads/main' }}
+
     steps:
       # this is a hack to let PyPi refresh for the upload that just happened
-      - name: Sleep for 30s
-        run: sleep 30s
+      - name: Sleep for 1min30
+        run: sleep 90s
         shell: bash
       # needed for pytest at the end
       - uses: actions/checkout@v4
