@@ -1,14 +1,18 @@
 __magic__: kloch_profile:4
-identifier: system-test
+identifier: mult-launchers
 version: 0.1.0
 launchers:
-  +=.system:
+  .base:
+    environ:
+      AYYYYY: "⭐"
+  .python:
+    python_file: test-script-a.py
+    environ:
+      LXMCUSTOM: 1
+  .system:
     environ:
       LXMCUSTOM: "表ポあA鷗ŒéＢ逍Üßªąñ丂㐀𠀀"
       HEH: "(╯°□°）╯︵ ┻━┻)"
     command:
       - paint.exe
       - new
-    subprocess_kwargs:
-      shell: True
-      timeout: 2

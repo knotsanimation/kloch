@@ -105,6 +105,56 @@ Here is an example making use of all of the tokens and the python API used to me
    :filename: _injected/exec-fileformat-token-append.py
    :language_output: python
 
+Context Tokens
+______________
+
+Those tokens are exclusive to the launcher's name key and allow to
+specify for which system context the launcher must be used. This allow you
+for example to have a same launcher with 2 different configuration depending
+on the operating system.
+
+A context token:
+
+- MUST only appear in the ``{launcher name}`` key
+- MUST be suffixed to the launcher name
+- CAN be optional
+
+A context have several property, to declare which properties the launcher
+must match you use the following syntax:
+
+.. code-block:: bash
+
+   @{property name}={property value}
+   # multiple properties can be chained
+   @{property name}={property value}@{property name}={property value}@...
+
+.. tip::
+
+   If you need the literal ``@`` character in the launcher name or in the
+   properties values you can escape it by doubling it like ``@@``.
+
+The following context properties are availables:
+
+.. exec-inject::
+   :filename: _injected/exec-fileformat-token-context.py
+
+Context tokens are then used with the following logic:
+
+- when reading a profile, a context is created from the current system.
+- this context is used to **filter out** launcher which doesn't match it.
+   - example: ``.system@os=linux: ...`` will be deleted if the current os = windows.
+- the remaining launchers which points to the same launcher are then merged
+  from top to bottom using the same Merge Tokens logic, thus leaving only
+  a launcher name with no context token at the end.
+
+Example:
+
+.. literalinclude:: _injected/demo-usage-tokens/profile-c.yml
+  :language: YAML
+
+In the above example we use the builtin system launcher to run a different
+command depending on the operating system. Make note that if the os is ``mac``
+then this mean the ``.system`` launcher will just not exist at all in the profile !
 
 Launchers
 ---------
@@ -162,7 +212,7 @@ We execute the following command:
 
 .. code-block:: shell
 
-   kloch resolve knots:echoes --profile_roots ./profiles/
+   kloch resolve knots:echoes --profile_roots ./profiles/ --skip-context-filtering
 
 .. exec_code::
    :hide_code:

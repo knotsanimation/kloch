@@ -1,0 +1,16 @@
+__magic__: kloch_profile:4
+identifier: prodml
+version: 0.1.0
+inherit: studio
+launchers:
+  .base:
+    environ:
+      PROD_NAME: "myprod"
+  .system:
+    command:
+      - echo
+      - hello
+      - from
+  .system@os=windows:
+    subprocess_kwargs:
+      shell: True

@@ -93,7 +93,8 @@ imply we will be using ``kloch`` as a `Command Line Interface` tool [2]_.
    :hide_code:
    :filename: _injected/demo-usage-basics/exec-list.py
 
-All good, which mean we can use our profile using the ``run`` command:
+All good, which mean we can use our profile using the ``run`` command and
+by giving it the **identifier** of the desire profile to launch:
 
 .. tip::
 
@@ -102,6 +103,15 @@ All good, which mean we can use our profile using the ``run`` command:
 .. code-block:: shell
 
    python -m kloch run myMovie
+
+Instead of providing the profile identifier, you can also provide a path
+to an existing profile file, that may not even be registred in a profile
+root !
+
+.. code-block:: shell
+
+   python -m kloch run /d/pipeline/profiles/basic-profile.yml
+
 
 Which in our case should start a rez interactive shell.
 
@@ -264,11 +274,27 @@ Which once merged internally by kloch will produce a ``launchers`` structure lik
    :language_output: yaml
 
 As you can view, we inherit the ``environ`` keys that were defined in the
-``.base`` launcher (that is deleted) for both ``system`` and ``@python`` launchers.
+``.base`` launcher (that is deleted) for both ``.system`` and ``.python`` launchers.
 
 It is also good to notice that we define environment variable that re-use previously
 defined environment variable, at profile level or system level (``$PATH``).
 
+
+supporting different os
+_______________________
+
+You can create conditional behavior in your profile by using `Context tokens`
+(explained in :doc:`file-format`).
+
+This token allow you to restrict the "visibility" of a launcher only when
+the system reading the profile reach some conditions. The most common one
+being which operating system it is currently running on.
+
+.. literalinclude:: _injected/demo-usage-tokens/profile-c.yml
+  :language: YAML
+
+In the above example we use the builtin .system launcher to run a different
+command depending on the operating system.
 
 Storing profiles
 ________________

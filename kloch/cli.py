@@ -2,10 +2,8 @@ import abc
 import argparse
 import copy
 import inspect
-import json
 import logging
 import logging.handlers
-import os
 import re
 import runpy
 import sys
@@ -14,8 +12,10 @@ import textwrap
 from pathlib import Path
 from typing import List
 from typing import Optional
+from typing import Type
 
 import kloch
+from kloch.launchers import LauncherContext
 from kloch.launchers import get_available_launchers_serialized_classes
 from kloch.launchers import BaseLauncher
 from kloch.launchers import BaseLauncherSerialized
@@ -36,9 +36,15 @@ class BaseParser:
         args: user command line argument already parsed by argparse
     """
 
-    def __init__(self, args: argparse.Namespace, config: kloch.KlochConfig):
+    def __init__(
+        self,
+        args: argparse.Namespace,
+        config: kloch.KlochConfig,
+        original_argv: List[str],
+    ):
         self._args: argparse.Namespace = args
         self._config = config
+        self._argv = original_argv
 
     @property
     def debug(self) -> bool:
@@ -92,7 +98,11 @@ class BaseParser:
         )
         parser.set_defaults(func=cls)
 
-    def _get_merged_profile(self, profile_identifiers: List[str]):
+    def _get_merged_profile(
+        self,
+        profile_identifiers: List[str],
+        context: Optional[LauncherContext],
+    ):
         """
         Merge each profile with its base then merge all of them from left to right.
         """
@@ -100,10 +110,15 @@ class BaseParser:
 
         profiles = []
         for profile_id in profile_identifiers:
-            profile_paths = kloch.get_profile_file_path(
-                profile_id,
-                profile_locations=profile_locations,
-            )
+
+            aspath = Path(profile_id)
+            if aspath.exists():
+                profile_paths = [aspath]
+            else:
+                profile_paths = kloch.get_profile_file_path(
+                    profile_id,
+                    profile_locations=profile_locations,
+                )
             if len(profile_paths) >= 2:
                 print(
                     f"ERROR | Found multiple profile with identifier '{profile_id}' "
@@ -144,6 +159,11 @@ class BaseParser:
             profile.inherit = base_profile
             profile = profile.get_merged_profile()
 
+        if context:
+            LOGGER.debug(f"filtering profile using context {context}")
+            profile.launchers = profile.launchers.get_filtered_context(context)
+            profile.launchers = profile.launchers.with_context_resolved()
+
         return profile
 
 
@@ -164,7 +184,8 @@ class RunParser(BaseParser):
     @property
     def profile_ids(self) -> List[str]:
         """
-        One or more identifier of existing environment profile(s).
+        One or more identifier or file paths of existing environment profile(s).
+
         The profiles are concatenated together from left to right.
         """
         return self._args.profile_ids
@@ -188,8 +209,9 @@ class RunParser(BaseParser):
         )
         launchers_classes = get_available_launchers_serialized_classes(launcher_plugins)
 
+        context = LauncherContext.create_from_system()
         print(f"loading {len(self.profile_ids)} profiles ...")
-        profile = self._get_merged_profile(self.profile_ids)
+        profile = self._get_merged_profile(self.profile_ids, context)
 
         # keep a backup of the merged profile for debugging
         LOGGER.debug(f"writing merged profile to '{session_dir.profile_path}'")
@@ -198,42 +220,76 @@ class RunParser(BaseParser):
             file_path=session_dir.profile_path,
             profile_locations=self.profile_roots,
             check_valid_id=False,
+            extra_comments=[
+                f"auto-generated profile from argv '{' '.join(self._argv)}'",
+                f"context was '{context}'",
+            ],
         )
 
         launchers_dict = profile.launchers
         launchers_list = launchers_dict.to_serialized_list(launchers_classes)
         launchers_list = launchers_list.with_base_merged()
-        if len(launchers_list) > 1 or self.launcher:
-            if not self.launcher:
-                print(
-                    f"ERROR | More than one launcher defined in profile "
-                    f"<{self.profile_ids}>: you need to specify a launcher name with --launcher",
-                    file=sys.stderr,
-                )
-                sys.exit(1)
+        if not launchers_list:
+            print(
+                f"ERROR | No launcher defined in profile(s) <{self.profile_ids}>",
+                file=sys.stderr,
+            )
+            sys.exit(113)
 
-            launchers_dict = [
-                _launcher
-                for _launcher in launchers_list
-                if _launcher.name == self.launcher
+        # the user want to use a specific launcher
+        if self.launcher:
+            launchers_list = [
+                launcher_
+                for launcher_ in launchers_list
+                if launcher_.identifier == self.launcher
             ]
-            if not launchers_dict:
+            if not launchers_list:
                 print(
                     f"ERROR | No launcher with name <{self.launcher}> "
-                    f"found in profile <{self.profile_ids}>",
+                    f"found in profile(s) <{self.profile_ids}>",
+                    file=sys.stderr,
+                )
+                sys.exit(112)
+
+        launchers: List[BaseLauncher] = []
+        for seriallauncher in launchers_list:
+            try:
+                seriallauncher.validate()
+            except AssertionError as error:
+                print(
+                    f"ERROR | Cannot validate launcher '{seriallauncher.identifier}' from profile '{profile.identifier}': "
+                    f"{error}",
                     file=sys.stderr,
                 )
                 sys.exit(1)
+            unserialized = seriallauncher.unserialize()
+            launchers.append(unserialized)
 
-        launcher_serial: BaseLauncherSerialized = launchers_list[0]
-        launcher_serial.validate()
-        launcher: BaseLauncher = launcher_serial.unserialize()
+        # try to filter launcher by priorities a first time
+        if len(launchers) > 1:
+            launcher_by_priority = {}
+            for launcher in launchers:
+                launcher_by_priority.setdefault(launcher.priority, []).append(launcher)
+            priorities = sorted(list(launcher_by_priority))
+            highest_priority = priorities[-1]
+            launchers = launcher_by_priority[highest_priority]
+
+        # conclude that user request / priorities were not enough to only have one launcher left
+        if len(launchers) > 1:
+            issues = ",".join([launcher.name for launcher in launchers])
+            print(
+                f"ERROR | Multiple launcher with same priority found: '{issues}'."
+                f" You need to specify a launcher name with --launcher"
+                f" or set launchers with a different priority.",
+                file=sys.stderr,
+            )
+            sys.exit(111)
+
+        launcher: BaseLauncher = launchers[0]
         command = self.command or None
 
-        print(f"starting launcher {launcher.name}")
         LOGGER.debug(f"executing launcher={launcher} with command={command}")
-        LOGGER.debug(f"os.environ={json.dumps(dict(os.environ), indent=4)}")
-
+        print(f"starting launcher {launcher.name}")
         sys.exit(launcher.execute(tmpdir=session_dir.path, command=command))
 
     def execute(self):
@@ -343,13 +399,26 @@ class ResolveParser(BaseParser):
     @property
     def profile_ids(self) -> List[str]:
         """
-        One or more identifier of existing environment profile(s).
+        One or more identifier or file paths of existing environment profile(s).
+
         The profiles are concatenated together from left to right.
         """
         return self._args.profile_ids
 
+    @property
+    def skip_context_filtering(self) -> bool:
+        """
+        Do not remove launcher that does not match the current system context.
+
+        (disable context token resolving)
+        """
+        return self._args.skip_context_filtering
+
     def execute(self):
-        profile = self._get_merged_profile(self.profile_ids)
+        context = LauncherContext.create_from_system()
+        if self.skip_context_filtering:
+            context = None
+        profile = self._get_merged_profile(self.profile_ids, context)
 
         try:
             serialized = kloch.filesyntax.serialize_profile(profile)
@@ -367,6 +436,11 @@ class ResolveParser(BaseParser):
             type=str,
             nargs="+",
             help=cls.profile_ids.__doc__,
+        )
+        parser.add_argument(
+            "--skip-context-filtering",
+            action="store_true",
+            help=cls.skip_context_filtering.__doc__,
         )
 
 
@@ -535,7 +609,10 @@ def _get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def get_cli(argv: Optional[List[str]] = None, config: kloch.KlochConfig = None) -> BaseParser:
+def get_cli(
+    argv: Optional[List[str]] = None,
+    config: kloch.KlochConfig = None,
+) -> BaseParser:
     """
     Return the command line interface generated from user arguments provided.
 
@@ -562,7 +639,8 @@ def get_cli(argv: Optional[List[str]] = None, config: kloch.KlochConfig = None) 
 
     args = parser.parse_args(argv)
     setattr(args, _ARGS_USER_COMMAND_DEST, user_command)
-    instance: BaseParser = args.func(args, config)
+    parser_class: Type[BaseParser] = args.func
+    instance: BaseParser = parser_class(args, config, argv)
 
     # clean old sessions everytime the cli is launched
     if instance.session_root and instance.session_root.exists():

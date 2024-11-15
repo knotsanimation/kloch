@@ -2,18 +2,27 @@
 
 Collection of various ideas to improve kloch.
 
+| icon  | priority |
+|-------|----------|
+| 🔴    | high     |
+| 🟠    | medium   |
+| 🟡    | normal   |
+| ⚪     | unsure   |
+
+
 ## features
 
-- [ ] allow to specify an absolute path to a profile instead of identifier
-- [ ] allow multiples arg in `inherit`
-- [ ] do something with the version attribute ? allow duplicate identifier in path, but with different version ?
-- [ ] private profiles ? with a dot prefix signifying they can only be inherited and not used directly ?
-- [ ] set cwd for relative paths
-- [ ] token replacement system ?
+- [ ] 🔴 allow to create "on-the-fly" profile directly from the command line
+- [ ] 🟠 allow multiples arg in `inherit`
+- [ ] 🟠 do something with the version attribute ? allow duplicate identifier in path, but with different version ?
+- [ ] 🟡 private profiles ? with a dot prefix signifying they can only be inherited and not used directly ?
+- [ ] ⚪ set cwd for relative paths
+- [ ] ⚪ token replacement system ?
   - [ ] PROFILE_DIR token
   - [ ] environment variable resolving ?
-- [ ] allow `python_file` to be an url to a python file to download
-- [ ] introduce operating system functions ? like maybe tokens or if conditions ?
+- [ ] 🟡 allow `python_file` to be an url to a python file to download
+- [x] ~~🟠 introduce operating system functions ? like maybe tokens or if conditions ?~~
+- [x] ~~🔴 allow to specify an absolute path to a profile instead of identifier~~
 - [x] ~~log on disk ?~~
 - [x] ~~validation of keys/value on profile read~~
 - [x] ~~add a "python/pip/poetry" package manager ?~~ (implemented as launcher with kiche)
@@ -22,7 +31,7 @@ Collection of various ideas to improve kloch.
 
 ## refacto
 
-- [ ] ensure environment can be reproducible
+- [ ] ⚪ ensure environment can be reproducible
   - always store them as an intermediate resolved file before execution ?
   - remove all resolving from launcher and perform all of this upstream ?
   - store intermediate resolved file at user-defined location OR tmp location ?
@@ -32,7 +41,7 @@ Collection of various ideas to improve kloch.
   - perhaps its too complicated to achieve, so achieve a middle ground, where
     you resolve the requirements formulated in the profile and store them on disk,
     (code at Serialized level) then use that file to launch.
-- [ ] abstract `subprocess.run` in BaseLauncher and offer a `prepare_execution`
+- [ ] ⚪ abstract `subprocess.run` in BaseLauncher and offer a `prepare_execution`
   abstractmethod instead.
 - [x] ~~naming of thing ? package manager could just be "launchers"~~
 - [x] ~~internalise PyYaml dependenciyes (add it to vendor module)~~ (impossible) 

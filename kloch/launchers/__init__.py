@@ -2,6 +2,9 @@
 Entities that serialize a function call made to execute a software.
 """
 
+from ._context import LauncherContext
+from ._context import LauncherPlatform
+
 from .base import BaseLauncher
 from .base import BaseLauncherSerialized
 from .base import BaseLauncherFields

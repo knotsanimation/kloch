@@ -1,4 +1,4 @@
-__magic__: kloch_profile:3
+__magic__: kloch_profile:4
 identifier: diagnose
 inherit: myStudio
 version: 0.1.0
@@ -6,9 +6,9 @@ launchers:
   .base:
     environ:
       LOG_LEVEL: DEBUG
-  system:
+  .system:
     command:
       - diagnose
-  '@python':
+  .python:
     cwd: $STUDIO_COMMON_TOOLS_PATH
     python_file: ./diagnose.py

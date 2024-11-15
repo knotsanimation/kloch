@@ -5,6 +5,18 @@ Launchers
 
    import kloch.launchers
 
+Contexts
+--------
+
+.. autoclass:: kloch.launchers.LauncherContext
+   :members:
+   :undoc-members:
+
+.. autoclass:: kloch.launchers.LauncherPlatform
+   :members:
+   :undoc-members:
+
+
 Getters
 -------
 

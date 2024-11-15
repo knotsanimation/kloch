@@ -1,0 +1,15 @@
+__magic__: kloch_profile:4
+identifier: priorities-fail
+version: 0.1.0
+launchers:
+  .system:
+    priority: 5
+    command:
+      - echo
+      - success_prio_test
+  .system@os=windows:
+    subprocess_kwargs:
+      shell: true
+  .python:
+    priority: 5
+    python_file: test-script-a.py

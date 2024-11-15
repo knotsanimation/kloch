@@ -18,10 +18,21 @@ DIRECTIVE_NAME = "exec-inject"
 
 
 class ExecutionError(RuntimeError):
+    """
+    The python code could not be run sucessfully
+    """
+
     pass
 
 
+def prefixlines(source: str, prefix: str):
+    return "\n".join([prefix + line for line in source.split("\n")])
+
+
 def execute_python_code(code: Union[str, Path]) -> str:
+    """
+    Execute the given python code in a python interpreter and return its stdout output.
+    """
     command = [sys.executable]
     if isinstance(code, Path):
         command.append(str(code))
@@ -36,10 +47,12 @@ def execute_python_code(code: Union[str, Path]) -> str:
         encoding="utf-8",
     )
     if result.returncode != 0:
+        stdout = result.stdout.strip("\n")
+        stderr = result.stderr.strip("\n")
         raise ExecutionError(
             f"# Error while executing code in subprocess:\n"
-            f"__stdout__:{result.stdout}\n"
-            f"__stderr__:{result.stderr}"
+            f"[__stdout__]\n{prefixlines(stdout, '| ')}\n"
+            f"[__stderr__]\n{prefixlines(stderr, '| ')}"
         )
 
     result_text = result.stdout or "" + result.stderr or ""
@@ -49,20 +62,31 @@ def execute_python_code(code: Union[str, Path]) -> str:
 def generate_error_nodes(
     source_file_path: Path,
     line: int,
+    traceback_txt: str,
     code_content: Optional[Union[str, Path]] = None,
 ):
+    """
+    Replace the directive by a traceback block to debug the error that just happened.
+
+    Args:
+        source_file_path: path of the rst file with the original directive.
+        line: number of the line in the rst file at which the directive is.
+        traceback_txt: python formatted traceback to include in the block.
+        code_content:
+            optional code or file path that the directive try to execute but failed to.
+            can be very verbose.
+    """
     nodes = [None]
     pnode = docutils.nodes.paragraph
     nodes += [
         pnode(
             text=(
-                f"With directive {DIRECTIVE_NAME} in {Path(source_file_path).name}:{line}"
+                f"Failed to execute directive {DIRECTIVE_NAME} in {Path(source_file_path).name}:{line}"
             )
         )
     ]
     if code_content:
         nodes += [docutils.nodes.literal_block(code_content, code_content)]
-    traceback_txt = traceback.format_exc()
     nodes += [docutils.nodes.literal_block(traceback_txt, traceback_txt)]
     return [docutils.nodes.error(*nodes)]
 
@@ -92,6 +116,7 @@ class ExecDirective(Directive):
         )
 
         filepath = self.filename
+        code_content = None
 
         try:
             if filepath:
@@ -101,31 +126,35 @@ class ExecDirective(Directive):
             else:
                 code_content = "\n".join(self.content)
 
-            try:
-                text = execute_python_code(code_content)
-            except ExecutionError as error:
-                self.reporter.error(
-                    f"{DIRECTIVE_NAME} directive failed to complete.",
-                    line=self.lineno,
-                )
-                return generate_error_nodes(source_file_path, self.lineno, code_content)
+            text = execute_python_code(code_content)
             lines = docutils.statemachine.string2lines(
                 text,
                 tab_width,
                 convert_whitespace=True,
             )
+
         except Exception as error:
             self.reporter.error(
-                f"{DIRECTIVE_NAME} directive failed to complete.",
+                f"{DIRECTIVE_NAME} directive failed to complete:\n"
+                f"{prefixlines(str(error), '# ')}",
                 line=self.lineno,
             )
-            return generate_error_nodes(source_file_path, self.lineno)
+            traceback_txt = traceback.format_exc()
+            return generate_error_nodes(
+                source_file_path=source_file_path,
+                line=self.lineno,
+                traceback_txt=traceback_txt,
+                code_content=code_content,
+            )
 
         self.state_machine.insert_input(lines, source_file_path)
         return []
 
 
 def setup(app: Sphinx) -> ExtensionMetadata:
+    """
+    Boilerplate required to be loaded by sphinx.
+    """
     app.add_directive(DIRECTIVE_NAME, ExecDirective)
     return {
         "version": "0.2",

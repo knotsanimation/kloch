@@ -74,7 +74,7 @@ def test__getCli__list__profile_paths(data_dir, capsys):
     assert int(profile_capture.group(1)) >= 1
 
 
-def test__getCli__run(monkeypatch, data_dir):
+def test__getCli__run__lxm(monkeypatch, data_dir):
     import subprocess
 
     class Results:
@@ -99,14 +99,39 @@ def test__getCli__run(monkeypatch, data_dir):
     assert Results.env.get("LXMCUSTOM") == "1"
 
 
-def test__getCli__run__command(monkeypatch, data_dir):
+def test__getCli__run__lxm__aspath(monkeypatch, data_dir):
+    import subprocess
+
+    def patched_subprocess(command, env, *args, **kwargs):
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(subprocess, "run", patched_subprocess)
+
+    profile_path = data_dir / "profile.lxm.yml"
+
+    argv = ["run", str(profile_path)]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit) as error:
+        cli.execute()
+    assert not error.value.code
+
+    profile_path = data_dir / "profile.YEEEEEEHAWWW.yml"
+
+    argv = ["run", str(profile_path)]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit) as error:
+        cli.execute()
+    assert error.value.code == 1
+
+
+def test__getCli__run__system_test__command(monkeypatch, data_dir):
     import subprocess
 
     class Results:
         command: List[str] = None
         env: Dict[str, str] = None
 
-    def patched_subprocess(command, shell, env, *args, **kwargs):
+    def patched_subprocess(command, env, *args, **kwargs):
         Results.command = command
         Results.env = env
         return subprocess.CompletedProcess(command, 0)
@@ -122,6 +147,79 @@ def test__getCli__run__command(monkeypatch, data_dir):
 
     assert Results.command == ["paint.exe", "new"] + extra_command
     assert Results.env["HEH"] == "(╯°□°）╯︵ ┻━┻)"
+
+
+def test__getCli__run__mult_launcher__error(monkeypatch, data_dir, capsys):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+
+    argv = ["run", "mult-launchers"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="111"):
+        cli.execute()
+
+    argv = ["run", "mult-launchers", "--launcher", "BABABOEI!!"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="112"):
+        cli.execute()
+
+
+def test__getCli__run__mult_launcher(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "mult-launchers", "--launcher", ".python"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="0"):
+        cli.execute()
+
+    result = capfd.readouterr()
+    assert f"test script working" in result.out
+
+
+def test__getCli__run__priorities_success(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "priorities-success"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="0"):
+        cli.execute()
+
+    result = capfd.readouterr()
+    assert f"success_prio_test" in result.out
+
+
+def test__getCli__run__priorities_success__python(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "priorities-success", "--launcher", ".python"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="0"):
+        cli.execute()
+
+    result = capfd.readouterr()
+    assert f"{kloch.__name__} test script working" in result.out
+
+
+def test__getCli__run__priorities_fail(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "priorities-fail"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="111"):
+        cli.execute()
+
+
+def test__getCli__run__nolauncher(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "nolauncher"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="113"):
+        cli.execute()
 
 
 def test__getCli__python(data_dir, capsys):

@@ -4,6 +4,9 @@ from typing import List
 from typing import Type
 
 from kloch import MergeableDict
+from ._context import LauncherContext
+from ._context import unserialize_context_expression
+from ._context import resolve_context_expression
 from kloch.launchers import BaseLauncherSerialized
 
 
@@ -55,6 +58,42 @@ class LauncherSerializedDict(MergeableDict):
     See :any:`MergeableDict` for the full documentation on tokens.
     """
 
+    def get_filtered_context(
+        self, context: LauncherContext
+    ) -> "LauncherSerializedDict":
+        """
+        Remove all launchers that doesn't match the given context.
+
+        Returns:
+             a new deepcopied instance with possibly lesser keys.
+        """
+        newdict = copy.deepcopy(self)
+        for launcher_identifier in self.keys():
+            launcher_context = unserialize_context_expression(launcher_identifier)
+            if launcher_context != context:
+                del newdict[launcher_identifier]
+
+        return newdict
+
+    def with_context_resolved(self) -> "LauncherSerializedDict":
+        """
+        Merge all the same launchers with different contexts to a single launcher.
+        """
+        toconcatenate: List[LauncherSerializedDict] = []
+        for launcher_identifier in self.keys():
+            resolved = resolve_context_expression(launcher_identifier)
+            newdict = LauncherSerializedDict(
+                {resolved: copy.deepcopy(self[launcher_identifier])}
+            )
+            toconcatenate.append(newdict)
+
+        if len(toconcatenate) == 0:
+            return copy.deepcopy(self)
+        elif len(toconcatenate) == 1:
+            return toconcatenate[0]
+
+        return sum(toconcatenate[1:], toconcatenate[0])
+
     def to_serialized_list(
         self,
         launcher_classes: List[Type[BaseLauncherSerialized]],
@@ -78,6 +117,8 @@ class LauncherSerializedDict(MergeableDict):
         launchers = []
         for identifier, launcher_config in self.items():
             _identifier = self.resolve_key_tokens(identifier)
+            # it's not supposed to have context expression at this stage but we safe-proof it
+            _identifier = resolve_context_expression(_identifier)
             launcher_class = _launcher_classes.get(_identifier)
             if not launcher_class:
                 raise ValueError(

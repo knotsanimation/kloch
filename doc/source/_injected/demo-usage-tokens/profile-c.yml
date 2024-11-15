@@ -1,0 +1,11 @@
+__magic__: kloch_profile:4
+identifier: greetings
+version: 0.1.0
+launchers:
+  .base:
+    environ:
+      BASE_GREETING: "hello"
+  .system@os=windows:
+    command: powershell -c "echo $Env:BASE_GREETING there 👋"
+  .system@os=linux:
+    command: sh -c "echo $BASE_GREETING there 👋"
