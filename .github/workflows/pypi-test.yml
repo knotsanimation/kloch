@@ -58,6 +58,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: publish-to-testpypi
     steps:
+      # this is a hack to let PyPi refresh for the upload that just happened
+      - name: Sleep for 30s
+        run: sleep 30s
+        shell: bash
       # needed for pytest at the end
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
