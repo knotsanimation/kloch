@@ -1,11 +1,13 @@
 from pathlib import Path
-
+import sys
 import subprocess
 
 THISDIR = Path(".", "source", "_injected", "demo-fileformat").absolute()
 
 result = subprocess.run(
     [
+        sys.executable,
+        "-m",
         "kloch",
         "resolve",
         "knots:echoes",
