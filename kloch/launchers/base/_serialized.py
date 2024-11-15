@@ -137,6 +137,16 @@ class BaseLauncherFields:
             "required": False,
         },
     )
+    priority: int = dataclasses.field(
+        default="priority",
+        metadata={
+            "description": (
+                "How much you should privilege this launcher to be used over other launchers."
+                "Higher number means higher priority."
+            ),
+            "required": False,
+        },
+    )
 
     @classmethod
     def iterate(cls) -> List[dataclasses.Field]:
@@ -215,6 +225,10 @@ class BaseLauncherSerialized(MergeableDict):
                 assert isinstance(
                     value, str
                 ), f"'{command}': item '{value}' must be str."
+
+        priority = self.fields.priority
+        if priority in self:
+            assert isinstance(self[priority], int), f"'{priority}': must be an int."
 
     def resolved(self) -> Dict:
         """

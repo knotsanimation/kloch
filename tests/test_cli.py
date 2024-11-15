@@ -176,6 +176,52 @@ def test__getCli__run__mult_launcher(monkeypatch, data_dir, capfd):
     assert f"test script working" in result.out
 
 
+def test__getCli__run__priorities_success(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "priorities-success"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="0"):
+        cli.execute()
+
+    result = capfd.readouterr()
+    assert f"success_prio_test" in result.out
+
+
+def test__getCli__run__priorities_success__python(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "priorities-success", "--launcher", ".python"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="0"):
+        cli.execute()
+
+    result = capfd.readouterr()
+    assert f"{kloch.__name__} test script working" in result.out
+
+
+def test__getCli__run__priorities_fail(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "priorities-fail"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="111"):
+        cli.execute()
+
+
+def test__getCli__run__nolauncher(monkeypatch, data_dir, capfd):
+    monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
+    # needed to resolve 'python_file: test-script-a.py' in profile
+    monkeypatch.chdir(data_dir)
+    argv = ["run", "nolauncher"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit, match="113"):
+        cli.execute()
+
+
 def test__getCli__python(data_dir, capsys):
     argv = ["python", str(data_dir / "test-script-a.py"), "some args ?", "test !"]
     cli = kloch.get_cli(argv=argv)

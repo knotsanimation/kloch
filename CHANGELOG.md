@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - context system: allow to specify suffix tokens on launchers name to filter
   their visiblity based on the system context on runtime.
 - cli: allow to specify profile to run/resolve as file paths
+- launchers: add `priority` key to let kloch guess which launcher to use
+  when a profile has multiple of them.
 
 ### changed
 

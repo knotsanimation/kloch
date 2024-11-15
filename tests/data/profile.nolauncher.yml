@@ -1,0 +1,7 @@
+__magic__: kloch_profile:4
+identifier: nolauncher
+version: 0.1.0
+launchers:
+  .base:
+    environ:
+      TRANS_RIGHT_ARE_HUMAN_RIGHTS: why is there even the question in the first place

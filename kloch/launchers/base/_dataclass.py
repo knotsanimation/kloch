@@ -38,6 +38,11 @@ class BaseLauncher:
     The developer is reponsible of honoring the field usage in its launcher implementation.
     """
 
+    priority: int = 0
+    """
+    How much you should privilege this launcher to be used over other launchers.
+    """
+
     required_fields: ClassVar[List[str]] = []
     """
     List of dataclass field that are required to have a non-None value when instancing.

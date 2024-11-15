@@ -229,40 +229,63 @@ class RunParser(BaseParser):
         launchers_dict = profile.launchers
         launchers_list = launchers_dict.to_serialized_list(launchers_classes)
         launchers_list = launchers_list.with_base_merged()
-        if len(launchers_list) > 1 or self.launcher:
-            if not self.launcher:
-                print(
-                    f"ERROR | More than one launcher defined in profile "
-                    f"<{self.profile_ids}>: you need to specify a launcher name with --launcher",
-                    file=sys.stderr,
-                )
-                sys.exit(111)
+        if not launchers_list:
+            print(
+                f"ERROR | No launcher defined in profile(s) <{self.profile_ids}>",
+                file=sys.stderr,
+            )
+            sys.exit(113)
 
+        # the user want to use a specific launcher
+        if self.launcher:
             launchers_list = [
-                _launcher
-                for _launcher in launchers_list
-                if _launcher.identifier == self.launcher
+                launcher_
+                for launcher_ in launchers_list
+                if launcher_.identifier == self.launcher
             ]
             if not launchers_list:
                 print(
                     f"ERROR | No launcher with name <{self.launcher}> "
-                    f"found in profile <{self.profile_ids}>",
+                    f"found in profile(s) <{self.profile_ids}>",
                     file=sys.stderr,
                 )
                 sys.exit(112)
 
-        launcher_serial: BaseLauncherSerialized = launchers_list[0]
-        try:
-            launcher_serial.validate()
-        except AssertionError as error:
+        launchers: List[BaseLauncher] = []
+        for seriallauncher in launchers_list:
+            try:
+                seriallauncher.validate()
+            except AssertionError as error:
+                print(
+                    f"ERROR | Cannot validate launcher '{seriallauncher.identifier}' from profile '{profile.identifier}': "
+                    f"{error}",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+            unserialized = seriallauncher.unserialize()
+            launchers.append(unserialized)
+
+        # try to filter launcher by priorities a first time
+        if len(launchers) > 1:
+            launcher_by_priority = {}
+            for launcher in launchers:
+                launcher_by_priority.setdefault(launcher.priority, []).append(launcher)
+            priorities = sorted(list(launcher_by_priority))
+            highest_priority = priorities[-1]
+            launchers = launcher_by_priority[highest_priority]
+
+        # conclude that user request / priorities were not enough to only have one launcher left
+        if len(launchers) > 1:
+            issues = ",".join([launcher.name for launcher in launchers])
             print(
-                f"ERROR | Cannot validate launcher '{launcher_serial.identifier}' from profile '{profile.identifier}': "
-                f"{error}",
+                f"ERROR | Multiple launcher with same priority found: '{issues}'."
+                f" You need to specify a launcher name with --launcher"
+                f" or set launchers with a different priority.",
                 file=sys.stderr,
             )
-            sys.exit(1)
+            sys.exit(111)
 
-        launcher: BaseLauncher = launcher_serial.unserialize()
+        launcher: BaseLauncher = launchers[0]
         command = self.command or None
 
         LOGGER.debug(f"executing launcher={launcher} with command={command}")
