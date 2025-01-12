@@ -354,9 +354,13 @@ class ListParser(BaseParser):
         profile_paths = kloch.get_all_profile_file_paths(profile_locations)
         profiles: List[kloch.EnvironmentProfile] = []
 
+        LOGGER.debug(f"searching profile locations {profile_locations}")
         for path in profile_paths:
             try:
-                profile = kloch.read_profile_from_file(path)
+                profile = kloch.read_profile_from_file(
+                    path,
+                    profile_locations=profile_locations,
+                )
             except Exception as error:
                 print(f"WARNING | {path}: {error}", file=sys.stderr)
                 continue
