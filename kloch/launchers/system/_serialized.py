@@ -43,9 +43,12 @@ class SystemLauncherSerialized(BaseLauncherSerialized):
     summary = (
         "A simple launcher executing the given command in the default system console."
     )
-    description = (
-        "Useless without a command specified. The launcher will just set "
-        "the given environment variables for the session, execute the command, then exit."
+    description = summary + (
+        "\n\n"
+        "The launcher will just set the given environment variables for the session,"
+        "execute the command, then exit. Which make it useless without a command specified."
+        "\n\n"
+        "The launcher use ``subprocess.run`` to execute the command."
     )
 
     def validate(self):

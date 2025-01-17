@@ -185,9 +185,12 @@ class BaseLauncherSerialized(MergeableDict):
     # Used for automatically building the static html documentation.
     # All string are in the rst syntax compatible with the static documentation builder.
     summary = (
-        "An abstract launcher that whose purpose is to be merged with other launchers."
+        "An abstract launcher whose only purpose is to be merged with other launchers."
     )
-    description = "This launcher is never launched and is simply merged with other launchers defined in the profile."
+    description = summary + (
+        "\n\n"
+        "This launcher is never launched and is simply merged with other launchers defined in the profile."
+    )
 
     def __add__(self: T, other: T) -> T:
         """
