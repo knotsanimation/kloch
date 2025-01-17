@@ -1,15 +1,15 @@
 Launcher Plugins
 ================
 
-A basic plugin system that allow you to add new launchers. The workflow can
-be simply described as:
+Kloch comes with a basic plugin system that allow you to add new launchers.
+The workflow can be simply described as:
 
 - create a new python module at an arbitrary location
 - subclass :any:`BaseLauncher` and :any:`BaseLauncherSerialized` inside
-- make sure its parent location is registred in the PYTHONPATH
+- make sure its parent location is registred in the PYTHONPATH so they can be imported
 - append the module name to the ``launcher_plugins`` configuration key
 
-Which could be illustrated by the following commands:
+Which could be illustrated by the following bash commands:
 
 .. code-block:: shell
 
@@ -22,10 +22,22 @@ Which could be illustrated by the following commands:
    kloch plugins
 
 
-As example you can check the content of:
+As example you can check:
 
 - ``{root}/tests/data/plugins-behr``
 - ``{root}/tests/data/plugins-tyfa``
+- https://github.com/knotsanimation/kloch-launcher-rezenv
+
+
+Creating the module
+-------------------
+
+A plugin for kloch is a regular python module that will be imported and parsed
+to find specific object.
+
+So you can create a regular python file at any location, or if you prefer
+you can also ship your plugin as a python package by creating a directory
+and an ``__init__.py`` file.
 
 
 .. tip::
@@ -38,9 +50,19 @@ As example you can check the content of:
 Creating the subclasses
 -----------------------
 
-When creating the a new launcher you would need to create a ``dataclass`` object from
-it which subclass :any:`BaseLauncher`, and it's corresponding :any:`BaseLauncherSerialized`
-subclass which describe how that dataclass is serialized.
+When creating the a new launcher you start by creating a ``dataclass`` object
+that declare what are the user-configurable options and how are they "launched".
+
+This is done by subclassing :any:`BaseLauncher`.
+
+Next you need to declare how that dataclass must be serialized, by creating
+a subclass of :any:`BaseLauncherSerialized`. This act as a high-level
+controller for serialization.
+
+For the granular control over how each field of the dataclass is serialized you
+must created another dataclass subclass, but of :any:`BaseLauncherFields`.
+Which will just miror the ``BaseLauncher`` field structure, but where each of
+its field provide more metadata to unserialize the field.
 
 Here is an example which subclass both of those class, in which we create
 a launcher for "git cloning":
@@ -49,11 +71,28 @@ a launcher for "git cloning":
    :language: python
    :caption: kloch_gitclone.py
 
+.. tip::
+
+   When implementing a field for the user to have control on the launcher,
+   it's best to implement it as ``dict`` type over ``list`` because it
+   allow users to override one item in particular using the token system.
+
 Registering
 -----------
 
 Then add the ``kloch_gitclone.py`` parent location in your PYTHONPATH
 so the plugin system can do an ``import kloch_gitclone``.
+
+.. tip::
+
+   PYTHONPATH is the standard mechanism by python to discover and import modules
+   but nothing prevent you to use other tools or methods.
+
+   You could for example create a ``pyproject.toml`` which declare ``kloch``
+   and your plugin as dependency and let a tool like `uv <https://docs.astral.sh/uv/>`_
+   or `poetry <https://python-poetry.org/>`_ create the venv.
+
+   As long as it can be ``import my_plugin_module_name`` it will work !
 
 The last step is to add the module name in the list of launcher plugins to use.
 You do this by modifying the kloch configuration, which is explained in :doc:`config`
@@ -64,3 +103,9 @@ starting `kloch`.
 .. code-block:: shell
 
    export KLOCH_CONFIG_LAUNCHER_PLUGINS=kloch_gitclone
+
+You can check your plugin is registred by calling:
+
+.. code-block:: shell
+
+   kloch plugins
