@@ -1,0 +1,15 @@
+__magic__: kloch_profile:4
+identifier: system-test-asstr
+version: 0.1.0
+launchers:
+  +=.system:
+    environ:
+      LXMCUSTOM: "表ポあA鷗ŒéＢ逍Üßªąñ丂㐀𠀀"
+      HEH: "(╯°□°）╯︵ ┻━┻)"
+    command:
+      - paint.exe
+      - new
+    command_as_str: true
+    subprocess_kwargs:
+      shell: True
+      timeout: 2

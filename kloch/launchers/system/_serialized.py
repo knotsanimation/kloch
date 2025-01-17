@@ -10,6 +10,18 @@ LOGGER = logging.getLogger(__name__)
 
 @dataclasses.dataclass(frozen=True)
 class SystemLauncherFields(BaseLauncherFields):
+
+    command_as_str: bool = dataclasses.field(
+        default="command_as_str",
+        metadata={
+            "description": (
+                "If True a str is passed to ``subprocess.run``, else a list is passed. "
+                "This can be useful in the context of setting ``shell=True`` or not on UNIX platforms."
+            ),
+            "required": False,
+        },
+    )
+
     subprocess_kwargs: dict = dataclasses.field(
         default="subprocess_kwargs",
         metadata={

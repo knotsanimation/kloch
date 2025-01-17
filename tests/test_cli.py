@@ -1,6 +1,7 @@
 import re
 from typing import Dict
 from typing import List
+from typing import Union
 
 import pytest
 
@@ -128,7 +129,7 @@ def test__getCli__run__system_test__command(monkeypatch, data_dir):
     import subprocess
 
     class Results:
-        command: List[str] = None
+        command: Union[List[str], str] = None
         env: Dict[str, str] = None
 
     def patched_subprocess(command, env, *args, **kwargs):
@@ -145,8 +146,20 @@ def test__getCli__run__system_test__command(monkeypatch, data_dir):
     with pytest.raises(SystemExit):
         cli.execute()
 
-    assert Results.command == ["paint.exe", "new"] + extra_command
+    assert isinstance(Results.command, list)
+    expected = ["paint.exe", "new"] + extra_command
+    assert Results.command == expected
     assert Results.env["HEH"] == "(╯°□°）╯︵ ┻━┻)"
+
+    extra_command = ["echo", "a", "bunch", "of", "ÅÍÎÏ˝ÓÔÒÚÆ☃", "--debug"]
+    argv = ["run", "system-test-asstr", "--"] + extra_command
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    assert isinstance(Results.command, str)
+    expected = subprocess.list2cmdline(["paint.exe", "new"] + extra_command)
+    assert Results.command == expected
 
 
 def test__getCli__run__mult_launcher__error(monkeypatch, data_dir, capsys):

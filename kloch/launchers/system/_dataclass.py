@@ -19,6 +19,8 @@ class SystemLauncher(BaseLauncher):
 
     name = ".system"
 
+    command_as_str: bool = False
+
     subprocess_kwargs: dict = dataclasses.field(default_factory=dict)
     """
     Mapping of kwargs to pass to python's 'subprocess.run' call.
@@ -29,6 +31,9 @@ class SystemLauncher(BaseLauncher):
         Just call subprocess.run.
         """
         _command = self.command + (command or [])
+
+        if self.command_as_str:
+            _command = subprocess.list2cmdline(_command)
 
         LOGGER.debug(
             f"subprocess.run({_command}, env={self.environ}, cwd={self.cwd}, **{self.subprocess_kwargs})"
