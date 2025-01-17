@@ -40,4 +40,4 @@ from .cli import get_cli
 from .cli import run_cli
 
 # keep in sync with pyproject.toml
-__version__ = "0.12.0"
+__version__ = "0.13.0"
