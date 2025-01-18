@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+import shutil
 import subprocess
 from pathlib import Path
 from typing import List
@@ -26,11 +27,24 @@ class SystemLauncher(BaseLauncher):
     Mapping of kwargs to pass to python's 'subprocess.run' call.
     """
 
+    expand_first_arg: bool = False
+
     def execute(self, tmpdir: Path, command: Optional[List[str]] = None):
         """
         Just call subprocess.run.
         """
         _command = self.command + (command or [])
+
+        if self.expand_first_arg:
+            toexpand = _command.pop(0)
+            env_path = self.environ.get("PATH")
+            expanded = shutil.which(toexpand, path=env_path)
+            if not expanded:
+                raise FileNotFoundError(
+                    f"Could not expand the '{toexpand}' argument; "
+                    f"searched PATH variable '{env_path}'"
+                )
+            _command.insert(0, expanded)
 
         if self.command_as_str:
             _command = subprocess.list2cmdline(_command)

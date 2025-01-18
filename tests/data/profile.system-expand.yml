@@ -1,0 +1,9 @@
+__magic__: kloch_profile:4
+identifier: system-expand
+version: 0.1.0
+launchers:
+  .system:
+    command:
+      - python
+      - -V
+    expand_first_arg: true

@@ -32,6 +32,19 @@ class SystemLauncherFields(BaseLauncherFields):
         },
     )
 
+    expand_first_arg: bool = dataclasses.field(
+        default="expand_first_arg",
+        metadata={
+            "description": (
+                "If True the first argument of the passed command will be expanded "
+                "using ``shutil.which`` to find its executable file on disk. Will "
+                "raise if no path is found.\n\n"
+                "Useful for avoiding using ``shell=True`` in ``subprocess_kwargs``."
+            ),
+            "required": False,
+        },
+    )
+
 
 class SystemLauncherSerialized(BaseLauncherSerialized):
     source = SystemLauncher

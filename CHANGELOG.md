@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### added
 
 - launchers : `.system` launcher new field `command_as_str`
+- launchers : `.system` launcher new field `expand_first_arg`
 
 ### chores
 
