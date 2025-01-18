@@ -174,7 +174,7 @@ its configuration.
 |                     | **description** | a registred launcher name with its configuration                             |
 +---------------------+-----------------+------------------------------------------------------------------------------+
 
-List of available built-in launchers (see :doc:`launcher-plugins` for extending it):
+List of available built-in launchers (check :doc:`launchers` for details):
 
 .. exec-inject::
 
@@ -184,14 +184,12 @@ List of available built-in launchers (see :doc:`launcher-plugins` for extending 
    txt = "\n- ".join([""] + [f"``{launcher.identifier}`` : {launcher.summary}" for launcher in launchers])
    print(txt)
 
-.. exec-inject::
-   :filename: _injected/exec-launchers-doc.py
 
 
 Examples
 --------
 
-Assuming the file structure:
+Assuming a file system with the 2 profiles:
 
 .. container:: columns
 
@@ -218,11 +216,3 @@ We execute the following command:
    :hide_code:
    :filename: _injected/demo-fileformat/exec-merge.py
    :language_output: yaml
-
-----
-
-**References**
-
-.. [1] https://docs.python.org/3/library/os.path.html#os.path.expandvars
-.. [2] ``:`` on UNIX, ``;`` on Windows
-.. [4] with https://docs.python.org/3.9/library/pathlib.html#pathlib.Path.resolve
