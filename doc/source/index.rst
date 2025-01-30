@@ -111,6 +111,7 @@ Contents
    install
    usage
    cli
+   launchers
    file-format
    config
 

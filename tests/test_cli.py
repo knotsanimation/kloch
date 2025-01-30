@@ -1,6 +1,10 @@
+import os
 import re
+import sys
+from pathlib import Path
 from typing import Dict
 from typing import List
+from typing import Union
 
 import pytest
 
@@ -128,7 +132,7 @@ def test__getCli__run__system_test__command(monkeypatch, data_dir):
     import subprocess
 
     class Results:
-        command: List[str] = None
+        command: Union[List[str], str] = None
         env: Dict[str, str] = None
 
     def patched_subprocess(command, env, *args, **kwargs):
@@ -139,14 +143,48 @@ def test__getCli__run__system_test__command(monkeypatch, data_dir):
     monkeypatch.setenv(kloch.Environ.CONFIG_PROFILE_ROOTS, str(data_dir))
     monkeypatch.setattr(subprocess, "run", patched_subprocess)
 
+    # // test case 1
+
     extra_command = ["echo", "a", "bunch", "of", "ÅÍÎÏ˝ÓÔÒÚÆ☃", "--debug"]
     argv = ["run", "system-test", "--"] + extra_command
     cli = kloch.get_cli(argv=argv)
     with pytest.raises(SystemExit):
         cli.execute()
 
-    assert Results.command == ["paint.exe", "new"] + extra_command
+    assert isinstance(Results.command, list)
+    expected = ["paint.exe", "new"] + extra_command
+    assert Results.command == expected
     assert Results.env["HEH"] == "(╯°□°）╯︵ ┻━┻)"
+
+    # // test case 2: command_as_str
+
+    extra_command = ["echo", "a", "bunch", "of", "ÅÍÎÏ˝ÓÔÒÚÆ☃", "--debug"]
+    argv = ["run", "system-test-asstr", "--"] + extra_command
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    assert isinstance(Results.command, str)
+    expected = subprocess.list2cmdline(["paint.exe", "new"] + extra_command)
+    assert Results.command == expected
+
+    # // test case 3: expand_first_arg
+
+    new_env_path = (
+        os.path.dirname(sys.executable) + os.pathsep + os.environ.get("PATH", "")
+    )
+    monkeypatch.setenv("PATH", new_env_path)
+
+    argv = ["run", "system-expand"]
+    cli = kloch.get_cli(argv=argv)
+    with pytest.raises(SystemExit):
+        cli.execute()
+
+    assert isinstance(Results.command, list)
+    result = Path(Results.command[0])
+    result = result.with_suffix(result.suffix.lower())
+    expected = Path(sys.executable)
+    assert result == expected
 
 
 def test__getCli__run__mult_launcher__error(monkeypatch, data_dir, capsys):

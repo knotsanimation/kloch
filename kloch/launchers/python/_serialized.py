@@ -47,10 +47,11 @@ class PythonLauncherSerialized(BaseLauncherSerialized):
     summary = (
         "A launcher that execute the given python file with kloch's own interpreter."
     )
-    description = (
-        "Execute the given python file with kloch internal python interpreter.\n"
+    description = summary + (
+        "\n\n"
+        "Execute the given python file with the python interpreter used to run kloch.\n"
         "\n"
-        "All ``command`` keys are passed as args to the python script."
+        "Any command will be basse as command line arguments to the script."
     )
 
     def validate(self):

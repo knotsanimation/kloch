@@ -15,8 +15,8 @@ class GitCloneLauncher(BaseLauncher):
 
     name = "git-clone"
 
-    # all field must have a default value
-    # but we make it required using the `required_fields` attribute
+    # all field must have a default value, but we make it
+    #   required using the bellow `required_fields` class attribute
     remote_url: str = ""
 
     required_fields = ["remote_url"]
@@ -29,6 +29,8 @@ class GitCloneLauncher(BaseLauncher):
 
 @dataclasses.dataclass(frozen=True)
 class GitCloneLauncherFields(BaseLauncherFields):
+
+    # field name must be the same as in the BaseLauncher subclass above
     remote_url: str = dataclasses.field(
         # this is the expected key name in the serialized representation
         default="remote-url",
