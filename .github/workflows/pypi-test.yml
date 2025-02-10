@@ -55,7 +55,8 @@ jobs:
 
   test-pip-install:
     name: Pip install the package from TestPyPI
-    runs-on: ubuntu-latest
+    # not latest because this is last version that supports python-3.7
+    runs-on: ubuntu-22.04
     needs: publish-to-testpypi
 
     # only run on main because it's slow due to the 'sleep' we have to use
