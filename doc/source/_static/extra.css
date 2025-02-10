@@ -1,8 +1,4 @@
 @font-face {
-    font-family: "Mango Regular";
-    src: url("./fonts/Mango-Regular.woff2");
-}
-@font-face {
     font-family: "Dosis";
     src: url("./fonts/Dosis-VariableFont_wght.ttf");
 }
@@ -15,7 +11,6 @@ img.sidebar-logo {
 }
 
 h1 {
-    font-family: "Mango Regular", var(--font-stack--headings), sans-serif;
     font-size: 4em;
 }
 
