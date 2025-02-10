@@ -66,6 +66,21 @@ def test__read_profile_from_file__old(data_dir):
         kloch.filesyntax.read_profile_from_file(profile_paths[0])
 
 
+def test__read_profile_from_file_nested(data_dir):
+    profile_paths = kloch.filesyntax.get_profile_file_path(
+        "knots:echoes:tmp", profile_locations=[data_dir]
+    )
+    profile = kloch.filesyntax.read_profile_from_file(
+        profile_paths[0],
+        profile_locations=[data_dir],
+    )
+    assert profile.identifier == "knots:echoes:tmp"
+    assert profile.inherit is not None
+    assert profile.inherit.identifier == "knots:echoes"
+    assert profile.inherit.inherit is not None
+    assert profile.inherit.inherit.identifier == "knots:echoes:beta"
+
+
 def test__serialize_profile(data_dir, tmp_path: Path):
     # test back and forth conversion
     profile_src = kloch.filesyntax.read_profile_from_id(

@@ -149,7 +149,10 @@ def read_profile_from_file(
                 f"specified from profile '{file_path}'."
             )
 
-        super_profile = read_profile_from_file(file_path=super_paths[0])
+        super_profile = read_profile_from_file(
+            file_path=super_paths[0],
+            profile_locations=profile_locations,
+        )
         asdict["inherit"] = super_profile
 
     launchers = LauncherSerializedDict(asdict["launchers"])
